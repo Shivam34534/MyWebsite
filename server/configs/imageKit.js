@@ -1,0 +1,19 @@
+import ImageKit from 'imagekit';
+
+// Initialize ImageKit client (ESM). If your project uses CommonJS, convert this file
+// to use `const ImageKit = require('imagekit');` and `module.exports = imagekit;`.
+let imagekit;
+if (process.env.IMAGEKIT_PRIVATE_KEY) {
+    imagekit = new ImageKit({
+        publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+        privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+        urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+    });
+} else {
+    imagekit = {
+        upload: async () => { throw new Error("ImageKit not configured"); },
+        url: () => ""
+    };
+}
+
+export default imagekit;
