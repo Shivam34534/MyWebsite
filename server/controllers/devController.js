@@ -2,6 +2,7 @@ import User from '../models/User.js'
 import fs from 'fs'
 import path from 'path'
 import imagekit from '../configs/imageKit.js'
+import nodemailer from 'nodemailer'
 
 export const createDevUser = async (req, res) => {
     try {
@@ -180,5 +181,46 @@ export const signupDevUser = async (req, res) => {
     } catch (error) {
         console.error(error)
         res.json({ success: false, message: error.message })
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const user = await User.findOneAndUpdate({ email }, { password }, { new: true })
+        if (user) {
+            return res.json({ success: true, message: "Password updated successfully" })
+        }
+        res.json({ success: false, message: "User not found" })
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
+export const sendOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp-relay.brevo.com',
+            port: 587,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: email,
+            subject: 'Password Reset OTP',
+            text: `Your OTP for resetting your password is: ${otp}. This code is valid for a single use.`
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: 'OTP sent to email successfully.' });
+    } catch (error) {
+        console.error("Email send error:", error);
+        res.json({ success: false, message: 'Failed to send OTP email.' });
     }
 }

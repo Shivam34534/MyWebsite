@@ -140,28 +140,51 @@ export const MockClerkProvider = ({ children }) => {
         setUser(null);
     };
 
-    const resetPassword = ({ email, newPassword }) => {
-        const usersListStr = localStorage.getItem('mock_users_list');
-        let usersList = usersListStr ? JSON.parse(usersListStr) : [];
+    const resetPassword = async ({ email, newPassword }) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BASEURL}/api/dev/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: newPassword })
+            });
+            const data = await response.json();
 
-        const userIndex = usersList.findIndex(u => u.primaryEmailAddress.emailAddress === email);
+            if (data.success) {
+                const usersListStr = localStorage.getItem('mock_users_list');
+                let usersList = usersListStr ? JSON.parse(usersListStr) : [];
 
-        if (userIndex !== -1) {
-            usersList[userIndex].password = newPassword;
-            localStorage.setItem('mock_users_list', JSON.stringify(usersList));
+                const userIndex = usersList.findIndex(u => u.primaryEmailAddress.emailAddress === email);
 
-            // Also update current active user data if they happen to be "half logged in" or similar
-            const storedUser = sessionStorage.getItem('mock_user_data');
-            if (storedUser) {
-                const parsed = JSON.parse(storedUser);
-                if (parsed.primaryEmailAddress.emailAddress === email) {
-                    parsed.password = newPassword;
-                    sessionStorage.setItem('mock_user_data', JSON.stringify(parsed));
+                if (userIndex !== -1) {
+                    usersList[userIndex].password = newPassword;
+                    localStorage.setItem('mock_users_list', JSON.stringify(usersList));
                 }
+
+                // Also update current active user data if they happen to be "half logged in" or similar
+                const storedUser = sessionStorage.getItem('mock_user_data');
+                if (storedUser) {
+                    const parsed = JSON.parse(storedUser);
+                    if (parsed.primaryEmailAddress.emailAddress === email) {
+                        parsed.password = newPassword;
+                        sessionStorage.setItem('mock_user_data', JSON.stringify(parsed));
+                    }
+                }
+                return { success: true };
             }
-            return true;
+            return { success: false, message: data.message };
+        } catch (error) {
+            console.error("Reset password error:", error);
+            // Fallback for purely mock setup
+            const usersListStr = localStorage.getItem('mock_users_list');
+            let usersList = usersListStr ? JSON.parse(usersListStr) : [];
+            const userIndex = usersList.findIndex(u => u.primaryEmailAddress.emailAddress === email);
+            if (userIndex !== -1) {
+                usersList[userIndex].password = newPassword;
+                localStorage.setItem('mock_users_list', JSON.stringify(usersList));
+                return { success: true };
+            }
+            return { success: false, message: "User not found" };
         }
-        return false;
     };
 
     const value = {
@@ -220,6 +243,19 @@ export const useClerk = () => {
         openSignUp: context.signUp,
         signOut: context.signOut,
         resetPassword: context.resetPassword,
+        sendOtp: async (email, otp) => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_BASEURL}/api/dev/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+                return await response.json();
+            } catch (error) {
+                console.error("sendOtp error:", error);
+                return { success: false, message: "Network error" };
+            }
+        },
         checkUser: async (email) => {
             const response = await fetch(`${import.meta.env.VITE_BASEURL}/api/dev/check-user`, {
                 method: 'POST',
