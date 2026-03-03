@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets'
-import { Star, Lock, Mail, ArrowRight, User, PenBox, MapPin } from 'lucide-react'
+import { Star, Lock, Mail, ArrowRight, User, PenBox, MapPin, Eye, EyeOff } from 'lucide-react'
 import { useClerk } from '../mockClerk'
 import toast from 'react-hot-toast'
 
@@ -9,8 +9,11 @@ const Login = () => {
   const { openSignIn, openSignUp } = useClerk()
   const [isSignup, setIsSignup] = useState(false)
   const [isForgotPassword, setIsForgotPassword] = useState(false)
+  const [forgotPasswordStep, setForgotPasswordStep] = useState(1) // 1: Email, 2: OTP, 3: New Password
 
   const [email, setEmail] = useState('')
+  const [otp, setOtp] = useState('')
+  const [generatedOtp, setGeneratedOtp] = useState('')
   const [password, setPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [fullName, setFullName] = useState('')
@@ -26,7 +29,9 @@ const Login = () => {
   const [coverFile, setCoverFile] = useState(null)
 
   const [loading, setLoading] = useState(false)
-  const { resetPassword } = useClerk()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const { resetPassword, checkUser, sendOtp } = useClerk()
 
   const handleProfileChange = (e) => {
     const file = e.target.files[0]
@@ -60,12 +65,42 @@ const Login = () => {
 
     try {
       if (isForgotPassword) {
-        const success = resetPassword({ email, newPassword })
-        if (success) {
-          toast.success("Password reset successfully! Please sign in.")
-          setIsForgotPassword(false)
-        } else {
-          toast.error("User not found with this email.")
+        if (forgotPasswordStep === 1) {
+          const userCheck = await checkUser(email)
+          if (userCheck.success) {
+            const newOtp = Math.floor(100000 + Math.random() * 900000).toString()
+            setGeneratedOtp(newOtp)
+
+            // Send OTP to user's email
+            const res = await sendOtp(email, newOtp);
+            if (res.success) {
+              toast.success(`OTP sent to your email address!`, { duration: 6000 })
+              setForgotPasswordStep(2)
+            } else {
+              toast.error("Failed to send OTP email.");
+            }
+          } else {
+            toast.error("User not found with this email.")
+          }
+        } else if (forgotPasswordStep === 2) {
+          if (otp === generatedOtp) {
+            toast.success("OTP verified successfully!")
+            setForgotPasswordStep(3)
+          } else {
+            toast.error("Invalid OTP. Please try again.")
+          }
+        } else if (forgotPasswordStep === 3) {
+          const res = await resetPassword({ email, newPassword })
+          if (res.success) {
+            toast.success("Password reset successfully! Please sign in.")
+            setIsForgotPassword(false)
+            setForgotPasswordStep(1)
+            setOtp('')
+            setNewPassword('')
+          } else {
+            toast.error(res.message || "User not found with this email.")
+            setForgotPasswordStep(1)
+          }
         }
       } else if (isSignup) {
         const res = await openSignUp({
@@ -155,10 +190,10 @@ const Login = () => {
 
           <div className='text-center mb-8'>
             <h2 className='text-2xl font-bold text-gray-800'>
-              {isForgotPassword ? 'Reset Password' : (isSignup ? 'Create Account' : 'Welcome Back')}
+              {isForgotPassword ? (forgotPasswordStep === 1 ? 'Reset Password' : forgotPasswordStep === 2 ? 'Verify OTP' : 'New Password') : (isSignup ? 'Create Account' : 'Welcome Back')}
             </h2>
             <p className='text-gray-500 text-sm mt-1'>
-              {isForgotPassword ? 'Enter your email and new password' : (isSignup ? 'Join our community today' : 'Please sign in to your account')}
+              {isForgotPassword ? (forgotPasswordStep === 1 ? 'Enter your email to receive an OTP' : forgotPasswordStep === 2 ? 'Enter the 6-digit OTP sent to your email' : 'Create a new secure password') : (isSignup ? 'Join our community today' : 'Please sign in to your account')}
             </p>
           </div>
 
@@ -268,23 +303,44 @@ const Login = () => {
               </div>
             )}
 
-            <div>
-              <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1.5'>Email Address</label>
-              <div className='relative'>
-                <Mail className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
-                />
+            {(!isForgotPassword || forgotPasswordStep === 1) && (
+              <div>
+                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1.5'>Email Address</label>
+                <div className='relative'>
+                  <Mail className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                  />
+                </div>
               </div>
-            </div>
+            )}
+
+            {isForgotPassword && forgotPasswordStep === 2 && (
+              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
+                <label htmlFor="otp" className='block text-sm font-medium text-gray-700 mb-1.5'>Verification Code</label>
+                <div className='relative'>
+                  <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type="text"
+                    id="otp"
+                    required
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter 6-digit OTP"
+                    maxLength={6}
+                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono tracking-widest'
+                  />
+                </div>
+              </div>
+            )}
 
             {!isForgotPassword && (
               <div>
@@ -292,7 +348,7 @@ const Login = () => {
                 <div className='relative'>
                   <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     name="password"
                     autoComplete="current-password"
@@ -300,8 +356,15 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                    className='w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
                 {!isSignup && (
                   <div className='flex justify-end mt-1'>
@@ -317,20 +380,27 @@ const Login = () => {
               </div>
             )}
 
-            {isForgotPassword && (
+            {isForgotPassword && forgotPasswordStep === 3 && (
               <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
                 <label htmlFor="newPassword" className='block text-sm font-medium text-gray-700 mb-1.5'>New Password</label>
                 <div className='relative'>
                   <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
                   <input
-                    type="password"
+                    type={showNewPassword ? "text" : "password"}
                     id="newPassword"
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter your new password"
-                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                    className='w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  >
+                    {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
             )}
@@ -344,7 +414,7 @@ const Login = () => {
                 <span className='animate-pulse'>Processing...</span>
               ) : (
                 <>
-                  {isForgotPassword ? 'Reset Password' : (isSignup ? 'Create Account' : 'Sign In')}
+                  {isForgotPassword ? (forgotPasswordStep === 1 ? 'Send OTP' : forgotPasswordStep === 2 ? 'Verify OTP' : 'Reset Password') : (isSignup ? 'Create Account' : 'Sign In')}
                   <ArrowRight className='w-5 h-5' />
                 </>
               )}
@@ -355,7 +425,10 @@ const Login = () => {
             <p className='text-sm text-gray-500'>
               {isForgotPassword ? (
                 <button
-                  onClick={() => setIsForgotPassword(false)}
+                  onClick={() => {
+                    setIsForgotPassword(false)
+                    setForgotPasswordStep(1)
+                  }}
                   className='font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer'
                 >
                   Back to sign in
