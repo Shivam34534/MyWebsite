@@ -78,8 +78,7 @@ const StoriesBar = () => {
     overflow-x-auto px-4'>
             <div className='flex gap-4 pb-5'>
                 {/* Add story card */}
-                <div onClick={() => setShowModel(true)} className='rounded-lg shadow-sm min-w-30 max-w-30 min-h-40 max-h-40 aspect-
-                [3/4] cursor-pointer hover:shadow-lg transition-all duration-200
+                <div onClick={() => setShowModel(true)} className='rounded-lg shadow-sm min-w-[130px] max-w-[130px] min-h-[176px] max-h-[176px] cursor-pointer hover:shadow-lg transition-all duration-200
                 border-2 border-dashed border-indigo-300 bg-gradient-to-b 
                 from-indigo-50 to-white'>
                     <div className='h-full flex flex-col items-center justify-center
@@ -97,10 +96,10 @@ const StoriesBar = () => {
                 {
                     storiesByUser.map((group, index) => (
                         <div onClick={() => setViewStory(group.stories)} key={index} className={`relative rounded-lg shadow
-                        min-w-30 max-w-30 min-h-40 max-h-40 cursor-pointer hover:shadow-lg
+                        min-w-[130px] max-w-[130px] min-h-[176px] max-h-[176px] cursor-pointer hover:shadow-lg
                         transition-all duration-200 bg-gradient-to-b from-indigo-500
                         to-purple-600 hover:from-indigo-700 hover:to-purple-800
-                        active:scale-95`}>
+                        active:scale-95 overflow-hidden`}>
                             <img src={group.user.profile_picture || assets.sample_profile} alt=""
                                 className='absolute size-8 top-3 left-3 z-10 rounded-full
                             ring ring-gray-100 shadow' />
