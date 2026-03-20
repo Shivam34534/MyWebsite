@@ -11,6 +11,7 @@ import storyRouter from './routes/storyRoutes.js';
 import messageRouter from './routes/messageRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 
+import authRouter from './routes/authRoute.js';
 // Dev-only routes
 import devRouter from './routes/devRoutes.js'
 
@@ -39,6 +40,7 @@ app.use('/uploads', express.static(uploadsDirPath));
 
 app.get('/', (req, res) => res.send('Server is running...'));
 // app.use('/api/inngest',serve({client: inngest, functions}));
+app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
 app.use('/api/post', postRouter)
 app.use('/api/story', storyRouter)
