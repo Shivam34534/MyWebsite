@@ -15,7 +15,7 @@ import authRouter from './routes/authRoute.js';
 // Dev-only routes
 import devRouter from './routes/devRoutes.js'
 
-const app = express();
+import { app, server } from './socket/socket.js';
 
 console.log("Attempting to connect to DB...");
 try {
@@ -28,18 +28,12 @@ try {
 app.use(express.json());
 app.use(cors());
 
-// Mock auth middleware removed to allow dev-user header to work
-// app.use((req, res, next) => {
-//   req.auth = async () => ({ userId: "mock-user-id" }); 
-//   next();
-// });
-
 // Serve uploaded files from the uploads directory
 const uploadsDirPath = path.resolve(process.cwd(), 'uploads');
 app.use('/uploads', express.static(uploadsDirPath));
 
 app.get('/', (req, res) => res.send('Server is running...'));
-// app.use('/api/inngest',serve({client: inngest, functions}));
+
 app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
 app.use('/api/post', postRouter)
@@ -55,7 +49,7 @@ if (process.env.NODE_ENV !== 'production') {
 const PORT = process.env.PORT || 4000;
 
 if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, () => console.log(`Server is running on port: http://localhost:${PORT}`));
+    server.listen(PORT, () => console.log(`Server is running with Socket.io on port: http://localhost:${PORT}`));
 }
 
 export default app;

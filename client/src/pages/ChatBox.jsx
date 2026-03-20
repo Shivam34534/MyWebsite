@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useSocket } from '../context/SocketContext'
 import { ImageIcon, SendHorizonal } from 'lucide-react'
 import { assets } from '../assets/assets'
 import { useParams } from 'react-router-dom'
@@ -19,6 +20,23 @@ const ChatBox = () => {
   const messageEndRef = useRef(null)
   const { getToken } = useAuth()
   const currentUser = useSelector((state) => state.user.value)
+  const { socket, onlineUsers } = useSocket()
+  
+  const isOnline = onlineUsers.includes(id)
+  
+  useEffect(() => {
+    if (!socket) return;
+    
+    // Listen for real-time WebSocket messages
+    socket.on('newMessage', (newMessage) => {
+        // Only append if the message belongs to this current chat thread!
+        if (newMessage.from_user_id === id || newMessage.to_user_id === id) {
+            setMessages(prev => [...prev, newMessage]);
+        }
+    });
+
+    return () => socket.off('newMessage');
+  }, [socket, id]);
 
   useEffect(() => {
     const fetchChatData = async () => {
@@ -93,12 +111,19 @@ const ChatBox = () => {
     <div className='flex flex-col h-screen'>
       <div className='flex items-center gap-2 p-2 md:px-10 xl:pl-42
       bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-300'>
-        <img src={user.profile_picture || assets.sample_profile}
-          onError={(e) => { e.target.src = assets.sample_profile }}
-          alt="" className='size-8 rounded-full' />
+        <div className='relative'>
+          <img src={user.profile_picture || assets.sample_profile}
+            onError={(e) => { e.target.src = assets.sample_profile }}
+            alt="" className='size-8 rounded-full' />
+          {isOnline && <span className='absolute bottom-0 right-0 size-2.5 bg-green-500 border-2 border-white rounded-full'></span>}
+        </div>
         <div>
-          <p className='font-medium'>{user.full_name}</p>
-          <p className='text-sm text-gray-500 mt-1.5'>@{user.username}</p>
+          <p className='font-medium text-slate-900'>{user.full_name}</p>
+          {isOnline ? (
+            <p className='text-xs text-green-600 font-medium'>Online</p>
+          ) : (
+            <p className='text-xs text-gray-500'>@{user.username}</p>
+          )}
         </div>
       </div>
       <div className='p-5 md:px-10 h-full overflow-y-scroll'>

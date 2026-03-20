@@ -2,35 +2,7 @@ import fs from "fs"
 import path from "path"
 import imagekit from "../configs/imageKit.js";
 import Message from "../models/Message.js";
-
-
-// Create an empty object to store SS Event connections
-const connections = {};
-
-// Controller function for the SSE endpoint
-export const sseController = (req, res) => {
-    const { userId } = req.params
-    console.log('New client  connected : ', userId)
-
-    // Set SSE headers
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    //Add the client's response object to the connections object
-    connections[userId] = res
-
-    //Send an initial event to the client
-    res.write('log: Connected to SSE stream\n\n');
-
-    //Handle client disconnection
-    req.on('close', () => {
-        //Remove the client's response object from the connections array
-        delete connections[userId];
-        console.log('Client disconnected')
-    })
-}
+import { io, getReceiverSocketId } from "../socket/socket.js";
 
 //Send Message
 export const sendMessage = async (req, res) => {
@@ -88,21 +60,15 @@ export const sendMessage = async (req, res) => {
 
         res.json({ success: true, message });
 
-        //Send message to to_user_id using SSE
-
-        const messageWithUserData = await Message.findById(message._id).populate
-            ('from_user_id ');
-
-        if (connections[targetUserId]) {
-            connections[targetUserId].write(`data: ${JSON.stringify
-                (messageWithUserData)}]\n\n`)
-
+        //Send message to target user via Socket.io in real-time
+        const receiverSocketId = getReceiverSocketId(targetUserId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", message);
         }
 
     } catch (error) {
-        console.log(error);
+        console.log("Socket/Message Error:", error);
         res.json({ success: false, message: error.message });
-
     }
 }
 
