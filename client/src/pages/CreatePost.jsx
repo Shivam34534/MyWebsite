@@ -124,7 +124,7 @@ const CreatePost = () => {
               <Image className='w-6 h-6' />
             </label>
 
-            <input type="file" id='images' accept='image/*,video/*' hidden multiple
+            <input type="file" id='images' accept='image/*' hidden multiple
               onChange={(e) => setImages([...images, ...e.target.files])} />
 
             <button disabled={loading} onClick={() => toast.promise(handleSubmit(),
