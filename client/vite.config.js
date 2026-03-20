@@ -11,7 +11,6 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'bgImage.png', 'logo.svg'], // Caches these heavy images!
       manifest: {
         name: 'Aura Social',
         short_name: 'Aura',
