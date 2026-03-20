@@ -3,6 +3,8 @@ import path from 'path'
 import imagekit from '../configs/imageKit.js';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import Notification from '../models/Notification.js';
+import { io, getReceiverSocketId } from '../socket/socket.js';
 
 // Add Post
 export const addPost = async (req, res) => {
@@ -115,6 +117,25 @@ export const likePost = async (req, res) => {
         } else {
             post.likes_count.push(userId)
             await post.save()
+
+            // NOTIFICATION LOGIC: Create and Emit
+            if (post.user.toString() !== userId.toString()) {
+                const newNotification = await Notification.create({
+                    user: post.user,
+                    sender: userId,
+                    post: postId,
+                    type: 'like'
+                });
+                
+                // Fetch full sender details right away for real-time ping!
+                await newNotification.populate('sender', 'username profile_picture full_name');
+                await newNotification.populate('post', 'content');
+
+                const receiverSocketId = getReceiverSocketId(post.user.toString());
+                if(receiverSocketId){
+                    io.to(receiverSocketId).emit('getNotification', newNotification);
+                }
+            }
 
             res.json({ success: true, message: "Post liked" })
         }

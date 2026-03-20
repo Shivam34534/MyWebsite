@@ -10,7 +10,7 @@ import postRouter from './routes/postRoutes.js';
 import storyRouter from './routes/storyRoutes.js';
 import messageRouter from './routes/messageRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
-
+import notificationRouter from './routes/notificationRoutes.js';
 import authRouter from './routes/authRoute.js';
 // Dev-only routes
 import devRouter from './routes/devRoutes.js'
@@ -40,6 +40,7 @@ app.use('/api/post', postRouter)
 app.use('/api/story', storyRouter)
 app.use('/api/message', messageRouter)
 app.use('/api/comment', commentRouter)
+app.use('/api/notification', notificationRouter)
 
 // Expose development helper routes only in non-production environments
 if (process.env.NODE_ENV !== 'production') {

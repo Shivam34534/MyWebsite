@@ -1,6 +1,8 @@
 import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import Notification from '../models/Notification.js';
+import { io, getReceiverSocketId } from '../socket/socket.js';
 
 // Add Comment
 // Add Comment
@@ -22,10 +24,27 @@ export const addComment = async (req, res) => {
         });
 
         // Increment comment count on Post
-        await Post.findByIdAndUpdate(postId, { $inc: { comments_count: 1 } });
+        const postDoc = await Post.findByIdAndUpdate(postId, { $inc: { comments_count: 1 } });
 
         // Populate user details immediately for the response
         await comment.populate('user', 'full_name username profile_picture');
+
+        // NOTIFICATION LOGIC
+        if (postDoc.user.toString() !== userId.toString()) {
+            const newNotification = await Notification.create({
+                user: postDoc.user,
+                sender: userId,
+                post: postId,
+                type: 'comment'
+            });
+            await newNotification.populate('sender', 'username profile_picture full_name');
+            await newNotification.populate('post', 'content');
+
+            const receiverSocketId = getReceiverSocketId(postDoc.user.toString());
+            if(receiverSocketId){
+                io.to(receiverSocketId).emit('getNotification', newNotification);
+            }
+        }
 
         res.json({ success: true, message: "Comment added", comment });
     } catch (error) {

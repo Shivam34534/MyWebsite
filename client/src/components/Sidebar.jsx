@@ -5,6 +5,7 @@ import MenuItems from './MenuItems'
 import { CirclePlus, LogOut } from 'lucide-react'
 import { UserButton, useClerk } from '../mockClerk'
 import { useSelector } from 'react-redux'
+import NotificationDropdown from './NotificationDropdown'
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
@@ -45,8 +46,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </div>
 
         </div>
-        <LogOut onClick={signOut} className='w-4.5 text-gray-400 
-        hover:text-gray-700 transition cursor-pointer' />
+        <div className='flex items-center gap-3'>
+          <NotificationDropdown />
+          <LogOut onClick={signOut} title="Logout" className='w-5 h-5 text-gray-400 
+          hover:text-red-500 transition cursor-pointer' />
+        </div>
       </div>
 
     </div>
