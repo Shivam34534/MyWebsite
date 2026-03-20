@@ -67,17 +67,31 @@ export const addPost = async (req, res) => {
     }
 }
 
-// Get Posts 
+// Get Posts with Pagination
 export const getFeedPosts = async (req, res) => {
     try {
         const { userId } = await req.auth();
         const user = await User.findById(userId)
 
+        // Pagination parameters
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
         //User's connections and followings
         const userIds = [userId, ...user.connections, ...user.following]
-        const posts = await Post.find({ user: { $in: userIds } }).populate('user').sort({ createdAt: -1 })
+        
+        const posts = await Post.find({ user: { $in: userIds } })
+            .populate('user')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-        res.json({ success: true, data: posts })
+        res.json({ 
+            success: true, 
+            data: posts,
+            hasMore: posts.length === limit
+        })
 
     } catch (error) {
         console.error(error);

@@ -11,22 +11,38 @@ import toast from 'react-hot-toast'
 const Feed = () => {
 
 
+  // Feed State
   const [feeds, setfeeds] = useState([])
   const [loading, setLoading] = useState(true)
+  
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // Sponsored State
   const [sponsoredImg, setSponsoredImg] = useState(assets.sponsored_img)
   const [sponsoredTitle, setSponsoredTitle] = useState("Email marketing")
   const [sponsoredDesc, setSponsoredDesc] = useState("Supercharge your marketing with a powerful, easy-to-use platform built for results.")
   const { getToken } = useAuth()
 
 
-  const fetchFeeds = async () => {
+  const fetchFeeds = async (pageNum = 1) => {
+    if (pageNum === 1) setLoading(true);
+    else setLoadingMore(true);
+
     try {
       const token = await getToken()
-      const { data } = await api.get('/api/post/feed', {
+      const { data } = await api.get(`/api/post/feed?page=${pageNum}&limit=10`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       if (data.success) {
-        setfeeds(data.data)
+        if (pageNum === 1) {
+            setfeeds(data.data);
+        } else {
+            setfeeds(prev => [...prev, ...data.data]);
+        }
+        setHasMore(data.hasMore);
       } else {
         toast.error(data.message || 'Failed to fetch posts')
       }
@@ -35,10 +51,12 @@ const Feed = () => {
       toast.error(error.response?.data?.message || 'Failed to fetch posts')
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
+
   useEffect(() => {
-    fetchFeeds()
+    fetchFeeds(1)
   }, [])
 
   return !loading ? (
@@ -47,12 +65,27 @@ const Feed = () => {
       {/* Stories and post list */}
       <div>
         <StoriesBar />
-        <div className='p-4 space-y-6'>
+        <div className='p-4 space-y-6 w-full max-w-[35rem]'>
           {feeds.map((post) => (
             <PostCard key={post._id} post={post} />
-          ))
-
-          }
+          ))}
+          
+          {/* Load More System */}
+          {hasMore && feeds.length > 0 && (
+            <div className='flex justify-center pt-2 pb-6'>
+                <button 
+                    onClick={() => {
+                        const next = page + 1;
+                        setPage(next);
+                        fetchFeeds(next);
+                    }} 
+                    disabled={loadingMore}
+                    className='px-6 py-2 bg-indigo-50/80 text-indigo-600 rounded-full font-medium hover:bg-indigo-100 transition disabled:opacity-50 text-sm'
+                >
+                    {loadingMore ? "Loading..." : "Load More Posts"}
+                </button>
+            </div>
+          )}
         </div>
       </div>
 
