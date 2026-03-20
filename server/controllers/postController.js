@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import imagekit from '../configs/imageKit.js';
+import { uploadToCloudinary } from '../configs/cloudinary.js';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 
@@ -15,31 +15,16 @@ export const addPost = async (req, res) => {
 
         // Check if files exist and is an array (multiple files) or object (single file)
         if (images) {
-            // Convert to array if single file
             const filesArray = Array.isArray(images) ? images : [images];
 
             image_urls = await Promise.all(
                 filesArray.map(async (image) => {
-                    // Use buffer directly from multer's memory storage
-                    if (process.env.IMAGEKIT_PRIVATE_KEY) {
-                        const response = await imagekit.upload({
-                            file: image.buffer,
-                            fileName: image.originalname,
-                            folder: "posts"
-                        })
-
-                        const isVideo = image.mimetype.startsWith('video/')
-
-                        const url = imagekit.url({
-                            path: response.filePath,
-                            transformation: isVideo ? [] : [
-                                { quality: 'auto' },
-                                { format: 'webp' },
-                                { width: '1280' },
-                            ]
-                        })
-                        return url;
+                    const isVideo = image.mimetype.startsWith('video/')
+                    
+                    if (process.env.CLOUDINARY_CLOUD_NAME) {
+                        return await uploadToCloudinary(image.buffer, isVideo);
                     } else {
+                        // Local dev fallback if Cloudinary is not configured yet
                         const uploadsDir = path.resolve(process.cwd(), 'uploads', 'posts')
                         fs.mkdirSync(uploadsDir, { recursive: true })
                         const filename = `${Date.now()}_${image.originalname.replace(/\s+/g, '_')}`

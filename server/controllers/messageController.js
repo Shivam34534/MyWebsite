@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-import imagekit from "../configs/imageKit.js";
+import { uploadToCloudinary } from "../configs/cloudinary.js";
 import Message from "../models/Message.js";
 import { io, getReceiverSocketId } from "../socket/socket.js";
 
@@ -19,20 +19,9 @@ export const sendMessage = async (req, res) => {
         if (message_type === 'image') {
             try {
                 const fileBuffer = image.buffer || fs.readFileSync(image.path);
-                const response = await imagekit.upload({
-                    file: fileBuffer,
-                    fileName: image.originalname,
-                });
-                media_url = imagekit.url({
-                    path: response.filePath,
-                    transformation: [
-                        { quality: 'auto' },
-                        { format: 'webp' },
-                        { width: '1280' }
-                    ]
-                })
+                media_url = await uploadToCloudinary(fileBuffer, false);
             } catch (error) {
-                if (error.message === "ImageKit not configured") {
+                if (error.message && error.message.includes("Must supply api_key")) {
                     const buffer = image.buffer;
                     const uploadsDir = path.resolve(process.cwd(), 'uploads', 'messages');
                     if (!fs.existsSync(uploadsDir)) {
