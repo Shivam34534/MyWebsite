@@ -137,11 +137,13 @@ const Login = () => {
 
   return (
     <div className='min-h-screen flex flex-col md:flex-row relative bg-white'>
-      {/* Background Image */}
+      {/* Background Image - Optimized for Mobile */}
       <img
         src={assets.bgImage}
         alt="Background"
-        className='absolute top-0 left-0 z-0 w-full h-full object-cover opacity-10 md:opacity-100'
+        loading="lazy"
+        decoding="async"
+        className='absolute top-0 left-0 z-0 w-full h-full object-cover opacity-10 md:opacity-100 mix-blend-multiply'
       />
 
       {/* Left Section - Hero (Hidden on Mobile) */}
