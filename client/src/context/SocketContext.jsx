@@ -11,6 +11,7 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
+    const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
     const { user, isSignedIn } = useUser(); // Using real user state from AuthContext
     const { getToken } = useAuth(); // Just in case, but user._id is main logic
 
@@ -30,6 +31,14 @@ export const SocketProvider = ({ children }) => {
                 setOnlineUsers(users);
             });
 
+            // Universal listener for unread messages logic
+            socketInstance.on("receiveMessage", (newMessage) => {
+                // If we are not actively on the EXACT page looking at the chat
+                if (!window.location.pathname.startsWith('/messages')) {
+                    setHasUnreadMessages(true);
+                }
+            });
+
             return () => {
                 socketInstance.close();
                 setSocket(null);
@@ -43,7 +52,7 @@ export const SocketProvider = ({ children }) => {
     }, [isSignedIn, user?.id]);
 
     return (
-        <SocketContext.Provider value={{ socket, onlineUsers }}>
+        <SocketContext.Provider value={{ socket, onlineUsers, hasUnreadMessages, setHasUnreadMessages }}>
             {children}
         </SocketContext.Provider>
     );

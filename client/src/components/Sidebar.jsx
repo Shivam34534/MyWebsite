@@ -55,7 +55,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
         </div>
         <div className='flex items-center gap-3'>
-          <NotificationDropdown />
           <LogOut onClick={signOut} title="Logout" className='w-5 h-5 text-gray-400 
           hover:text-red-500 transition cursor-pointer' />
         </div>
