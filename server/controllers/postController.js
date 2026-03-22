@@ -5,6 +5,10 @@ import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
 import { io, getReceiverSocketId } from '../socket/socket.js';
+import NodeCache from 'node-cache';
+
+// Initialize cache with a 60-second standard TTL
+const memoryCache = new NodeCache({ stdTTL: 60 });
 
 // Add Post
 export const addPost = async (req, res) => {
@@ -22,6 +26,13 @@ export const addPost = async (req, res) => {
 
             image_urls = await Promise.all(
                 filesArray.map(async (image) => {
+                    const isVideo = image.mimetype.startsWith('video/')
+                    
+                    // Strict 2MB check for images since overall multer allowed 20MB for videos
+                    if (!isVideo && image.size > 2 * 1024 * 1024) {
+                        throw new Error(`Image ${image.originalname} exceeds the 2MB size limit!`);
+                    }
+
                     // Use buffer directly from multer's memory storage
                     if (process.env.IMAGEKIT_PRIVATE_KEY) {
                         const response = await imagekit.upload({
@@ -30,14 +41,15 @@ export const addPost = async (req, res) => {
                             folder: "posts"
                         })
 
-                        const isVideo = image.mimetype.startsWith('video/')
-
                         const url = imagekit.url({
                             path: response.filePath,
-                            transformation: isVideo ? [] : [
+                            transformation: isVideo ? [
+                                { height: '720' }, 
+                                { quality: 'auto' }
+                            ] : [
                                 { quality: 'auto' },
                                 { format: 'webp' },
-                                { width: '1280' },
+                                { width: '400' }, 
                             ]
                         })
                         return url;
@@ -61,6 +73,9 @@ export const addPost = async (req, res) => {
             post_type
         })
 
+        // Flush the feed cache dynamically when a new post is successfully created!
+        memoryCache.flushAll();
+
         res.json({ success: true, message: "Post created successfully" })
 
     } catch (error) {
@@ -80,6 +95,18 @@ export const getFeedPosts = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
+        // Check cache precisely using the userId + page map
+        const cacheKey = `feed_${userId}_page_${page}`;
+        const cachedResults = memoryCache.get(cacheKey);
+        
+        if (cachedResults) {
+            return res.json({ 
+                success: true, 
+                data: cachedResults.data,
+                hasMore: cachedResults.hasMore
+            });
+        }
+
         //User's connections and followings
         const userIds = [userId, ...user.connections, ...user.following]
         
@@ -89,11 +116,15 @@ export const getFeedPosts = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-        res.json({ 
-            success: true, 
+        const payload = {
             data: posts,
             hasMore: posts.length === limit
-        })
+        };
+
+        // Cache the newly retrieved MongoDB payload for future hits
+        memoryCache.set(cacheKey, payload);
+
+        res.json({ success: true, ...payload })
 
     } catch (error) {
         console.error(error);

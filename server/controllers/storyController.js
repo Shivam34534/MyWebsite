@@ -20,12 +20,29 @@ export const addUserStory = async (req, res) => {
         if (media_type === 'image' || media_type === 'video') {
             const fileBuffer = media.buffer || fs.readFileSync(media.path)
 
+            const isVideo = media.mimetype.startsWith('video/')
+            
+            // Limit images to 2MB specifically
+            if (!isVideo && media.size > 2 * 1024 * 1024) throw new Error("Image exceeds the 2MB limit!");
+
             if (process.env.IMAGEKIT_PRIVATE_KEY) {
                 const response = await imagekit.upload({
                     file: fileBuffer,
                     fileName: media.originalname,
+                    folder: "stories"
                 })
-                media_url = response.url;
+
+                media_url = imagekit.url({
+                    path: response.filePath,
+                    transformation: isVideo ? [
+                        { height: '720' }, 
+                        { quality: 'auto' }
+                    ] : [
+                        { quality: 'auto' },
+                        { format: 'webp' },
+                        { width: '400' }, 
+                    ]
+                })
             } else {
                 // save to local uploads folder
                 const uploadsDir = path.resolve(process.cwd(), 'uploads', 'stories')

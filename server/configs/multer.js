@@ -4,19 +4,19 @@ import multer from 'multer';
 // Do not perform any synchronous fs operations here.
 const storage = multer.memoryStorage();
 
-// Add strict validation: Allow only image files!
+// Add strict validation: Allow specified image files and web-ready videos!
+const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'];
+
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only images are allowed!'), false);
+    cb(new Error(`File format ${file.mimetype} is not allowed!`), false);
   }
 };
 
-// Export simple multer instance; files will be available as Buffer on
-// req.file.buffer (single) or req.files[...].buffer (array/fields).
 export const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB per file
+  limits: { fileSize: 20 * 1024 * 1024 }, // Max 20MB per file (handles video sizes). 
   fileFilter
 });
