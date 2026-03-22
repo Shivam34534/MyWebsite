@@ -12,6 +12,8 @@ import PostCommentsList from './PostCommentsList'
 
 
 const PostCard = ({ post }) => {
+    // Shield against orphaned database payloads
+    if (!post || !post.user) return null;
 
     const postWithHashtags = post.content?.replace(/(#\w+)/g,
         '<span class="text-indigo-600">$1</span>') || ''
