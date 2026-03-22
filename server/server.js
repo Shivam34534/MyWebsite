@@ -43,7 +43,7 @@ const apiLimiter = rateLimit({
 });
 app.use('/api', apiLimiter);
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 // Highly dynamic CORS configuration to reflect the exact requesting Origin, ensuring zero blocks while maintaining security tokens
 app.use(cors({ 

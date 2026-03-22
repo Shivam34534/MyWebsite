@@ -21,7 +21,7 @@ const loginSchema = z.object({
 
 const router = express.Router();
 
-router.post('/register', validateRequest(registerSchema), registerUser);
+router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 export default router;
