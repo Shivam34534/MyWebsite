@@ -5,12 +5,15 @@ export const globalSearch = async (req, res) => {
     try {
         const { query } = req.query;
 
+        const { userId } = await req.auth();
+
         if (!query || query.trim() === '') {
             return res.json({ success: true, users: [], posts: [] });
         }
 
-        // Search Users by name or username (case-insensitive regex)
+        // Search Users by name or username (case-insensitive regex) while explicitly excluding the requesting User
         const users = await User.find({
+            _id: { $ne: userId },
             $or: [
                 { full_name: { $regex: query, $options: 'i' } },
                 { username: { $regex: query, $options: 'i' } }
