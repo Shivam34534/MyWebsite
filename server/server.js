@@ -1,4 +1,6 @@
 import express from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import cors from 'cors';
 import 'dotenv/config.js';
 import connectDB from './configs/db.js';
@@ -12,6 +14,7 @@ import messageRouter from './routes/messageRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 import searchRouter from './routes/searchRoutes.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 import authRouter from './routes/authRoute.js';
 // Dev-only routes
@@ -27,8 +30,26 @@ try {
     console.error("DB connection failed immediately:", error);
 }
 
+// Apply Helmet for strict security HTTP headers while allowing cross-origin image requests
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+
+// Apply global rate limiting to protect against brute-force DDoS attacks
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes window
+    max: 150, // Limit each IP to 150 requests per window
+    message: 'Too many requests from this IP, please try again after 15 minutes',
+    standardHeaders: true, 
+    legacyHeaders: false, 
+});
+app.use('/api', apiLimiter);
+
 app.use(express.json());
-app.use(cors());
+
+// Strict CORS to only accept explicit frontend connections safely
+app.use(cors({ 
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173', 
+    credentials: true 
+}));
 
 // Serve uploaded files from the uploads directory
 const uploadsDirPath = path.resolve(process.cwd(), 'uploads');
@@ -49,6 +70,9 @@ app.use('/api/search', searchRouter)
 if (process.env.NODE_ENV !== 'production') {
     app.use('/api/dev', devRouter)
 }
+
+// Global Exception error-handling middleware is ALWAYS the last middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 4000;
 
