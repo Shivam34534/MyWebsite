@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
     location: { type: String, default: '' },
     followers: [{ type: String, ref: 'User' }],
     following: [{ type: String, ref: 'User' }],
-    connections: [{ type: String, ref: 'User' }]
+    connections: [{ type: String, ref: 'User' }],
+    role: { type: String, enum: ['user', 'admin'], default: 'user' }
 }, { timestamps: true, minimize: false })
 
 const User = mongoose.model('User', userSchema)

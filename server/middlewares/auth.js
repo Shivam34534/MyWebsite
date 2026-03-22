@@ -25,9 +25,10 @@ export const protect = async (req, res, next) => {
 
         // Attach userId correctly so existing controllers operate perfectly
         const userId = currentUser._id;
+        const role = currentUser.role || 'user';
         
         // Polyfill req.auth for controllers that expected it originally
-        req.auth = async () => ({ userId });
+        req.auth = async () => ({ userId, role });
 
         next();
     } catch (error) {

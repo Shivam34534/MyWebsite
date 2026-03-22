@@ -15,6 +15,7 @@ const Discover = lazy(() => import('./pages/Discover'))
 const Profile = lazy(() => import('./pages/Profile'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const Layout = lazy(() => import('./pages/Layout'))
+const Admin = lazy(() => import('./pages/Admin'))
 
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
             <Route path='profile' element={<Profile />} />
             <Route path='profile/:profileId' element={<Profile />} />
             <Route path='create-post' element={<CreatePost />} />
+            <Route path='admin' element={<Admin />} />
           </Route>
         </Routes>
       </Suspense>

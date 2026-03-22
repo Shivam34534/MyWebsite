@@ -14,6 +14,7 @@ import messageRouter from './routes/messageRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 import searchRouter from './routes/searchRoutes.js';
+import adminRouter from './routes/adminRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 import authRouter from './routes/authRoute.js';
@@ -68,6 +69,7 @@ app.use('/api/message', messageRouter)
 app.use('/api/comment', commentRouter)
 app.use('/api/notification', notificationRouter)
 app.use('/api/search', searchRouter)
+app.use('/api/admin', adminRouter)
 
 // Expose development helper routes only in non-production environments
 if (process.env.NODE_ENV !== 'production') {
