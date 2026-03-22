@@ -307,11 +307,11 @@ const Login = () => {
 
             {(!isForgotPassword || forgotPasswordStep === 1) && (
               <div>
-                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1.5'>Email Address</label>
+                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1.5'>Email or Username</label>
                 <div className='relative'>
                   <Mail className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
                   <input
-                    type="email"
+                    type="text"
                     id="email"
                     name="email"
                     autoComplete="email"

