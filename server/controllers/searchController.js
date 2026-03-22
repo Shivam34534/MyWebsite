@@ -12,13 +12,16 @@ export const globalSearch = async (req, res) => {
         }
 
         // Search Users by name or username (case-insensitive regex) while explicitly excluding the requesting User
-        const users = await User.find({
+        let users = await User.find({
             _id: { $ne: userId },
             $or: [
                 { full_name: { $regex: query, $options: 'i' } },
                 { username: { $regex: query, $options: 'i' } }
             ]
         }).limit(10);
+
+        // Defensive filtration layer to double-check exclusion
+        users = users.filter(u => u._id.toString() !== userId.toString());
 
         // Search Posts by content
         const posts = await Post.find({
