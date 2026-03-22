@@ -11,8 +11,31 @@ const Discover = () => {
   const [input, setInput] = useState('')
   const [users, setUsers] = useState([])
   const [posts, setPosts] = useState([])
+  const [suggestedUsers, setSuggestedUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const { getToken } = useAuth()
+
+  // Initial discovery fetch (Random/Suggested users when search is empty)
+  useEffect(() => {
+    const fetchInitialDiscover = async () => {
+      if (!input.trim()) {
+        try {
+          const token = await getToken();
+          const { data } = await api.post('/api/user/discover', { input: '' }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (data.success) {
+            setSuggestedUsers(data.users.slice(0, 8)); // Grab top 8
+          }
+        } catch (error) {
+          console.error('Initial discover error', error);
+        }
+      } else {
+        setSuggestedUsers([]);
+      }
+    };
+    fetchInitialDiscover();
+  }, [input, getToken]);
 
   useEffect(() => {
     if (!input.trim()) {
@@ -42,7 +65,7 @@ const Discover = () => {
     }, 400); // 400ms Debounce
 
     return () => clearTimeout(timer);
-  }, [input]);
+  }, [input, getToken]);
 
   return (
     <div className='min-h-screen bg-gradient-to-b from-slate-50 to-white'>
@@ -75,7 +98,19 @@ const Discover = () => {
 
         {!loading && (
             <div className='flex flex-col gap-10'>
-                {/* Users Section */}
+                {/* Suggested Users Section (When not searching) */}
+                {suggestedUsers.length > 0 && !input.trim() && (
+                    <div>
+                        <h2 className='text-xl font-semibold mb-4 text-slate-800'>Suggested for You</h2>
+                        <div className='flex flex-wrap gap-6'>
+                            {suggestedUsers.map((user) => (
+                                <UserCard user={user} key={user._id} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Users Section (Search Results) */}
                 {users.length > 0 && (
                     <div>
                         <h2 className='text-xl font-semibold mb-4 text-slate-800'>People</h2>
