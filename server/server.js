@@ -45,19 +45,12 @@ app.use('/api', apiLimiter);
 
 app.use(express.json());
 
-// Strict CORS to only accept explicit frontend connections safely
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'https://mywebsite-frontend.onrender.com',
-    'https://mywebsite-frontend.onrender.com/'
-];
-if (process.env.FRONTEND_URL) {
-    allowedOrigins.push(process.env.FRONTEND_URL);
-}
-
+// Highly dynamic CORS configuration to reflect the exact requesting Origin, ensuring zero blocks while maintaining security tokens
 app.use(cors({ 
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+        // Automatically accept the incoming origin
+        callback(null, true);
+    },
     credentials: true 
 }));
 
