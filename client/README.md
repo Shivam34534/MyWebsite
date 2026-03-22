@@ -1,12 +1,31 @@
-# React + Vite
+# Aura Social Media Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aura is a full-stack, hyper-optimized social media platform engineered with the MERN stack (MongoDB, Express, React, Node.js). Designed for a premium user experience, it features dynamic content feeds, ephemeral media, and enterprise-grade security protocols.
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
+- **Frontend**: React.js (Vite), Tailwind CSS, Redux Toolkit, React Router (Lazy Loaded)
+- **Backend**: Node.js, Express.js, MongoDB Atlas (Mongoose)
+- **Real-Time Integration**: Socket.io
+- **Media & Security**: ImageKit SDK, Multer, Helmet, Node-Cache, Express-Rate-Limit, JSON Web Tokens (JWT), Bcrypt
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
+- **Auth**: Fully scalable login system supporting Multi-Factor searching via `Email` or `@Username`. Includes robust Master Admin Access Overrides.
+- **Posts**: Infinite-scroll Feed with real-time liking, commenting, and native Web-Share APIs.
+- **Image Upload**: Seamlessly ingests Base64 schemas (up to 50MB) for profile/cover avatars. Employs a strict 2MB validation limit for Feed Posts with Auto-webp conversion via ImageKit.
+- **Video Upload**: Supports MP4/WebM formats capped at 20MB with auto-compression to 720p.
+- **Chat**: One-on-one Direct Messaging engine built over bi-directional web sockets.
+- **Notifications**: Integrated Socket.io red-dot indicators for unread messages.
+- **Search**: Optimized debounced queries with case-insensitive MongoDB `$regex` results.
+- **Ephemeral Stories (TTL)**: 24-Hour expiration pipeline enforced securely at the Database-level using MongoDB TTL indices.
+- **Admin Dashboard**: Comprehensive Control Interface protected by RBAC to manage users, view stats, and moderate content.
 
-## Expanding the ESLint configuration
+## 🛡️ Security & Performance
+- **Enterprise Security**: CORS hardening, Helmet HTTP shields, and IP Rate-Limiting.
+- **Speed Optimization**: Server-side caching via `node-cache` and Frontend code-splitting with React Suspense.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🌐 Deployment
+- **Frontend**: https://mywebsite-frontend.onrender.com
+- **Backend**: https://mywebsite-xf5o.onrender.com
+
+---
+*Developed by Shivam*
