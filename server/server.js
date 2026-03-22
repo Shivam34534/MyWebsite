@@ -48,7 +48,9 @@ app.use(express.json());
 // Strict CORS to only accept explicit frontend connections safely
 const allowedOrigins = [
     'http://localhost:5173',
-    'https://mywebsite-frontend.onrender.com'
+    'http://localhost:5174',
+    'https://mywebsite-frontend.onrender.com',
+    'https://mywebsite-frontend.onrender.com/'
 ];
 if (process.env.FRONTEND_URL) {
     allowedOrigins.push(process.env.FRONTEND_URL);
