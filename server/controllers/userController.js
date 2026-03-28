@@ -5,7 +5,8 @@ import User from "../models/User.js";
 import fs from 'fs';
 import path from 'path'
 import Post from "../models/Post.js";
-// import { inngest } from "../inngest/index.js";
+import Notification from "../models/Notification.js";
+import { io, getReceiverSocketId } from '../socket/socket.js';
 
 //Get User Data using userId
 export const getUserData = async (req, res) => {
@@ -215,6 +216,36 @@ export const followUser = async (req, res) => {
         const toUser = await User.findById(targetId)
         toUser.followers.push(userId)
         await toUser.save()
+
+        // NOTIFICATION LOGIC
+        let notif = await Notification.findOne({
+            user: targetId,
+            type: 'follow',
+            isRead: false
+        });
+
+        if (notif) {
+            if (!notif.senders.includes(userId)) {
+                notif.senders.push(userId);
+            }
+            notif.sender = userId;
+            notif.updatedAt = new Date();
+            await notif.save();
+        } else {
+            notif = await Notification.create({
+                user: targetId,
+                sender: userId,
+                senders: [userId],
+                type: 'follow'
+            });
+        }
+        
+        await notif.populate('sender', 'username profile_picture full_name');
+        
+        const receiverSocketId = getReceiverSocketId(targetId);
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit('getNotification', notif);
+        }
 
         res.json({ success: true, message: 'Now you are following this user' })
 

@@ -39,18 +39,36 @@ export const addComment = async (req, res) => {
 
         // NOTIFICATION LOGIC
         if (postDoc.user.toString() !== userId.toString()) {
-            const newNotification = await Notification.create({
+            let notif = await Notification.findOne({
                 user: postDoc.user,
-                sender: userId,
                 post: postId,
-                type: 'comment'
+                type: 'comment',
+                isRead: false
             });
-            await newNotification.populate('sender', 'username profile_picture full_name');
-            await newNotification.populate('post', 'content');
+
+            if (notif) {
+                if (!notif.senders.includes(userId)) {
+                    notif.senders.push(userId);
+                }
+                notif.sender = userId;
+                notif.updatedAt = new Date();
+                await notif.save();
+            } else {
+                notif = await Notification.create({
+                    user: postDoc.user,
+                    sender: userId,
+                    senders: [userId],
+                    post: postId,
+                    type: 'comment'
+                });
+            }
+            
+            await notif.populate('sender', 'username profile_picture full_name');
+            await notif.populate('post', 'content');
 
             const receiverSocketId = getReceiverSocketId(postDoc.user.toString());
             if(receiverSocketId){
-                io.to(receiverSocketId).emit('getNotification', newNotification);
+                io.to(receiverSocketId).emit('getNotification', notif);
             }
         }
 

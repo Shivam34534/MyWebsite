@@ -247,22 +247,39 @@ export const likePost = async (req, res) => {
                 { upsert: true }
             );
 
-            // NOTIFICATION LOGIC: Create and Emit
+            // NOTIFICATION LOGIC: Create or Update and Emit
             if (post.user.toString() !== userId.toString()) {
-                const newNotification = await Notification.create({
+                let notif = await Notification.findOne({
                     user: post.user,
-                    sender: userId,
                     post: postId,
-                    type: 'like'
+                    type: 'like',
+                    isRead: false 
                 });
+
+                if (notif) {
+                    if (!notif.senders.includes(userId)) {
+                        notif.senders.push(userId);
+                        notif.sender = userId;
+                        notif.updatedAt = new Date();
+                        await notif.save();
+                    }
+                } else {
+                    notif = await Notification.create({
+                        user: post.user,
+                        sender: userId,
+                        senders: [userId],
+                        post: postId,
+                        type: 'like'
+                    });
+                }
                 
                 // Fetch full sender details right away for real-time ping!
-                await newNotification.populate('sender', 'username profile_picture full_name');
-                await newNotification.populate('post', 'content');
+                await notif.populate('sender', 'username profile_picture full_name');
+                await notif.populate('post', 'content');
 
                 const receiverSocketId = getReceiverSocketId(post.user.toString());
                 if(receiverSocketId){
-                    io.to(receiverSocketId).emit('getNotification', newNotification);
+                    io.to(receiverSocketId).emit('getNotification', notif);
                 }
             }
 
