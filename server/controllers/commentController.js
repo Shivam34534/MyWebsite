@@ -3,6 +3,7 @@ import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
 import { io, getReceiverSocketId } from '../socket/socket.js';
+import Interaction from '../models/Interaction.js';
 
 // Add Comment
 // Add Comment
@@ -25,6 +26,13 @@ export const addComment = async (req, res) => {
 
         // Increment comment count on Post
         const postDoc = await Post.findByIdAndUpdate(postId, { $inc: { comments_count: 1 } });
+
+        // Track Interaction
+        await Interaction.updateOne(
+            { user: userId, post: postId, type: 'comment' },
+            { $set: { updatedAt: new Date() } },
+            { upsert: true }
+        );
 
         // Populate user details immediately for the response
         await comment.populate('user', 'full_name username profile_picture');

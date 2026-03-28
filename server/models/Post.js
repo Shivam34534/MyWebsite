@@ -12,6 +12,9 @@ const postSchema = new mongoose.Schema({
     shares_count: { type: Number, default: 0 }
 }, { timestamps: true, minimize: false })
 
+postSchema.index({ user: 1, createdAt: -1 });
+postSchema.index({ createdAt: -1 });
+
 const Post = mongoose.model('Post', postSchema)
 
 export default Post;

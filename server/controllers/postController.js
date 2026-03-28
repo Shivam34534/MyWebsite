@@ -6,6 +6,7 @@ import User from '../models/User.js';
 import Notification from '../models/Notification.js';
 import { io, getReceiverSocketId } from '../socket/socket.js';
 import NodeCache from 'node-cache';
+import Interaction from '../models/Interaction.js';
 
 // Initialize cache with a 60-second standard TTL
 const memoryCache = new NodeCache({ stdTTL: 60 });
@@ -108,13 +109,138 @@ export const getFeedPosts = async (req, res) => {
         }
 
         //User's connections and followings
-        const userIds = [userId, ...user.connections, ...user.following]
-        
-        const posts = await Post.find({ user: { $in: userIds } })
-            .populate('user')
+        const followingIds = user.following || [];
+        const connectionIds = user.connections || [];
+        const userIds = [userId, ...connectionIds, ...followingIds]
+
+        // Find frequently interacted users (recent interactions by this user)
+        const recentInteractions = await Interaction.find({ user: userId })
             .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit);
+            .limit(30)
+            .populate({ path: 'post', select: 'user' });
+            
+        const interactedAuthors = recentInteractions
+            .filter(i => i.post && i.post.user) // safeguard against deleted posts
+            .map(i => i.post.user.toString());
+            
+        const frequentlyInteractedUserIds = [...new Set(interactedAuthors)];
+
+        const now = new Date();
+
+        // Pipeline for Main Feed
+        const pipeline = [
+            { $match: { user: { $in: userIds } } },
+            {
+                $addFields: {
+                    likes: { $size: { $ifNull: ["$likes_count", []] } },
+                    comments: { $ifNull: ["$comments_count", 0] },
+                    shares: { $ifNull: ["$shares_count", 0] },
+                    isFollowing: { $in: ["$user", followingIds] },
+                    isFrequentlyInteracted: { $in: ["$user", frequentlyInteractedUserIds] },
+                    hoursSincePost: {
+                        $max: [
+                            1,
+                            { $divide: [ { $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 ] }
+                        ]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    baseScore: {
+                        $add: [
+                            { $multiply: ["$likes", 3] },
+                            { $multiply: ["$comments", 5] },
+                            { $multiply: ["$shares", 4] },
+                            { $cond: ["$isFollowing", 10, 0] }
+                        ]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    boostedScore: {
+                        $add: [
+                            "$baseScore",
+                            { $cond: ["$isFrequentlyInteracted", 20, 0] }, // Boost: frequently interacted
+                            { $cond: [{ $gt: ["$baseScore", 30] }, 15, 0] } // Boost: trending posts
+                        ]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    score: {
+                        $multiply: ["$boostedScore", { $divide: [1, "$hoursSincePost"] }]
+                    }
+                }
+            },
+            { $sort: { score: -1, createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit }
+        ];
+
+        let posts = await Post.aggregate(pipeline);
+        let fallbackTriggered = false;
+
+        // Fallback: If no posts → return trending posts
+        if (posts.length === 0 && page === 1) {
+            fallbackTriggered = true;
+            let cachedTrending = memoryCache.get('top_trending_posts');
+            
+            if (cachedTrending) {
+                posts = cachedTrending.slice(skip, skip + limit);
+            } else {
+                const trendingPipeline = [
+                    {
+                        $addFields: {
+                            likes: { $size: { $ifNull: ["$likes_count", []] } },
+                            comments: { $ifNull: ["$comments_count", 0] },
+                            shares: { $ifNull: ["$shares_count", 0] },
+                            hoursSincePost: {
+                                $max: [
+                                    1,
+                                    { $divide: [ { $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 ] }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            baseScore: {
+                                $add: [
+                                    { $multiply: ["$likes", 3] },
+                                    { $multiply: ["$comments", 5] },
+                                    { $multiply: ["$shares", 4] }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            score: {
+                                $multiply: ["$baseScore", { $divide: [1, "$hoursSincePost"] }]
+                            }
+                        }
+                    },
+                    { $sort: { score: -1, createdAt: -1 } },
+                    { $limit: 100 } // Fetch top 100 global trending posts to cache
+                ];
+                
+                let trendingPosts = await Post.aggregate(trendingPipeline);
+                await Post.populate(trendingPosts, { path: 'user' });
+                
+                // Cache top trending posts for 5 mins
+                memoryCache.set('top_trending_posts', trendingPosts, 300);
+                
+                posts = trendingPosts.slice(skip, skip + limit);
+            }
+        }
+
+        // Populate user data if not falling back to the cached array (which is already populated)
+        if (!fallbackTriggered) {
+             await Post.populate(posts, { path: 'user' });
+        }
 
         const payload = {
             data: posts,
@@ -143,11 +269,19 @@ export const likePost = async (req, res) => {
         if (post.likes_count.includes(userId)) {
             post.likes_count = post.likes_count.filter(user => user !== userId)
             await post.save()
+            
+            await Interaction.deleteOne({ user: userId, post: postId, type: 'like' });
 
             res.json({ success: true, message: "Post unliked" })
         } else {
             post.likes_count.push(userId)
             await post.save()
+            
+            await Interaction.updateOne(
+                { user: userId, post: postId, type: 'like' },
+                { $set: { updatedAt: new Date() } },
+                { upsert: true }
+            );
 
             // NOTIFICATION LOGIC: Create and Emit
             if (post.user.toString() !== userId.toString()) {
@@ -185,6 +319,29 @@ export const sharePost = async (req, res) => {
         const post = await Post.findByIdAndUpdate(postId, { $inc: { shares_count: 1 } }, { new: true })
 
         res.json({ success: true, message: "Post shared", data: post })
+
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Track Post View
+export const trackView = async (req, res) => {
+    try {
+        const { userId } = await req.auth();
+        const { postId, duration } = req.body;
+
+        await Interaction.updateOne(
+            { user: userId, post: postId, type: 'view' },
+            { 
+               $set: { updatedAt: new Date() },
+               $inc: { duration: duration || 0 }
+            },
+            { upsert: true }
+        );
+
+        res.json({ success: true, message: "View tracked successfully" });
 
     } catch (error) {
         console.error(error);
