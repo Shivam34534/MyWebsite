@@ -9,7 +9,9 @@ const postSchema = new mongoose.Schema({
     },
     likes_count: [{ type: String, ref: 'User' }],
     comments_count: { type: Number, default: 0 },
-    shares_count: { type: Number, default: 0 }
+    shares_count: { type: Number, default: 0 },
+    views: { type: Number, default: 0 },
+    watchTime: { type: Number, default: 0 }
 }, { timestamps: true, minimize: false })
 
 postSchema.index({ user: 1, createdAt: -1 });

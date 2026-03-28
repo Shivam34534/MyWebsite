@@ -50,18 +50,21 @@ export const sendMessage = async (req, res) => {
             }
         }
 
+        const receiverSocketId = getReceiverSocketId(targetUserId);
+        const status = receiverSocketId ? 'delivered' : 'sent';
+
         const message = await Message.create({
             from_user_id: userId,
             to_user_id: targetUserId,
             text,
             message_type,
-            media_url
+            media_url,
+            status
         })
 
         res.json({ success: true, message });
 
         //Send message to target user via Socket.io in real-time
-        const receiverSocketId = getReceiverSocketId(targetUserId);
         if (receiverSocketId) {
             io.to(receiverSocketId).emit("newMessage", message);
         }
@@ -85,9 +88,17 @@ export const getChatMessages = async (req, res) => {
             ]
         }).sort({ createdAt: -1 })
         // mark messages as seen
-        await Message.updateMany({
-            from_user_id: to_user_id, to_user_id: userId
-        }, { seen: true })
+        const updated = await Message.updateMany({
+            from_user_id: to_user_id, to_user_id: userId, status: { $ne: 'seen' }
+        }, { status: 'seen' });
+
+        // Notify sender via socket if messages were just marked as seen
+        if (updated.modifiedCount > 0) {
+            const senderSocketId = getReceiverSocketId(to_user_id);
+            if (senderSocketId) {
+                io.to(senderSocketId).emit("messagesSeen", { receiverId: userId });
+            }
+        }
 
         res.json({ success: true, messages });
 

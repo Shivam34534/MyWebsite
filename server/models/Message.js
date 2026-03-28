@@ -6,7 +6,7 @@ const messageSchema = new mongoose.Schema({
     text: {type: String, trim: true},
     message_type: {type: String, enum: ['text', 'image', 'video']},
     media_url: {type: String},
-    seen: {type: Boolean, default: false }
+    status: { type: String, enum: ['sent', 'delivered', 'seen'], default: 'sent' }
 }, {timestamps: true, minimize: false})
 
 const Message = mongoose.model('Message', messageSchema)

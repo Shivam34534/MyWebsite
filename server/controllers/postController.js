@@ -135,7 +135,10 @@ export const getFeedPosts = async (req, res) => {
                     likes: { $size: { $ifNull: ["$likes_count", []] } },
                     comments: { $ifNull: ["$comments_count", 0] },
                     shares: { $ifNull: ["$shares_count", 0] },
+                    views: { $ifNull: ["$views", 0] },
+                    watchTime: { $ifNull: ["$watchTime", 0] },
                     isFollowing: { $in: ["$user", followingIds] },
+                    isConnection: { $in: ["$user", connectionIds] },
                     isFrequentlyInteracted: { $in: ["$user", frequentlyInteractedUserIds] },
                     hoursSincePost: {
                         $max: [
@@ -152,7 +155,9 @@ export const getFeedPosts = async (req, res) => {
                             { $multiply: ["$likes", 3] },
                             { $multiply: ["$comments", 5] },
                             { $multiply: ["$shares", 4] },
-                            { $cond: ["$isFollowing", 10, 0] }
+                            { $multiply: ["$watchTime", 0.05] }, // Boost: Higher watch time -> higher rank
+                            { $cond: ["$isFollowing", 10, 0] },
+                            { $cond: ["$isConnection", 15, 0] } // Mutual connections boost
                         ]
                     }
                 }
@@ -191,48 +196,7 @@ export const getFeedPosts = async (req, res) => {
             if (cachedTrending) {
                 posts = cachedTrending.slice(skip, skip + limit);
             } else {
-                const trendingPipeline = [
-                    {
-                        $addFields: {
-                            likes: { $size: { $ifNull: ["$likes_count", []] } },
-                            comments: { $ifNull: ["$comments_count", 0] },
-                            shares: { $ifNull: ["$shares_count", 0] },
-                            hoursSincePost: {
-                                $max: [
-                                    1,
-                                    { $divide: [ { $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 ] }
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            baseScore: {
-                                $add: [
-                                    { $multiply: ["$likes", 3] },
-                                    { $multiply: ["$comments", 5] },
-                                    { $multiply: ["$shares", 4] }
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            score: {
-                                $multiply: ["$baseScore", { $divide: [1, "$hoursSincePost"] }]
-                            }
-                        }
-                    },
-                    { $sort: { score: -1, createdAt: -1 } },
-                    { $limit: 100 } // Fetch top 100 global trending posts to cache
-                ];
-                
-                let trendingPosts = await Post.aggregate(trendingPipeline);
-                await Post.populate(trendingPosts, { path: 'user' });
-                
-                // Cache top trending posts for 5 mins
-                memoryCache.set('top_trending_posts', trendingPosts, 300);
-                
+                let trendingPosts = await getAndCacheTrendingPosts();
                 posts = trendingPosts.slice(skip, skip + limit);
             }
         }
@@ -332,6 +296,8 @@ export const trackView = async (req, res) => {
         const { userId } = await req.auth();
         const { postId, duration } = req.body;
 
+        const existingInteraction = await Interaction.findOne({ user: userId, post: postId, type: 'view' });
+
         await Interaction.updateOne(
             { user: userId, post: postId, type: 'view' },
             { 
@@ -341,8 +307,83 @@ export const trackView = async (req, res) => {
             { upsert: true }
         );
 
+        const updatePostFields = { $inc: { watchTime: duration || 0 } };
+        // Determine unique view
+        if (!existingInteraction) {
+            updatePostFields.$inc.views = 1;
+        }
+
+        await Post.findByIdAndUpdate(postId, updatePostFields);
+
         res.json({ success: true, message: "View tracked successfully" });
 
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Get Trending Posts Core Logic Helper
+const getAndCacheTrendingPosts = async () => {
+    const now = new Date();
+    const trendingPipeline = [
+        {
+            $addFields: {
+                likes: { $size: { $ifNull: ["$likes_count", []] } },
+                comments: { $ifNull: ["$comments_count", 0] },
+                shares: { $ifNull: ["$shares_count", 0] },
+                views: { $ifNull: ["$views", 0] },
+                watchTime: { $ifNull: ["$watchTime", 0] },
+                hoursSincePost: {
+                    $max: [
+                        1,
+                        { $divide: [ { $subtract: [now, "$createdAt"] }, 1000 * 60 * 60 ] }
+                    ]
+                }
+            }
+        },
+        {
+            $addFields: {
+                baseScore: {
+                    $add: [
+                        { $multiply: ["$likes", 3] },
+                        { $multiply: ["$comments", 5] },
+                        { $multiply: ["$shares", 4] },
+                        { $multiply: ["$watchTime", 0.05] } // Trending also respects watchtime heavily
+                    ]
+                }
+            }
+        },
+        {
+            $addFields: {
+                score: {
+                    $multiply: ["$baseScore", { $divide: [1, "$hoursSincePost"] }]
+                }
+            }
+        },
+        { $sort: { score: -1, createdAt: -1 } },
+        { $limit: 100 }
+    ];
+    
+    let trendingPosts = await Post.aggregate(trendingPipeline);
+    await Post.populate(trendingPosts, { path: 'user' });
+    
+    memoryCache.set('top_trending_posts', trendingPosts, 300);
+    return trendingPosts;
+};
+
+// GET Trending Posts API
+export const getTrendingPosts = async (req, res) => {
+    try {
+        let cachedTrending = memoryCache.get('top_trending_posts');
+        
+        if (cachedTrending) {
+            return res.json({ success: true, data: cachedTrending });
+        }
+        
+        const trendingPosts = await getAndCacheTrendingPosts();
+        
+        res.json({ success: true, data: trendingPosts });
     } catch (error) {
         console.error(error);
         res.json({ success: false, message: error.message });
