@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import Post from '../models/Post.js';
+import Connection from '../models/Connection.js';
 
 export const globalSearch = async (req, res) => {
     try {
@@ -23,6 +24,29 @@ export const globalSearch = async (req, res) => {
         // Defensive filtration layer to double-check exclusion
         users = users.filter(u => u._id.toString() !== userId.toString());
 
+        // Fetch connections for current user to determine status
+        const myConnections = await Connection.find({
+            $or: [
+                { from_user_id: userId },
+                { to_user_id: userId }
+            ]
+        })
+
+        const usersWithStatus = users.map(user => {
+            const userObj = user.toObject();
+            const connection = myConnections.find(conn =>
+                conn.from_user_id === user._id.toString() || conn.to_user_id === user._id.toString()
+            );
+
+            if (connection) {
+                userObj.connectionStatus = connection.status;
+                userObj.connectionFrom = connection.from_user_id;
+            } else {
+                userObj.connectionStatus = null;
+            }
+            return userObj;
+        });
+
         // Search Posts by content
         const posts = await Post.find({
             content: { $regex: query, $options: 'i' }
@@ -31,7 +55,7 @@ export const globalSearch = async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(10);
 
-        res.json({ success: true, users, posts });
+        res.json({ success: true, users: usersWithStatus, posts });
 
     } catch (error) {
         console.error(error);

@@ -14,12 +14,15 @@ const UserCard = ({ user }) => {
     const navigate = useNavigate()
     const { getToken } = useAuth()
 
-    // Hooks must be called unconditionally
-    const isFollowingInitial = user && currentUser?.following?.includes(user._id);
-    const isConnectedInitial = user && currentUser?.connections?.includes(user._id);
+    const isFollowingInitial = user && (currentUser?.following?.includes(user._id) || user.followers?.includes(currentUser?._id));
+    const isConnectedInitial = user && (currentUser?.connections?.includes(user._id) || user.connectionStatus === 'accepted');
+    const isPendingInitial = user && (user.connectionStatus === 'pending' && user.connectionFrom === currentUser?._id);
+    const isPendingFromThemInitial = user && (user.connectionStatus === 'pending' && user.connectionFrom === user._id);
 
     const [isFollowing, setIsFollowing] = useState(isFollowingInitial)
     const [isConnected, setIsConnected] = useState(isConnectedInitial)
+    const [isPending, setIsPending] = useState(isPendingInitial)
+    const [isPendingFromThem, setIsPendingFromThem] = useState(isPendingFromThemInitial)
 
     if (!user) return null;
 
@@ -49,8 +52,6 @@ const UserCard = ({ user }) => {
             return
         }
 
-        const isPendingFromThem = user.connectionStatus === 'pending' && user.connectionFrom === user._id;
-
         try {
             const token = await getToken()
             const endpoint = isPendingFromThem ? '/api/user/accept' : '/api/user/connect'
@@ -59,6 +60,12 @@ const UserCard = ({ user }) => {
             })
             if (data.success) {
                 toast.success(data.message)
+                if (isPendingFromThem) {
+                    setIsConnected(true)
+                    setIsPendingFromThem(false)
+                } else {
+                    setIsPending(true)
+                }
                 dispatch(fetchUser(token))
             } else {
                 toast.error(data.message || 'Failed to update connection status')
@@ -108,17 +115,16 @@ const UserCard = ({ user }) => {
                 <button onClick={handleConnectionRequest} className='flex items-center
                 justify-center w-16 border text-slate-500 group rounded-md
                 cursor-pointer active:scale-105 transition disabled:opacity-60'
-                    disabled={user.connectionStatus === 'pending' && user.connectionFrom === currentUser?._id}>
+                    disabled={isPending}>
                     {
                         isConnected ?
                             <MessageCircle className='w-5 h-5 group-hover:scale-105 transition text-indigo-600' />
                             :
-                            user.connectionStatus === 'pending' ? (
-                                user.connectionFrom === currentUser?._id ?
-                                    <span className='text-[10px] font-bold text-gray-400 uppercase tracking-tighter'>Sent</span> :
-                                    <span className='text-[10px] font-bold text-indigo-600 uppercase tracking-tighter'>Accept</span>
-                            ) :
-                                <Plus className='w-5 h-5 group-hover:scale-110 transition' />
+                            isPending ?
+                                <span className='text-[10px] font-bold text-gray-400 uppercase tracking-tighter'>Sent</span> :
+                                isPendingFromThem ?
+                                    <span className='text-[10px] font-bold text-indigo-600 uppercase tracking-tighter'>Accept</span> :
+                                    <Plus className='w-5 h-5 group-hover:scale-110 transition' />
                     }
                 </button>
 
