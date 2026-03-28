@@ -1,5 +1,5 @@
 import { populate } from "dotenv";
-import imagekit from "../configs/imageKit.js";
+import imagekit, { getImageKitUrl } from "../configs/imageKit.js";
 import Connection from "../models/Connection.js";
 import User from "../models/User.js";
 import fs from 'fs';
@@ -69,14 +69,11 @@ export const updateUserData = async (req, res) => {
 
                 console.log('ImageKit upload response:', response);
 
-                const url = imagekit.url({
-                    path: response.filePath,
-                    transformation: [
-                        { quality: 'auto' },
-                        { format: 'webp' },
-                        { width: '512' },
-                    ]
-                })
+                const url = getImageKitUrl(response, [
+                    { quality: 'auto' },
+                    { format: 'webp' },
+                    { width: '512' },
+                ])
                 console.log('Generated ImageKit URL:', url);
                 updateData.profile_picture = url;
             } else {
@@ -107,14 +104,11 @@ export const updateUserData = async (req, res) => {
 
                 console.log('ImageKit upload response:', response);
 
-                const url = imagekit.url({
-                    path: response.filePath,
-                    transformation: [
-                        { quality: 'auto' },
-                        { format: 'webp' },
-                        { width: '1280' },
-                    ]
-                })
+                const url = getImageKitUrl(response, [
+                    { quality: 'auto' },
+                    { format: 'webp' },
+                    { width: '1280' },
+                ])
                 console.log('Generated ImageKit URL:', url);
                 updateData.cover_picture = url;
             } else {

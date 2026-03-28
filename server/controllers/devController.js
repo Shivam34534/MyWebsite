@@ -1,7 +1,7 @@
 import User from '../models/User.js'
 import fs from 'fs'
 import path from 'path'
-import imagekit from '../configs/imageKit.js'
+import imagekit, { getImageKitUrl } from '../configs/imageKit.js';
 import nodemailer from 'nodemailer'
 
 export const createDevUser = async (req, res) => {
@@ -115,10 +115,7 @@ export const signupDevUser = async (req, res) => {
                     fileName: profile.originalname,
                     folder: '/profile-pictures'
                 })
-                const url = imagekit.url({
-                    path: response.filePath,
-                    transformation: [{ quality: 'auto' }, { format: 'webp' }, { width: '512' }]
-                })
+                const url = getImageKitUrl(response, [{ quality: 'auto' }, { format: 'webp' }, { width: '512' }]);
                 userData.profile_picture = url;
             } else {
                 const uploadsProfileDir = path.resolve(process.cwd(), 'uploads', 'profiles')
@@ -144,10 +141,7 @@ export const signupDevUser = async (req, res) => {
                     fileName: cover.originalname,
                     folder: '/cover-pictures'
                 })
-                const url = imagekit.url({
-                    path: response.filePath,
-                    transformation: [{ quality: 'auto' }, { format: 'webp' }, { width: '1280' }]
-                })
+                const url = getImageKitUrl(response, [{ quality: 'auto' }, { format: 'webp' }, { width: '1280' }]);
                 userData.cover_picture = url;
             } else {
                 const uploadsCoverDir = path.resolve(process.cwd(), 'uploads', 'covers')

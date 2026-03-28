@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-import imagekit from "../configs/imageKit.js";
+import imagekit, { getImageKitUrl } from "../configs/imageKit.js";
 import Message from "../models/Message.js";
 import { io, getReceiverSocketId } from "../socket/socket.js";
 
@@ -23,14 +23,11 @@ export const sendMessage = async (req, res) => {
                     file: fileBuffer,
                     fileName: image.originalname,
                 });
-                media_url = imagekit.url({
-                    path: response.filePath,
-                    transformation: [
-                        { quality: 'auto' },
-                        { format: 'webp' },
-                        { width: '1280' }
-                    ]
-                })
+                media_url = getImageKitUrl(response, [
+                    { quality: 'auto' },
+                    { format: 'webp' },
+                    { width: '1280' }
+                ])
             } catch (error) {
                 if (error.message === "ImageKit not configured") {
                     const buffer = image.buffer;

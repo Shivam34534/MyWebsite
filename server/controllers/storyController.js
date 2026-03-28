@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path'
-import imagekit from "../configs/imageKit.js";
+import imagekit, { getImageKitUrl } from "../configs/imageKit.js";
 import Story from '../models/Story.js';
 import User from '../models/User.js';
 // import { inngest } from '../inngest/index.js';
@@ -32,17 +32,15 @@ export const addUserStory = async (req, res) => {
                     folder: "stories"
                 })
 
-                media_url = imagekit.url({
-                    path: response.filePath,
-                    transformation: isVideo ? [
+                media_url = getImageKitUrl(response, isVideo ? [
                         { height: '720' }, 
                         { quality: 'auto' }
                     ] : [
                         { quality: 'auto' },
                         { format: 'webp' },
                         { width: '400' }, 
-                    ]
-                })
+                    ]);
+                
             } else {
                 // save to local uploads folder
                 const uploadsDir = path.resolve(process.cwd(), 'uploads', 'stories')

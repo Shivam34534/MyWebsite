@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import imagekit from '../configs/imageKit.js';
+import imagekit, { getImageKitUrl } from '../configs/imageKit.js';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
@@ -42,17 +42,14 @@ export const addPost = async (req, res) => {
                             folder: "posts"
                         })
 
-                        const url = imagekit.url({
-                            path: response.filePath,
-                            transformation: isVideo ? [
+                        const url = getImageKitUrl(response, isVideo ? [
                                 { height: '720' }, 
                                 { quality: 'auto' }
                             ] : [
                                 { quality: 'auto' },
                                 { format: 'webp' },
                                 { width: '400' }, 
-                            ]
-                        })
+                            ]);
                         return url;
                     } else {
                         const uploadsDir = path.resolve(process.cwd(), 'uploads', 'posts')

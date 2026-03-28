@@ -16,4 +16,17 @@ if (process.env.IMAGEKIT_PRIVATE_KEY) {
     };
 }
 
+export const getImageKitUrl = (uploadResponse, transformation = []) => {
+    if (!uploadResponse) return '';
+    if (uploadResponse.url) {
+        return imagekit.url({ src: uploadResponse.url, transformation });
+    }
+    let filePath = uploadResponse.filePath || uploadResponse.path || uploadResponse.name || '';
+    if (!filePath) return '';
+    if (!filePath.startsWith('/')) {
+        filePath = `/${filePath}`;
+    }
+    return imagekit.url({ path: filePath, transformation });
+};
+
 export default imagekit;
