@@ -35,7 +35,7 @@ const UserCard = ({ user }) => {
             })
             if (data.success) {
                 setIsFollowing(!isFollowing)
-                dispatch(fetchUser(token))
+                dispatch(fetchUser())
                 toast.success(data.message)
             } else {
                 toast.error(data.message || 'Failed to update follow status')
@@ -66,7 +66,7 @@ const UserCard = ({ user }) => {
                 } else {
                     setIsPending(true)
                 }
-                dispatch(fetchUser(token))
+                dispatch(fetchUser())
             } else {
                 toast.error(data.message || 'Failed to update connection status')
             }

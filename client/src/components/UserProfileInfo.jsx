@@ -32,7 +32,7 @@ const UserProfileInfo = ({ user, posts, profileId, setShowEdit, onUpdate }) => {
       })
       if (data.success) {
         setIsFollowing(!isFollowing)
-        dispatch(fetchUser(token))
+        dispatch(fetchUser())
         if (onUpdate) onUpdate()
         toast.success(data.message)
       } else {
