@@ -4,7 +4,6 @@ import imagekit, { getImageKitUrl } from '../configs/imageKit.js';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
-import { io, getReceiverSocketId } from '../socket/socket.js';
 import NodeCache from 'node-cache';
 import Interaction from '../models/Interaction.js';
 
@@ -244,7 +243,7 @@ export const likePost = async (req, res) => {
                 { upsert: true }
             );
 
-            // NOTIFICATION LOGIC: Create or Update and Emit
+            // NOTIFICATION LOGIC: Create or Update
             if (post.user.toString() !== userId.toString()) {
                 let notif = await Notification.findOne({
                     user: post.user,
@@ -270,14 +269,8 @@ export const likePost = async (req, res) => {
                     });
                 }
                 
-                // Fetch full sender details right away for real-time ping!
                 await notif.populate('sender', 'username profile_picture full_name');
                 await notif.populate('post', 'content');
-
-                const receiverSocketId = getReceiverSocketId(post.user.toString());
-                if(receiverSocketId){
-                    io.to(receiverSocketId).emit('getNotification', notif);
-                }
             }
 
             res.json({ success: true, message: "Post liked" })

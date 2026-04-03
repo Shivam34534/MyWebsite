@@ -2,7 +2,6 @@ import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
-import { io, getReceiverSocketId } from '../socket/socket.js';
 import Interaction from '../models/Interaction.js';
 
 // Add Comment
@@ -65,11 +64,6 @@ export const addComment = async (req, res) => {
             
             await notif.populate('sender', 'username profile_picture full_name');
             await notif.populate('post', 'content');
-
-            const receiverSocketId = getReceiverSocketId(postDoc.user.toString());
-            if(receiverSocketId){
-                io.to(receiverSocketId).emit('getNotification', notif);
-            }
         }
 
         res.json({ success: true, message: "Comment added", comment });

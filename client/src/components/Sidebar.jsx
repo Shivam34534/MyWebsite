@@ -33,13 +33,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           Create Post
         </Link>
 
-        {user.role === 'admin' && (
-          <Link to='/admin' className='flex items-center justify-center
-          gap-2 py-2 mt-3 mx-6 rounded-lg border-2 border-red-500 text-red-600
-          hover:bg-red-50 active:scale-95 transition cursor-pointer font-bold'>
-            Admin Panel
-          </Link>
-        )}
       </div>
 
       <div className='w-full border-t border-gray-200 p-4 px-7 flex items-center

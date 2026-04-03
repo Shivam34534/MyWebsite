@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useSocket } from '../context/SocketContext'
 import { Eye, MessageSquare } from 'lucide-react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
@@ -14,7 +13,6 @@ const Messages = () => {
   const [connections, setConnections] = useState([])
   const [loading, setLoading] = useState(true)
   const { getToken } = useAuth()
-  const { onlineUsers } = useSocket()
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -74,9 +72,6 @@ const Messages = () => {
                   <img src={user.profile_picture || assets.sample_profile} alt=""
                     onError={(e) => { e.target.src = assets.sample_profile }}
                     className='rounded-full size-12' />
-                    {onlineUsers.includes(user._id) && (
-                      <span className='absolute bottom-0 right-0 size-3.5 bg-green-500 border-2 border-white rounded-full'></span>
-                    )}
                 </div>
                 <div className='flex-1'>
                   <p className='font-medium text-slate-700'>{user.full_name}</p>

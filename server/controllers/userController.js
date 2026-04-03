@@ -6,7 +6,6 @@ import fs from 'fs';
 import path from 'path'
 import Post from "../models/Post.js";
 import Notification from "../models/Notification.js";
-import { io, getReceiverSocketId } from '../socket/socket.js';
 
 //Get User Data using userId
 export const getUserData = async (req, res) => {
@@ -236,11 +235,6 @@ export const followUser = async (req, res) => {
         
         await notif.populate('sender', 'username profile_picture full_name');
         
-        const receiverSocketId = getReceiverSocketId(targetId);
-        if(receiverSocketId){
-            io.to(receiverSocketId).emit('getNotification', notif);
-        }
-
         res.json({ success: true, message: 'Now you are following this user' })
 
     }

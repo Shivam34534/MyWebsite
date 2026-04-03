@@ -2,7 +2,6 @@ import fs from "fs"
 import path from "path"
 import imagekit, { getImageKitUrl } from "../configs/imageKit.js";
 import Message from "../models/Message.js";
-import { io, getReceiverSocketId } from "../socket/socket.js";
 
 //Send Message
 export const sendMessage = async (req, res) => {
@@ -47,27 +46,19 @@ export const sendMessage = async (req, res) => {
             }
         }
 
-        const receiverSocketId = getReceiverSocketId(targetUserId);
-        const status = receiverSocketId ? 'delivered' : 'sent';
-
         const message = await Message.create({
             from_user_id: userId,
             to_user_id: targetUserId,
             text,
             message_type,
             media_url,
-            status
+            status: 'sent'
         })
 
         res.json({ success: true, message });
 
-        //Send message to target user via Socket.io in real-time
-        if (receiverSocketId) {
-            io.to(receiverSocketId).emit("newMessage", message);
-        }
-
     } catch (error) {
-        console.log("Socket/Message Error:", error);
+        console.log("Message Error:", error);
         res.json({ success: false, message: error.message });
     }
 }
@@ -84,18 +75,11 @@ export const getChatMessages = async (req, res) => {
                 { from_user_id: to_user_id, to_user_id: userId }
             ]
         }).sort({ createdAt: -1 })
+        
         // mark messages as seen
-        const updated = await Message.updateMany({
+        await Message.updateMany({
             from_user_id: to_user_id, to_user_id: userId, status: { $ne: 'seen' }
         }, { status: 'seen' });
-
-        // Notify sender via socket if messages were just marked as seen
-        if (updated.modifiedCount > 0) {
-            const senderSocketId = getReceiverSocketId(to_user_id);
-            if (senderSocketId) {
-                io.to(senderSocketId).emit("messagesSeen", { receiverId: userId });
-            }
-        }
 
         res.json({ success: true, messages });
 

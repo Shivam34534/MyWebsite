@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import api from '../api/axios';
 import { useAuth } from '../mockClerk';
-import { useSocket } from '../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
@@ -11,7 +10,6 @@ const NotificationDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const { getToken } = useAuth();
-    const { socket } = useSocket();
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
 
@@ -34,16 +32,6 @@ const NotificationDropdown = () => {
     useEffect(() => {
         fetchNotifications();
     }, []);
-
-    // Listen for Real-Time notifications
-    useEffect(() => {
-        if (!socket) return;
-        socket.on('getNotification', (newNotification) => {
-            setNotifications(prev => [newNotification, ...prev]);
-            setUnreadCount(prev => prev + 1);
-        });
-        return () => socket.off('getNotification');
-    }, [socket]);
 
     // Handle Mark as Read
     const handleOpen = async () => {

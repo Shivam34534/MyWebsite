@@ -4,8 +4,6 @@ import rateLimit from 'express-rate-limit';
 import cors from 'cors';
 import 'dotenv/config.js';
 import connectDB from './configs/db.js';
-// import {inngest, functions} from './inngest/index.js'
-// import { serve } from 'inngest/express'
 import path from 'path'
 import userRouter from './routes/userRoutes.js';
 import postRouter from './routes/postRoutes.js';
@@ -14,14 +12,14 @@ import messageRouter from './routes/messageRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 import searchRouter from './routes/searchRoutes.js';
-import adminRouter from './routes/adminRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 import authRouter from './routes/authRoute.js';
 // Dev-only routes
 import devRouter from './routes/devRoutes.js'
 
-import { app, server } from './socket/socket.js';
+const app = express();
+
 
 console.log("Attempting to connect to DB...");
 try {
@@ -69,7 +67,6 @@ app.use('/api/message', messageRouter)
 app.use('/api/comment', commentRouter)
 app.use('/api/notification', notificationRouter)
 app.use('/api/search', searchRouter)
-app.use('/api/admin', adminRouter)
 
 // Expose development helper routes only in non-production environments
 if (process.env.NODE_ENV !== 'production') {
@@ -82,7 +79,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 4000;
 
 if (process.env.NODE_ENV !== 'test') {
-    server.listen(PORT, () => console.log(`Server is running with Socket.io on port: http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`Server is running on port: http://localhost:${PORT}`));
 }
 
 export default app;
