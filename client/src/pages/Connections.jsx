@@ -1,280 +1,60 @@
-import React, { useState, useEffect } from 'react'
-import { Users, UserPlus, UserCheck, UserRoundPen, MessageSquare } from 'lucide-react'
-import { assets } from '../assets/assets'
-import { useNavigate } from 'react-router-dom'
-import api from '../api/axios'
-import { useAuth } from '../mockClerk'
-import toast from 'react-hot-toast'
-import Loading from '../components/Loading'
-import { useDispatch } from 'react-redux'
-import { fetchUser } from '../features/user/userSlice'
+import React from 'react';
 
 const Connections = () => {
-
-  const [currentTab, setCurrentTab] = useState('Followers')
-  const [connections, setConnections] = useState([])
-  const [followers, setFollowers] = useState([])
-  const [following, setFollowing] = useState([])
-  const [pendingConnections, setPendingConnections] = useState([])
-  const [loading, setLoading] = useState(true)
-  const { getToken } = useAuth()
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-
-  const handleUnfollow = async (userId) => {
-    try {
-      const token = await getToken()
-      const { data } = await api.post('/api/user/unfollow', { id: userId }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (data.success) {
-        toast.success(data.message)
-        // Refresh connections
-        const { data: connData } = await api.get('/api/user/connections', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        if (connData.success) {
-          const fetchUserDetails = async (userIds) => {
-            return Promise.all(
-              userIds.map(async (userId) => {
-                try {
-                  const { data: userData } = await api.get(`/api/user/profile/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                  })
-                  return userData.success ? userData.profile : null
-                } catch (error) {
-                  return null
-                }
-              })
-            )
-          }
-          const [connUsers, followersUsers, followingUsers, pendingUsers] = await Promise.all([
-            fetchUserDetails(connData.connections || []),
-            fetchUserDetails(connData.followers || []),
-            fetchUserDetails(connData.following || []),
-            fetchUserDetails(connData.pendingConnections || [])
-          ])
-          setConnections(connUsers.filter(u => u !== null))
-          setFollowers(followersUsers.filter(u => u !== null))
-          setFollowing(followingUsers.filter(u => u !== null))
-          setPendingConnections(pendingUsers.filter(u => u !== null))
-        }
-      }
-    } catch (error) {
-      console.error('Error unfollowing user:', error)
-      toast.error(error.response?.data?.message || 'Failed to unfollow user')
-    }
-  }
-
-  const handleAcceptConnection = async (userId) => {
-    try {
-      const token = await getToken()
-      const { data } = await api.post('/api/user/accept', { id: userId }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (data.success) {
-        toast.success(data.message)
-        dispatch(fetchUser(token))
-        // Refresh connections
-        const { data: connData } = await api.get('/api/user/connections', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        if (connData.success) {
-          const fetchUserDetails = async (userIds) => {
-            return Promise.all(
-              userIds.map(async (userId) => {
-                try {
-                  const { data: userData } = await api.get(`/api/user/profile/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                  })
-                  return userData.success ? userData.profile : null
-                } catch (error) {
-                  return null
-                }
-              })
-            )
-          }
-          const [connUsers, followersUsers, followingUsers, pendingUsers] = await Promise.all([
-            fetchUserDetails(connData.connections || []),
-            fetchUserDetails(connData.followers || []),
-            fetchUserDetails(connData.following || []),
-            fetchUserDetails(connData.pendingConnections || [])
-          ])
-          setConnections(connUsers.filter(u => u !== null))
-          setFollowers(followersUsers.filter(u => u !== null))
-          setFollowing(followingUsers.filter(u => u !== null))
-          setPendingConnections(pendingUsers.filter(u => u !== null))
-        }
-      }
-    } catch (error) {
-      console.error('Error accepting connection:', error)
-      toast.error(error.response?.data?.message || 'Failed to accept connection')
-    }
-  }
-
-  useEffect(() => {
-    const fetchConnections = async () => {
-      try {
-        const token = await getToken()
-        const { data } = await api.get('/api/user/connections', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        if (data.success) {
-          // Fetch user details for each array
-          const fetchUserDetails = async (userIds) => {
-            return Promise.all(
-              userIds.map(async (userId) => {
-                try {
-                  const { data: userData } = await api.get(`/api/user/profile/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                  })
-                  return userData.success ? userData.profile : null
-                } catch (error) {
-                  console.error(`Error fetching user ${userId}:`, error)
-                  return null
-                }
-              })
-            )
-          }
-
-          const [connUsers, followersUsers, followingUsers, pendingUsers] = await Promise.all([
-            fetchUserDetails(data.connections || []),
-            fetchUserDetails(data.followers || []),
-            fetchUserDetails(data.following || []),
-            fetchUserDetails(data.pendingConnections || [])
-          ])
-
-          setConnections(connUsers.filter(u => u !== null))
-          setFollowers(followersUsers.filter(u => u !== null))
-          setFollowing(followingUsers.filter(u => u !== null))
-          setPendingConnections(pendingUsers.filter(u => u !== null))
-        } else {
-          toast.error(data.message || 'Failed to fetch connections')
-        }
-      } catch (error) {
-        console.error('Error fetching connections:', error)
-        toast.error(error.response?.data?.message || 'Failed to fetch connections')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchConnections()
-  }, [])
-
-  const dataArray = [
-    { label: 'Followers', value: followers, icon: Users },
-    { label: 'Following', value: following, icon: UserCheck },
-    { label: 'Pending', value: pendingConnections, icon: UserRoundPen },
-    { label: 'Connections', value: connections, icon: UserPlus },
-  ]
-
-  if (loading) return <Loading />
+  const connections = [
+    { name: 'Elena Vance', handle: '@elena_creates', role: 'Designer', bio: 'Visual storyteller focused on brutalist architecture and minimalist digital experiences.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB_pklmRLtC87AneOXFWYGO6nRJBGCE02UI6pzXTw1DfQjuUo47r7v_4Tedpqq_hJ_yXzAzkOp26S3o-vBy5XrVp7M3Wq6dM5Kg4WUR61enVuWePp_DK1W68a1yR3O7Ws-NZzZtc2leZwq8QpszN8ILLf5rXPOfU4VE9SwwFORjQIFLg_a1bgRTUkdip1AoZpMvdN-V-hg0XCy4tmTZZrsFribg3cJZHYbL0kWiXkeDKALaokGf8wG0ldI_uaBDG39PMPrs8ldqcxTN' },
+    { name: 'Marcus Thorne', handle: '@mthorne_edits', role: 'Editor', bio: 'Curation specialist for high-end tech journals. Always looking for the next big shift.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCljrReiq_1YaSMXrS7tWGOr-XN4LdCPa3h72rAJ2M_ZMS2P-kdZxz_8pdvhK3H3ZOvrNTMKj8S-nUGQOETFeMDOucV7mIUkBoMei44O7GI-rbWqBT5DS7q2XtSMdDH1Hydjp0HcGXjp74Ut8fZzFPkkzPFQ72oWADG6o5pzHj-3TE1voTdIFDOR4iLjQz8OaVfeODidoKkwi7-HUI4I-O9AlG9SMgMAj7X-qRgiNkrageyvJc2GtNJILLk-wDsKzJyrSAYmopo3zOS' },
+    { name: 'Sia Nakamura', handle: '@sianak_arch', role: 'Architect', bio: 'Designing spaces that breathe. Exploring the intersection of digital and physical form.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHnWfXE9lgBNwNlHc8jcqes-996ATVlwGG5iEY5onqVSYGuKZZbXnBKSVXles260DScJE38SArr3d4YEoVcrvPhSvS5sREaa533uTommn-XAjZ0sNn7k3zUQgKrqy3NKfHj-kUN8kfzF9G4extCTdan07Bss5KwfppdMkoDoosv6odnQtwnvJS1gMbAgQ1zm1asxZoSnNBf3SZVfQQnuCyIEliz1UVDsHlrKW1k_oEprbpT9qn5eWUZ-4GOy7VEPOzJzfKCxw729X6' },
+  ];
 
   return (
-    <div className='min-h-screen bg-slate-50'>
-      <div className='max-w-6xl mx-auto p-6'>
-
-        {/* Title */}
+    <div className="max-w-6xl mx-auto px-6 py-12">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
         <div>
-          <h1 className='text-3xl font-bold text-slate-900 mb-2'>Connections</h1>
-          <p className='text-slate-600'>Manage your network and discover new
-            connections</p>
+          <h1 className="text-5xl font-extrabold font-headline tracking-tighter text-on-surface">Connections</h1>
+          <p className="text-on-surface-variant mt-2 max-w-md">Curate your network of digital storytellers and visionaries.</p>
         </div>
-
-        {/* Counts */}
-        <div className='mb-8 flex flex-wrap gap-6'>
-          {dataArray.map((item, index) => (
-            <div key={index} className='flex flex items-center justify-center 
-            gap-1 border h-20 w-40 border-gray-200 bg-white shadow rounded-md'>
-              <b>{item.value.length}</b>
-              <p className='text-slate-600'>{item.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Tabs */}
-        {/* Tabs */}
-        <div className='inline-flex flex-wrap items-center border border-gray-200 rounded-md p-1 bg-white shadow-sm'>
-          {
-            dataArray.map((tab) => (
-              <button onClick={() => setCurrentTab(tab.label)} key={tab.label}
-                className={`cursor-pointer flex items-center px-3 py-1 text-sm rounded-md
-                    transition-colors ${currentTab === tab.label ?
-                    'bg-white font-medium text-black' :
-                    'text-gray-500 hover:text-black'}`}>
-                <tab.icon className='w-4 h-4' />
-                <span className='ml-1'>{tab.label}</span>
-                {tab.count !== undefined && (
-                  <span className='ml-2 text-xs bg-gray-100 text-gray-700 px-2 py-0.5
-                      rounded-full'>{tab.count}</span>
-                )}
-              </button>
-            ))
-          }
-        </div>
-
-        {/* Connections*/}
-        <div className='flex wrap gap-6  mt-6'>
-          {dataArray.find((item) => item.label === currentTab)?.value.length === 0 ? (
-            <p className='text-gray-500 text-center py-8 w-full'>No {currentTab.toLowerCase()} yet.</p>
-          ) : (
-            dataArray.find((item) => item.label === currentTab)?.value.map((user) => (
-              <div key={user._id} className='w-full max-w-88 flex gap-5 p-6 bg-white
-            shadow rounded-md'>
-                <img src={user.profile_picture || assets.sample_profile} alt=""
-                  onError={(e) => { e.target.src = assets.sample_profile }}
-                  className="rounded-full w-12 h-12 shadow-md mx-auto" />
-                <div className='flex-1'>
-                  <p className='font-medium text-slate-700'>{user.full_name}</p>
-                  <p className='text-slate-500'>@{user.username}</p>
-                  {user.bio && <p className='text-slate-500'>{user.bio.slice(0, 30)}...</p>}
-                  <div className='flex max-sm:flex-col gap-2 mt-4'>
-                    {
-                      <button onClick={() => navigate(`/profile/${user._id}`)} className='w-full p-2 text-sm rounded
-                    bg-gradient-to-r from-indigo-500 to-purple-600
-                    hover:from-indigo-600 hover:to-purple-700 active:scale-95
-                    transition text-white cursor-pointer'>
-                        View Profile
-                      </button>
-                    }
-                    {
-                      currentTab === 'Following' && (
-                        <button onClick={() => handleUnfollow(user._id)} className='w-full p-2 text-sm rounded bg-slate-100 
-                      hover:bg-slate-200 text-black active:scale-95 transition 
-                      cursor-pointer'>
-                          Unfollow
-                        </button>
-                      )
-                    }
-                    {
-                      currentTab === 'Pending' && (
-                        <button onClick={() => handleAcceptConnection(user._id)} className='w-full p-2 text-sm rounded bg-slate-100 
-                      hover:bg-slate-200 text-black active:scale-95 transition 
-                      cursor-pointer'>
-                          Accept
-                        </button>
-                      )
-                    }
-                    {
-                      currentTab === 'Connections' && (
-                        <button onClick={() => navigate(`/messages/${user._id}`)} className='w-full p-2 text-sm rounded bg-slate-100 
-                      hover:bg-slate-200 text-slate-800 active:scale-95 transition 
-                      cursor-pointer flex items-center justify-center gap-1'>
-                          <MessageSquare className='w-4 h-4' />
-                          Message
-                        </button>
-                      )
-                    }
-
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+        {/* Tabbed Interface */}
+        <div className="flex bg-surface-container-low p-1.5 rounded-2xl">
+          <button className="px-8 py-2.5 rounded-xl bg-white shadow-sm font-bold text-primary transition-all text-sm">
+            Followers
+          </button>
+          <button className="px-8 py-2.5 rounded-xl font-bold text-on-surface-variant hover:text-on-surface transition-all text-sm">
+            Following
+          </button>
         </div>
       </div>
-    </div>
-  )
-}
 
-export default Connections
+      {/* Bento Grid of UserCards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {connections.map((user, i) => (
+          <div key={i} className="group bg-surface-container-lowest p-6 rounded-2xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 relative overflow-hidden shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="relative">
+                <img alt={user.name} className="w-20 h-20 rounded-full object-cover ring-4 ring-surface-container-low group-hover:ring-primary/20 transition-all" src={user.img}/>
+                <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-4 border-white rounded-full"></div>
+              </div>
+              <span className="perspective-chip uppercase tracking-wider text-[10px]">{user.role}</span>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold font-headline text-on-surface">{user.name}</h3>
+              <p className="text-primary text-sm font-semibold mb-3">{user.handle}</p>
+              <p className="text-on-surface-variant text-sm leading-relaxed mb-6">{user.bio}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="flex-1 primary-gradient text-white py-2.5 rounded-xl text-sm font-bold hover:scale-[0.98] transition-transform">
+                Follow Back
+              </button>
+              <button className="w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                <span className="material-symbols-outlined text-[20px]">more_horiz</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Connections;

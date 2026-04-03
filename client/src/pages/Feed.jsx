@@ -1,133 +1,78 @@
-import React, { useEffect, useState } from 'react'
-import { assets } from '../assets/assets'
-import Loading from '../components/Loading'
-import StoriesBar from '../components/StoriesBar'
-import PostCard from '../components/PostCard'
-import RecentMessages from '../components/RecentMessages'
-import api from '../api/axios'
-import { useAuth } from '../mockClerk'
-import toast from 'react-hot-toast'
+import React from 'react';
 
 const Feed = () => {
-
-
-  // Feed State
-  const [feeds, setfeeds] = useState([])
-  const [loading, setLoading] = useState(true)
-  
-  // Pagination State
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  // Sponsored State
-  const [sponsoredImg, setSponsoredImg] = useState(assets.sponsored_img)
-  const [sponsoredTitle, setSponsoredTitle] = useState("Email marketing")
-  const [sponsoredDesc, setSponsoredDesc] = useState("Supercharge your marketing with a powerful, easy-to-use platform built for results.")
-  const { getToken } = useAuth()
-
-
-  const fetchFeeds = async (pageNum = 1) => {
-    if (pageNum === 1) setLoading(true);
-    else setLoadingMore(true);
-
-    try {
-      const token = await getToken()
-      const { data } = await api.get(`/api/post/feed?page=${pageNum}&limit=10`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (data.success) {
-        if (pageNum === 1) {
-            setfeeds(data.data);
-        } else {
-            setfeeds(prev => [...prev, ...data.data]);
-        }
-        setHasMore(data.hasMore);
-      } else {
-        toast.error(data.message || 'Failed to fetch posts')
-      }
-    } catch (error) {
-      console.error('Error fetching feeds:', error)
-      toast.error(error.response?.data?.message || 'Failed to fetch posts')
-    } finally {
-      setLoading(false)
-      setLoadingMore(false)
+  const posts = [
+    {
+      title: "The Light Within",
+      time: "2 days ago",
+      author: "Eleanor Vance",
+      content: "Exploring how natural light interacts with raw concrete surfaces in my latest project. Minimalism is not about lack, it's about essence.",
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkJ7NtwmVG-faIsfqUibaoLaH-Bw4Y_wuNg_nm2KJFCwkMCrS0N30etGqaXZyA33TzzKll7nln5lfAzCQEoDJA_DWDtuLWeDkhiRM-5evX2EZxtd-h-SAGtnAG5vAFLNoI6p7bzHzZQjZriQo8RHvlDOvbWsyqym1MyjHlEJ9lnYzlN5SRWJgoELX0SK00ZN7AIC3bK9hqnw8-KGrIADPNFnmOpvJEbT9RUGVJtE21wnsUik5C-xwhJff4zF54jgSzF2H54aTpEoC-",
+      likes: "1.2k",
+      comments: "48",
+      tag: "Design"
+    },
+    {
+      title: "Geometric Echoes",
+      time: "5 days ago",
+      author: "Marcus Thorne",
+      content: "Architecture is the learned game, correct and magnificent, of forms assembled in the light. Today's find in the financial district.",
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAk4DW5bHT3PiH-dFUbj3TK4bjbTTAbJ_0gsZSSKZJWBiaVCVPF6ndnb0H0k6DqZHCHbMMO7ockZSGYbbnPQt2xzX1pQjVxIa9XaBxk1NJQ3fC7hSjqA2W3vHE7Nn9xGena0Mg0acEph6RcafsuIn42QfPRoQPggJNsL1JpiMu0O8fThU88nnM2YGnRqTWfQY3N5lMUBhYtPPsCkpi1nSZr_wtSgATl-UBmMWrXDkG_VjY5TWZ4HwGwZep2kPD73IHjuIYgywLkEQfn",
+      likes: "856",
+      comments: "32",
+      tag: "Brutalism"
     }
-  }
+  ];
 
-  useEffect(() => {
-    fetchFeeds(1)
-  }, [])
+  return (
+    <div className="max-w-4xl mx-auto px-6 py-12">
+      <header className="mb-12">
+        <h1 className="text-4xl font-black font-headline tracking-tighter text-on-surface">Curated Feed</h1>
+        <p className="text-on-surface-variant font-medium mt-1">Discover what's trending in your curated circle.</p>
+      </header>
 
-  return !loading ? (
-    <div className='h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex
-    items-start justify-center xl:gap-8'>
-      {/* Stories and post list */}
-      <div>
-        <StoriesBar />
-        <div className='p-4 space-y-6 w-full max-w-[35rem]'>
-          {feeds.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
-          
-          {/* Load More System */}
-          {hasMore && feeds.length > 0 && (
-            <div className='flex justify-center pt-2 pb-6'>
-                <button 
-                    onClick={() => {
-                        const next = page + 1;
-                        setPage(next);
-                        fetchFeeds(next);
-                    }} 
-                    disabled={loadingMore}
-                    className='px-6 py-2 bg-indigo-50/80 text-indigo-600 rounded-full font-medium hover:bg-indigo-100 transition disabled:opacity-50 text-sm'
-                >
-                    {loadingMore ? "Loading..." : "Load More Posts"}
-                </button>
+      <div className="space-y-12">
+        {posts.map((post, i) => (
+          <article key={i} className="bg-surface-container-lowest rounded-3xl overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-500 border border-surface-container">
+            <div className="flex flex-col md:flex-row">
+              <div className="md:w-1/2 aspect-square md:aspect-auto overflow-hidden">
+                <img alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src={post.img}/>
+              </div>
+              <div className="md:w-1/2 p-8 flex flex-col">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <span className="perspective-chip mb-3">{post.tag}</span>
+                    <h3 className="font-headline font-extrabold text-2xl text-on-surface leading-tight">{post.title}</h3>
+                    <div className="flex items-center gap-2 mt-2">
+                       <span className="text-on-surface-variant text-sm font-semibold">{post.author}</span>
+                       <span className="w-1 h-1 rounded-full bg-outline-variant"></span>
+                       <span className="text-on-surface-variant/60 text-xs">{post.time}</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-on-surface-variant leading-relaxed mb-8 flex-grow">{post.content}</p>
+                <div className="flex items-center justify-between pt-6 border-t border-surface-container">
+                  <div className="flex items-center gap-6">
+                    <button className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group/btn">
+                      <span className="material-symbols-outlined filled group-hover/btn:scale-120 transition-transform">favorite</span>
+                      <span className="text-sm font-bold">{post.likes}</span>
+                    </button>
+                    <button className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group/btn">
+                      <span className="material-symbols-outlined group-hover/btn:scale-120 transition-transform">chat_bubble</span>
+                      <span className="text-sm font-bold">{post.comments}</span>
+                    </button>
+                  </div>
+                  <button className="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+                    <span className="material-symbols-outlined">share</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Right Sidebar */}
-      <div className='max-xl:hidden stickly top-0'>
-        <div className='max-w-xs bg-white text-xs p-4 rounded-md inline-flex
-        flex-col gap-2 shadow' >
-          <h1 className='text-slate-800 font-semibold'>Sponsored</h1>
-          <div className='relative group cursor-pointer' onClick={() => document.getElementById('sponsored-upload').click()}>
-            <img src={sponsoredImg} className='w-75 h-50 rounded-md object-cover transition-opacity hover:opacity-90' alt="" />
-            <div className='absolute inset-0 bg-black/20 hidden group-hover:flex items-center justify-center rounded-md'>
-              <p className='text-white font-medium'>Change Image</p>
-            </div>
-          </div>
-          <input
-            type="file"
-            id="sponsored-upload"
-            hidden
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                setSponsoredImg(URL.createObjectURL(e.target.files[0]))
-              }
-            }}
-          />
-          <input
-            type="text"
-            value={sponsoredTitle}
-            onChange={(e) => setSponsoredTitle(e.target.value)}
-            className='text-indigo-950 font-semibold bg-transparent outline-none border-b border-transparent hover:border-gray-200 transition-colors w-full'
-          />
-          <textarea
-            value={sponsoredDesc}
-            onChange={(e) => setSponsoredDesc(e.target.value)}
-            className='text-slate-700 font-medium bg-transparent outline-none border-b border-transparent hover:border-gray-200 transition-colors w-full resize-none overflow-hidden'
-            rows={2}
-          />
-        </div>
-        <RecentMessages />
+          </article>
+        ))}
       </div>
     </div>
-  ) : <Loading />
-}
+  );
+};
 
-export default Feed
+export default Feed;

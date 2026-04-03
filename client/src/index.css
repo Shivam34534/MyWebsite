@@ -1,58 +1,87 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Teal Palette - Darkened for Visibility */
-  --color-indigo-50: #effcfd;
-  --color-indigo-100: #dff6f8;
-  --color-indigo-200: #bdeaf0;
-  --color-indigo-300: #8ddbe4;
-  --color-indigo-400: #5ad1db;
-  --color-indigo-500: #388E96;
-  /* Darker Teal */
-  --color-indigo-600: #2C7A80;
-  /* Darker Teal for Text/Buttons */
-  --color-indigo-700: #246368;
-  --color-indigo-800: #1C4D52;
-  --color-indigo-900: #15393D;
-  --color-indigo-950: #0E2528;
+  --color-surface-tint: #5e34e7;
+  --color-on-surface: #2b2f34;
+  --color-error-container: #f74b6d;
+  --color-outline-variant: #aaadb4;
+  --color-on-secondary-fixed-variant: #7900c5;
+  --color-on-tertiary-fixed: #170059;
+  --color-surface-container-high: #dee3ec;
+  --color-on-secondary-container: #6c00b0;
+  --color-on-secondary-fixed: #510086;
+  --color-secondary-fixed-dim: #deb3ff;
+  --color-background: #f3f6fd;
+  --color-secondary: #8900dd;
+  --color-on-error-container: #510017;
+  --color-inverse-surface: #0a0f13;
+  --color-on-background: #2b2f34;
+  --color-primary-container: #a491ff;
+  --color-tertiary-fixed-dim: #a595ff;
+  --color-inverse-primary: #947dff;
+  --color-surface: #f3f6fd;
+  --color-primary-dim: #5120db;
+  --color-surface-bright: #f3f6fd;
+  --color-primary-fixed-dim: #9780ff;
+  --color-on-tertiary-container: #2f009c;
+  --color-on-tertiary-fixed-variant: #3800b4;
+  --color-secondary-container: #e7c5ff;
+  --color-error: #b41340;
+  --color-surface-dim: #cfd5df;
+  --color-surface-container-highest: #d8dde7;
+  --color-on-surface-variant: #585c62;
+  --color-on-secondary: #fceeff;
+  --color-surface-container-low: #edf1f8;
+  --color-on-primary: #f6f0ff;
+  --color-surface-container: #e4e8f1;
+  --color-error-dim: #a70138;
+  --color-outline: #73777d;
+  --color-on-primary-fixed: #000000;
+  --color-secondary-fixed: #e7c5ff;
+  --color-tertiary-fixed: #b3a5ff;
+  --color-tertiary-container: #b3a5ff;
+  --color-on-primary-container: #230075;
+  --color-on-error: #ffefef;
+  --color-on-tertiary: #f6f0ff;
+  --color-primary: #5e34e7;
+  --color-tertiary: #5a2af7;
+  --color-primary-fixed: #a491ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-tertiary-dim: #4e0bec;
+  --color-on-primary-fixed-variant: #2d008e;
+  --color-secondary-dim: #7800c3;
+  --color-surface-variant: #d8dde7;
+  --color-inverse-on-surface: #999da3;
 
-  /* Salmon/Red Palette - Darkened for Visibility */
-  --color-purple-50: #fff1f2;
-  --color-purple-100: #ffe4e6;
-  --color-purple-200: #fecdd3;
-  --color-purple-300: #fda4af;
-  --color-purple-400: #fb7185;
-  --color-purple-500: #E85D60;
-  /* Darker Salmon */
-  --color-purple-600: #C94044;
-  /* Darker Red for Text/Buttons */
-  --color-purple-700: #A83236;
-  --color-purple-800: #8A2529;
-  --color-purple-900: #6E1B1E;
-  --color-purple-950: #420D10;
-
-  /* Yellow Palette - Replacing Amber */
-  --color-amber-50: #fefce8;
-  --color-amber-100: #fef9c3;
-  --color-amber-200: #fef08a;
-  --color-amber-300: #fde047;
-  --color-amber-400: #FAD575;
-  /* Base Yellow from image */
-  --color-amber-500: #eab308;
-  --color-amber-600: #ca8a04;
-
-  /* Orange Palette - Replacing Orange */
-  --color-orange-400: #F8A56A;
-  /* Base Orange from image */
-  --color-orange-500: #f97316;
-  --color-orange-600: #ea580c;
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
 }
 
-* {
-  font-family: "Outfit", sans-serif;
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-body selection:bg-primary/20 selection:text-primary;
+  }
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+@layer utilities {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    @apply inline-block;
+  }
+  .filled {
+    font-variation-settings: 'FILL' 1;
+  }
+  .perspective-chip {
+    @apply bg-surface-container-highest rounded px-3 py-1 text-xs font-bold text-on-surface-variant font-label;
+  }
+  .glass-header {
+    @apply bg-surface/80 dark:bg-slate-950/80 backdrop-blur-xl;
+  }
+  .editorial-gradient {
+    background: linear-gradient(135deg, #7551FF 0%, #A838FF 100%);
+  }
+  .primary-gradient {
+    background: linear-gradient(135deg, #7551FF 0%, #A838FF 100%);
+  }
 }
