@@ -19,25 +19,29 @@ const Admin = lazy(() => import('./pages/Admin'))
 
 
 const App = () => {
-  const { user } = useUser()
-  const { getToken, signOut } = useAuth()
+  const { user, isLoaded } = useUser()
+  const { signOut } = useAuth()
 
   const dispatch = useDispatch()
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (user) {
-        const token = await getToken()
-        const action = await dispatch(fetchUser(token))
-        // If server returns null (user not found), force logout to clear stale client state
-        if (fetchUser.fulfilled.match(action) && !action.payload) {
-          signOut();
+    // Only attempt to fetch data if auth is loaded and user exists
+    if (isLoaded && user) {
+      const fetchData = async () => {
+        try {
+          const action = await dispatch(fetchUser())
+          
+          if (fetchUser.fulfilled.match(action) && !action.payload) {
+            signOut();
+          }
+        } catch (error) {
+          // Errors are handled by global axios interceptor but keeping local safety
+          console.error("App user fetch error:", error);
         }
       }
+      fetchData()
     }
-    fetchData()
-
-  }, [user, getToken, dispatch])
+  }, [user, isLoaded, dispatch, signOut])
   
   // A sleek loading spinner to display while chunks are downloading
   const LoadingScreen = () => (

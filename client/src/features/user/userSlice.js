@@ -7,17 +7,11 @@ const initialState = {
     value: null
 }
 
-export const fetchUser = createAsyncThunk('user/fetchUser', async (token) => {
-    // Token format is "mock-token:userId:password" or just "mock-token"
-    const [tokenType, userId, password] = token.split(':')
-
+export const fetchUser = createAsyncThunk('user/fetchUser', async () => {
     const { data } = await api.get('api/user/data', {
         headers: {
-            Authorization: `Bearer ${tokenType}`,
-            'x-dev-user': userId || localStorage.getItem('dev_user'),
-            'x-dev-user-password': password || localStorage.getItem('dev_user_password'),
-            'x-dev-user-image': JSON.parse(localStorage.getItem('mock_user_data') || '{}')?.profile_picture || '',
-            'x-dev-user-fullname': JSON.parse(localStorage.getItem('mock_user_data') || '{}')?.fullName || ''
+            'x-dev-user': localStorage.getItem('dev_user') || '',
+            'x-dev-user-password': localStorage.getItem('dev_user_password') || ''
         }
     })
     return data.success ? data.data : null
