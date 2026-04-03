@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { assets } from '../assets/assets'
-import Loading from '../components/Loading'
 import StoriesBar from '../components/StoriesBar'
 import PostCard from '../components/PostCard'
+import PostSkeleton from '../components/PostSkeleton'
 import RecentMessages from '../components/RecentMessages'
 import api from '../api/axios'
 import { useAuth } from '../mockClerk'
@@ -59,20 +59,25 @@ const Feed = () => {
     fetchFeeds(1)
   }, [])
 
-  return !loading ? (
-    <div className='h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex
-    items-start justify-center xl:gap-8'>
+  return (
+    <div className='h-full overflow-y-scroll no-scrollbar py-6 xl:pr-5 flex
+    items-start justify-center xl:gap-8 bg-slate-50/50'>
       {/* Stories and post list */}
-      <div>
+      <div className='w-full max-w-[36rem]'>
         <StoriesBar />
-        <div className='p-4 space-y-6 w-full max-w-[35rem]'>
-          {feeds.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
+        <div className='p-4 space-y-8 mt-4'>
+          {loading ? (
+            // Render 3 skeletons initial load
+            [1, 2, 3].map((i) => <PostSkeleton key={i} />)
+          ) : (
+            feeds.map((post) => (
+              <PostCard key={post._id} post={post} />
+            ))
+          )}
           
           {/* Load More System */}
-          {hasMore && feeds.length > 0 && (
-            <div className='flex justify-center pt-2 pb-6'>
+          {hasMore && feeds.length > 0 && !loading && (
+            <div className='flex justify-center pt-2 pb-10'>
                 <button 
                     onClick={() => {
                         const next = page + 1;
@@ -80,7 +85,7 @@ const Feed = () => {
                         fetchFeeds(next);
                     }} 
                     disabled={loadingMore}
-                    className='px-6 py-2 bg-indigo-50/80 text-indigo-600 rounded-full font-medium hover:bg-indigo-100 transition disabled:opacity-50 text-sm'
+                    className='px-8 py-3 bg-white text-indigo-600 rounded-2xl font-bold shadow-sm hover:shadow-md border border-gray-100 transition-all active:scale-95 disabled:opacity-50 text-sm'
                 >
                     {loadingMore ? "Loading..." : "Load More Posts"}
                 </button>
@@ -90,14 +95,17 @@ const Feed = () => {
       </div>
 
       {/* Right Sidebar */}
-      <div className='max-xl:hidden stickly top-0'>
-        <div className='max-w-xs bg-white text-xs p-4 rounded-md inline-flex
-        flex-col gap-2 shadow' >
-          <h1 className='text-slate-800 font-semibold'>Sponsored</h1>
-          <div className='relative group cursor-pointer' onClick={() => document.getElementById('sponsored-upload').click()}>
-            <img src={sponsoredImg} className='w-75 h-50 rounded-md object-cover transition-opacity hover:opacity-90' alt="" />
-            <div className='absolute inset-0 bg-black/20 hidden group-hover:flex items-center justify-center rounded-md'>
-              <p className='text-white font-medium'>Change Image</p>
+      <div className='max-xl:hidden sticky top-6 space-y-6'>
+        <div className='w-80 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col gap-4' >
+          <div className='flex items-center justify-between'>
+            <h1 className='text-slate-900 font-bold'>Sponsored</h1>
+            <span className='text-[10px] text-slate-400 font-bold uppercase tracking-widest'>Ad</span>
+          </div>
+          
+          <div className='relative group cursor-pointer overflow-hidden rounded-2xl shadow-inner' onClick={() => document.getElementById('sponsored-upload').click()}>
+            <img src={sponsoredImg} className='w-full h-44 rounded-2xl object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100' alt="" />
+            <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center'>
+              <p className='text-white font-bold text-xs'>Change Image</p>
             </div>
           </div>
           <input
@@ -111,23 +119,28 @@ const Feed = () => {
               }
             }}
           />
-          <input
-            type="text"
-            value={sponsoredTitle}
-            onChange={(e) => setSponsoredTitle(e.target.value)}
-            className='text-indigo-950 font-semibold bg-transparent outline-none border-b border-transparent hover:border-gray-200 transition-colors w-full'
-          />
-          <textarea
-            value={sponsoredDesc}
-            onChange={(e) => setSponsoredDesc(e.target.value)}
-            className='text-slate-700 font-medium bg-transparent outline-none border-b border-transparent hover:border-gray-200 transition-colors w-full resize-none overflow-hidden'
-            rows={2}
-          />
+          <div>
+            <input
+                type="text"
+                value={sponsoredTitle}
+                onChange={(e) => setSponsoredTitle(e.target.value)}
+                className='text-slate-900 font-bold bg-transparent outline-none border-none w-full text-sm'
+            />
+            <textarea
+                value={sponsoredDesc}
+                onChange={(e) => setSponsoredDesc(e.target.value)}
+                className='text-slate-500 font-medium text-xs bg-transparent outline-none border-none w-full resize-none mt-1'
+                rows={2}
+            />
+          </div>
+          <button className='w-full py-2.5 bg-indigo-50 text-indigo-600 rounded-xl font-bold text-xs hover:bg-indigo-100 transition-colors'>
+            Learn More
+          </button>
         </div>
         <RecentMessages />
       </div>
     </div>
-  ) : <Loading />
+  )
 }
 
 export default Feed

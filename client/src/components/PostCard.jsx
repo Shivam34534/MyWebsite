@@ -16,7 +16,7 @@ const PostCard = ({ post }) => {
     if (!post || !post.user) return null;
 
     const postWithHashtags = post.content?.replace(/(#\w+)/g,
-        '<span class="text-indigo-600">$1</span>') || ''
+        '<span class="text-indigo-600 font-medium">$1</span>') || ''
 
     const [likes, setLikes] = useState(post.likes_count || [])
     const [commentCount, setCommentCount] = useState(post.comments_count || 0)
@@ -25,6 +25,7 @@ const PostCard = ({ post }) => {
     const [showComments, setShowComments] = useState(false)
     const currentUser = useSelector((state) => state.user.value)
     const { getToken } = useAuth()
+    const navigate = useNavigate()
 
     const handleLike = async () => {
         try {
@@ -50,10 +51,9 @@ const PostCard = ({ post }) => {
         const shareData = {
             title: 'Check out this post on Aura!',
             text: post.content,
-            url: window.location.origin // In a real app, this would be a deep link like `/post/${post._id}`
+            url: window.location.origin
         }
 
-        // Call backend to increment share count
         try {
             const token = await getToken()
             await api.post('/api/post/share', { postId: post._id }, {
@@ -72,135 +72,99 @@ const PostCard = ({ post }) => {
                 console.log('Error sharing:', err)
             }
         } else {
-            // Fallback
             navigator.clipboard.writeText(shareData.url + ' ' + shareData.text)
             toast.success('Link copied to clipboard')
         }
     }
 
-    const navigate = useNavigate()
     return (
-        <div className='bg-white sm:border border-gray-200 sm:rounded-lg sm:my-3 transition-shadow duration-250 w-full max-w-[550px] mx-auto overflow-hidden'>
+        <div className='bg-white border border-gray-100 sm:rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 w-full max-w-[550px] mx-auto group/card'>
             {/* User Info Header */}
-            <div className='px-3 py-3 flex items-center justify-between'>
-                <div onClick={() => navigate('/profile/' + post.user._id)} className='flex items-center gap-2.5 cursor-pointer group'>
-                    <div className='w-[42px] h-[42px] rounded-full bg-gradient-to-tr from-yellow-400 to-indigo-600 p-[2px]'>
-                        <img src={post.user.profile_picture || assets.sample_profile} alt="Profile" className='w-full h-full rounded-full object-cover border-2 border-white' />
-                    </div>
-                    <div className='flex flex-col'>
-                        <div className='flex items-center gap-1'>
-                            <span className='font-semibold text-[14px] text-gray-900 leading-tight group-hover:text-gray-600 transition-colors'>
-                                {post.user.username}
-                            </span>
-                            {/* <BadgeCheck className='w-3.5 h-3.5 text-blue-500 fill-blue-500 text-white' /> */}
+            <div className='px-5 py-4 flex items-center justify-between'>
+                <div onClick={() => navigate('/profile/' + post.user._id)} className='flex items-center gap-3 cursor-pointer group'>
+                    <div className='relative'>
+                        <div className='w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-yellow-400 via-rose-400 to-indigo-600 p-[2.5px] transition-transform duration-500 group-hover:rotate-12'>
+                            <img src={post.user.profile_picture || assets.sample_profile} alt="Profile" className='w-full h-full rounded-full object-cover border-2 border-white' />
+                        </div>
+                        <div className='absolute -bottom-1 -right-1 w-4 h-4 bg-indigo-500 border-2 border-white rounded-full flex items-center justify-center'>
+                           <div className='w-1.5 h-1.5 bg-white rounded-full animate-pulse'></div>
                         </div>
                     </div>
+                    <div className='flex flex-col'>
+                        <span className='font-bold text-[15px] text-slate-900 leading-tight group-hover:text-indigo-600 transition-colors'>
+                            {post.user.username}
+                        </span>
+                        <span className='text-[11px] text-slate-400 font-medium'>{moment(post.createdAt).fromNow()}</span>
+                    </div>
                 </div>
-            </div>            {/* Media (Images/Videos) */}
+                <button className='p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400'>
+                    <BadgeCheck className='w-5 h-5 text-indigo-500' />
+                </button>
+            </div>
+
+            {/* Media (Images/Videos) */}
             {post.image_urls && post.image_urls.length > 0 && (
-                <div className={`grid gap-[1px] w-full bg-black ${post.image_urls.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                <div className={`relative w-full bg-slate-50 overflow-hidden ${post.image_urls.length > 1 ? 'grid grid-cols-2 gap-1' : ''}`}>
                     {post.image_urls.map((url, index) => {
                         const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(url);
-                        const isSingle = post.image_urls.length === 1;
-
-                        return isVideo ? (
-                            <div key={index} className={`bg-black w-full flex items-center justify-center overflow-hidden ${isSingle ? 'aspect-square' : 'aspect-square'}`}>
-                                <video
-                                    src={url}
-                                    controls
-                                    className='w-full h-full object-cover'
-                                />
+                        return (
+                            <div key={index} className='aspect-square overflow-hidden group/media'>
+                                {isVideo ? (
+                                    <video src={url} controls className='w-full h-full object-cover' />
+                                ) : (
+                                    <img 
+                                        src={url} 
+                                        className='w-full h-full object-cover transition-transform duration-700 group-hover/media:scale-110' 
+                                        alt="" 
+                                    />
+                                )}
                             </div>
-                        ) : (
-                            <div key={index} className={`w-full flex items-center justify-center bg-gray-100 overflow-hidden ${isSingle ? 'aspect-square' : 'aspect-square'}`}>
-                                <img
-                                    src={url}
-                                    className='w-full h-full object-cover hover:opacity-95 transition-opacity cursor-pointer'
-                                    alt={`Post media ${index + 1}`}
-                                />
-                            </div>
-                        );
+                        )
                     })}
                 </div>
-            )
-            }
+            )}
 
             {/* Actions Bar */}
-            <div className='px-3 py-3 flex items-center justify-between bg-white'>
-                <div className='flex items-center gap-4'>
-                    <button
-                        onClick={handleLike}
-                        className='group transition-transform active:scale-90 hover:opacity-70'
-                        aria-label="Like post"
-                    >
-                        <Heart className={`w-[26px] h-[26px] transition-colors ${likes.includes(currentUser._id) ? 'fill-red-500 text-red-500' : 'text-gray-900'}`} />
+            <div className='px-5 pt-4 pb-3 flex items-center justify-between'>
+                <div className='flex items-center gap-6'>
+                    <button onClick={handleLike} className='flex items-center gap-1.5 group/btn transition-transform active:scale-90'>
+                        <Heart className={`w-7 h-7 transition-all duration-300 ${likes.includes(currentUser._id) ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-700 group-hover/btn:text-rose-500'}`} />
+                        <span className='text-xs font-bold text-slate-600'>{likes.length}</span>
                     </button>
 
-                    <button
-                        onClick={() => setShowComments(!showComments)}
-                        className='group transition-transform active:scale-90 hover:opacity-70'
-                        aria-label="Comment on post"
-                    >
-                        <MessageCircle className='w-[26px] h-[26px] text-gray-900 transition-colors' />
+                    <button onClick={() => setShowComments(!showComments)} className='flex items-center gap-1.5 group/btn transition-transform active:scale-90'>
+                        <MessageCircle className='w-7 h-7 text-slate-700 group-hover/btn:text-indigo-500 transition-colors' />
+                        <span className='text-xs font-bold text-slate-600'>{commentCount}</span>
                     </button>
 
-                    <button
-                        onClick={handleShare}
-                        className='group transition-transform active:scale-90 hover:opacity-70'
-                        aria-label="Share post"
-                    >
-                        <Share2 className='w-[26px] h-[26px] text-gray-900 transition-colors' />
+                    <button onClick={handleShare} className='flex items-center gap-1.5 group/btn transition-transform active:scale-90'>
+                        <Share2 className='w-7 h-7 text-slate-700 group-hover/btn:text-emerald-500 transition-colors' />
+                        <span className='text-xs font-bold text-slate-600'>{shareCount}</span>
                     </button>
                 </div>
             </div>
 
-            {/* Post Data Area (Likes, Caption, Comments) */}
-            <div className='px-3 pb-4'>
-                {/* Likes String */}
-                {likes.length > 0 && (
-                    <div
-                        onClick={() => setShowLikes(true)}
-                        className='font-semibold text-[14px] text-gray-900 cursor-pointer mb-1.5'
-                    >
-                        {likes.length} {likes.length === 1 ? 'like' : 'likes'}
-                    </div>
-                )}
-
-                {/* Caption / Content */}
+            {/* Content Area */}
+            <div className='px-5 pb-6'>
                 {post.content && (
-                    <div className='text-[14px] text-gray-900 leading-[18px] mb-1.5 inline-block w-full'>
-                        <span
-                            onClick={() => navigate('/profile/' + post.user._id)}
-                            className='font-semibold cursor-pointer mr-2'
-                        >
+                    <div className='text-[14px] text-slate-800 leading-relaxed'>
+                        <span onClick={() => navigate('/profile/' + post.user._id)} className='font-bold cursor-pointer hover:text-indigo-600 transition-colors mr-2'>
                             {post.user.username}
                         </span>
-                        <span
-                            className='whitespace-pre-wrap break-words inline'
-                            dangerouslySetInnerHTML={{ __html: postWithHashtags }}
-                        />
+                        <span className='whitespace-pre-wrap break-words inline text-slate-600' dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
                     </div>
                 )}
-
-                {/* Comments Link */}
+                
                 {commentCount > 0 && (
-                    <div
-                        onClick={() => setShowComments(true)}
-                        className='text-[14px] text-gray-500 cursor-pointer mb-1.5 hover:underline'
-                    >
-                        View all {commentCount} comments
-                    </div>
+                    <button onClick={() => setShowComments(true)} className='text-xs font-bold text-indigo-500 mt-3 hover:text-indigo-700 transition-colors'>
+                        View all {commentCount} discussions
+                    </button>
                 )}
-
-                {/* Timestamp */}
-                <div className='text-[10px] text-gray-400 uppercase tracking-wide mt-1'>
-                    {moment(post.createdAt).fromNow()}
-                </div>
             </div>
 
             {showLikes && <PostLikesList likes={likes} setShowLikes={setShowLikes} />}
             {showComments && <PostCommentsList postId={post._id} setShowComments={setShowComments} onCommentAdded={() => setCommentCount(prev => prev + 1)} />}
-        </div >
+        </div>
     )
 }
 
