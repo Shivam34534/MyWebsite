@@ -1,171 +1,150 @@
-import React from 'react';
+import React, { useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { useEffect } from 'react'
+import UserProfileInfo from '../components/UserProfileInfo'
+import PostCard from '../components/PostCard'
+import moment from 'moment'
+import ProfileModal from '../components/ProfileModal'
+import Loading from '../components/Loading'
+import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
+import { useUser, useAuth } from '../mockClerk'
+import api from '../api/axios'
+import { assets } from '../assets/assets'
+
 
 const Profile = () => {
-  return (
-    <div className="bg-surface min-h-screen">
-      {/* Profile Header Section */}
-      <section className="relative">
-        {/* Banner */}
-        <div className="h-48 md:h-72 w-full primary-gradient overflow-hidden">
-          <div 
-            className="w-full h-full opacity-30 mix-blend-overlay" 
-            style={{ 
-              backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGd0JUPncsC7-fBdfuCjku0fYUW5LT_pOJbA0tfd_iKc3mrxqqKGCIFTkrSjADpT1s7J-sMD6lgs3FuQTD2ASdMrnECJN7kEoK7wMHzoGAFCf4vhOLi103xuaOurs12NacrQZ_VHj7Yql-wdpstsl6YdSxJCaHPre6z3OZVFgWBxj9QNoCVe_xdoIH7tJhKZb43ycuQCUKNw_UszmkXYfcv9MBInffE4pybh3sXn9PyEybC2_lRW9dqVCicTX9__RZJsychDIBRk-N')", 
-              backgroundSize: 'cover', 
-              backgroundPosition: 'center' 
-            }} 
-          />
-        </div>
-        {/* Profile Info Overlap */}
-        <div className="max-w-5xl mx-auto px-6 -mt-16 md:-mt-24 relative z-10 pb-12">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
-              <div className="p-1.5 bg-surface rounded-full shadow-xl">
-                <img alt="Eleanor Vance" className="w-32 h-32 md:w-44 md:h-44 rounded-full object-cover border-4 border-surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZLPzTGJ-vOLN6VORZWCP-zdyJEKMhvWbhOI-mLDX8aZTpMU_CPUx8RiPzzZFizTkZgxeFJ54hFh0NNj-Y72he_1F2rTB4kAM_siLSXR76nNluNVHc8vwjutLIsaBIz5LaijMJBzrDWmRJMvkLD1-fRHnxZzkpwaj58FBH8c6Brg6oHbusmIRMDF__AyLUBnS5su39ftIk53uZsXirc4y4bQ8BVoYFCYRWt5mG22V1lsDacPonqJPVqqMjRUV_Aeszw0JguJEk1QrU"/>
-              </div>
-              <div className="pb-2">
-                <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tight text-on-surface">Eleanor Vance</h1>
-                <p className="text-on-surface-variant text-lg font-medium mt-1">Interior Architect & Digital Curator</p>
-              </div>
-            </div>
-            <div className="flex gap-4 pb-4">
-              <button className="px-6 py-2.5 rounded-full bg-surface-container-high text-on-surface font-semibold hover:bg-surface-container-highest transition-colors">Edit Profile</button>
-              <button className="px-6 py-2.5 rounded-full primary-gradient text-white font-bold shadow-lg hover:brightness-105 transition-all">Share</button>
-            </div>
+  const currentUser = useSelector((state) => state.user.value)
+
+  const { getToken } = useAuth()
+  const { profileId } = useParams()
+  const [user, setUser] = useState(null)
+  const [posts, setPosts] = useState([])
+  const [likedPosts, setLikedPosts] = useState([])
+  const [activeTab, setActiveTab] = useState('posts')
+  const [showEdit, setShowEdit] = useState(false)
+
+  const fetchUser = async (profileId) => {
+    const token = await getToken()
+
+    try {
+      const { data } = await api.post(`api/user/profiles`, { profileId }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (data.success) {
+        setUser(data.profile)
+        setPosts(data.posts)
+        setLikedPosts(data.likedPosts || [])
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+
+  }
+
+  useEffect(() => {
+    if (profileId) {
+      fetchUser(profileId)
+    } else {
+      fetchUser(currentUser._id)
+    }
+  }, [profileId, currentUser])
+
+  return user ? (
+    <div className='relative h-full overflow-y-scroll bg-gray-50 p-6'>
+      <div className='max-w-3xl mx-auto'>
+
+        <div className='bg-white rounded-2xl shadow overflow-hidden'>
+
+          <div className='h-40 md:h-56 bg-gradient-to-r from-indigo-200
+            via-purple-200 to-orange-200'>
+            {user.cover_picture && <img src={user.cover_picture} alt=""
+              className='w-full h-full object-cover' />}
           </div>
-          {/* Bio & Stats Bento Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <div className="md:col-span-2 p-8 bg-surface-container-lowest rounded-2xl shadow-sm">
-              <h3 className="text-xs uppercase tracking-widest text-outline font-bold mb-4">Biography</h3>
-              <p className="text-on-surface leading-relaxed text-lg italic">
-                "Exploring the intersection of brutalist architecture and organic minimalism. Curating spaces that breathe and stories that resonate in the digital void."
-              </p>
-              <div className="flex gap-3 mt-6">
-                <span className="perspective-chip">#ArchDaily</span>
-                <span className="perspective-chip">#Minimalism</span>
-                <span className="perspective-chip">#DigitalSpace</span>
-              </div>
-            </div>
-            <div className="p-8 bg-surface-container-low rounded-2xl flex flex-col justify-center gap-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-3xl font-black font-headline text-primary">128</p>
-                  <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Posts</p>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary">grid_view</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-3xl font-black font-headline text-primary">12.4k</p>
-                  <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Followers</p>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary">group</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-3xl font-black font-headline text-primary">842</p>
-                  <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Following</p>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary">person_add</span>
-                </div>
-              </div>
-            </div>
+
+          <UserProfileInfo user={user} posts={posts} profileId={profileId}
+            setShowEdit={setShowEdit} onUpdate={() => fetchUser(profileId || currentUser._id)} />
+        </div>
+
+        <div className='mt-6'>
+          <div className='bg-white rounded-xl shadow p-1 flex max-w-md mx-auto'>
+            {["posts", "media", "likes"].map((tab) => (
+              <button onClick={() => setActiveTab(tab)} key={tab} className={`flex-1 px-4 py-2 text-sm font-medium
+                rounded-lg transition-colors cursor-pointer ${activeTab === tab ?
+                  "bg-indigo-600 text-white" : "text-gray-600 hover:text-gray-900"}`}>
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
           </div>
-        </div>
-      </section>
 
-      {/* Feed Section */}
-      <section className="max-w-5xl mx-auto px-6">
-        {/* Tabs */}
-        <div className="flex gap-12 mb-8 border-b-0">
-          <button className="pb-4 text-primary font-bold border-b-2 border-primary flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl">grid_on</span>
-            <span className="font-headline uppercase tracking-widest text-sm">Posts</span>
-          </button>
-          <button className="pb-4 text-slate-500 font-semibold hover:text-primary transition-colors flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl">perm_media</span>
-            <span className="font-headline uppercase tracking-widest text-sm">Media</span>
-          </button>
-          <button className="pb-4 text-slate-500 font-semibold hover:text-primary transition-colors flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl">bookmark</span>
-            <span className="font-headline uppercase tracking-widest text-sm">Saved</span>
-          </button>
-        </div>
+          {activeTab === 'posts' && (
 
-        {/* Post Grid (Asymmetric Editorial Style) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-20">
-          {/* Post Card 1 */}
-          <article className="bg-surface-container-lowest rounded-2xl overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
-            <div className="aspect-square w-full overflow-hidden">
-              <img alt="Interior design post" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkJ7NtwmVG-faIsfqUibaoLaH-Bw4Y_wuNg_nm2KJFCwkMCrS0N30etGqaXZyA33TzzKll7nln5lfAzCQEoDJA_DWDtuLWeDkhiRM-5evX2EZxtd-h-SAGtnAG5vAFLNoI6p7bzHzZQjZriQo8RHvlDOvbWsyqym1MyjHlEJ9lnYzlN5SRWJgoELX0SK00ZN7AIC3bK9hqnw8-KGrIADPNFnmOpvJEbT9RUGVJtE21wnsUik5C-xwhJff4zF54jgSzF2H54aTpEoC-"/>
+            <div className='mt-6 flex flex-col items-center gap-6'>
+              {posts.length > 0 ? (
+                posts.map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))
+              ) : (
+                <p className='text-gray-500'>No posts yet.</p>
+              )}
             </div>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-headline font-bold text-xl text-on-surface">The Light Within</h3>
-                  <p className="text-on-surface-variant text-sm mt-1 font-label">Posted 2 days ago</p>
-                </div>
-                <button className="p-2 hover:bg-surface-container-low rounded-full transition-colors">
-                  <span className="material-symbols-outlined">more_vert</span>
-                </button>
-              </div>
-              <p className="text-on-surface-variant mb-6 line-clamp-2">Exploring how natural light interacts with raw concrete surfaces in my latest project. Minimalism is not about lack, it's about essence.</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
-                    <span className="material-symbols-outlined filled">favorite</span>
-                    <span className="text-sm font-bold">1.2k</span>
-                  </button>
-                  <button className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
-                    <span className="material-symbols-outlined">chat_bubble</span>
-                    <span className="text-sm font-bold">48</span>
-                  </button>
-                </div>
-                <span className="perspective-chip uppercase">Design</span>
-              </div>
-            </div>
-          </article>
+          )}
 
-          {/* Post Card 2 */}
-          <article className="bg-surface-container-lowest rounded-2xl overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
-            <div className="aspect-square w-full overflow-hidden">
-              <img alt="Architecture post" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAk4DW5bHT3PiH-dFUbj3TK4bjbTTAbJ_0gsZSSKZJWBiaVCVPF6ndnb0H0k6DqZHCHbMMO7ockZSGYbbnPQt2xzX1pQjVxIa9XaBxk1NJQ3fC7hSjqA2W3vHE7Nn9xGena0Mg0acEph6RcafsuIn42QfPRoQPggJNsL1JpiMu0O8fThU88nnM2YGnRqTWfQY3N5lMUBhYtPPsCkpi1nSZr_wtSgATl-UBmMWrXDkG_VjY5TWZ4HwGwZep2kPD73IHjuIYgywLkEQfn"/>
+          {activeTab === 'media' && (
+            <div className='flex flex-wrap mt-6 max-w-6xl gap-1'>
+              {
+                posts.filter((post) => post.image_urls?.length > 0).map((post) => (
+                  <React.Fragment key={post._id}>
+                    {post.image_urls.map((image, index) => (
+                      <Link target='_blank' to={image} key={index} className='relative group '>
+                        <img src={image} className='w-63 aspect-video
+                        object-cover' alt="" />
+                        <p className='absolute bottom-0 right-0 text-xs p-1 px-3
+                        backdrop-blur-xl text-white opacity-0 group-hover:opacity-100
+                        transition duration-300'>Posted {moment(post.createdAt).
+                            fromNow()}</p>
+                      </Link>
+                    ))}
+                  </React.Fragment>
+                ))
+              }
             </div>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-headline font-bold text-xl text-on-surface">Geometric Echoes</h3>
-                  <p className="text-on-surface-variant text-sm mt-1 font-label">Posted 5 days ago</p>
-                </div>
-                <button className="p-2 hover:bg-surface-container-low rounded-full transition-colors">
-                  <span className="material-symbols-outlined">more_vert</span>
-                </button>
-              </div>
-              <p className="text-on-surface-variant mb-6 line-clamp-2">Architecture is the learned game, correct and magnificent, of forms assembled in the light. Today's find in the financial district.</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
-                    <span className="material-symbols-outlined">favorite</span>
-                    <span className="text-sm font-bold">856</span>
-                  </button>
-                  <button className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
-                    <span className="material-symbols-outlined">chat_bubble</span>
-                    <span className="text-sm font-bold">32</span>
-                  </button>
-                </div>
-                <span className="perspective-chip uppercase">Brutalism</span>
-              </div>
+          )}
+
+          {activeTab === 'likes' && (
+            <div className='mt-6 flex flex-col items-center gap-6'>
+              {likedPosts.length > 0 ? (
+                likedPosts.map((post) => (
+                  <div key={post._id} className="flex items-center gap-3 p-3 w-full bg-white rounded-lg shadow-sm border border-gray-100">
+                    <Link to={`/profile/${post.user._id}`}>
+                      <img
+                        src={post.user.profile_picture || assets.sample_profile}
+                        onError={(e) => { e.target.src = assets.sample_profile }}
+                        alt=""
+                        className='w-10 h-10 rounded-full object-cover'
+                      />
+                    </Link>
+                    <div className='flex flex-col'>
+                      <Link to={`/profile/${post.user._id}`} className='font-semibold text-gray-900 hover:underline'>
+                        {post.user.full_name}
+                      </Link>
+                      <span className='text-sm text-gray-500'>@{post.user.username}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className='text-gray-500'>No liked posts yet.</p>
+              )}
             </div>
-          </article>
+          )}
         </div>
-      </section>
+      </div>
+
+      {showEdit && <ProfileModal setShowEdit={setShowEdit} />}
     </div>
-  );
-};
+  ) : (<Loading />)
+}
 
-export default Profile;
+export default Profile

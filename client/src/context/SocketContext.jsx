@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth, useUser } from "../mockClerk"; // From our custom Auth setup
 import { io } from "socket.io-client";
 
@@ -51,15 +51,8 @@ export const SocketProvider = ({ children }) => {
         }
     }, [isSignedIn, user?.id]);
 
-    const value = useMemo(() => ({ 
-        socket, 
-        onlineUsers, 
-        hasUnreadMessages, 
-        setHasUnreadMessages 
-    }), [socket, onlineUsers, hasUnreadMessages]);
-
     return (
-        <SocketContext.Provider value={value}>
+        <SocketContext.Provider value={{ socket, onlineUsers, hasUnreadMessages, setHasUnreadMessages }}>
             {children}
         </SocketContext.Provider>
     );

@@ -49,7 +49,7 @@ const ProfileModal = ({ setShowEdit }) => {
 
             if (data.success) {
                 toast.success('Profile updated successfully')
-                dispatch(fetchUser())
+                dispatch(fetchUser(token))
                 setShowEdit(false)
             } else {
                 toast.error(data.message || 'Failed to update profile')

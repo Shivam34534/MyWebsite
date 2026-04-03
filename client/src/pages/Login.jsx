@@ -1,134 +1,457 @@
-import React, { useState } from 'react';
-import { useClerk } from '../mockClerk';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React, { useState } from 'react'
+import { assets } from '../assets/assets'
+import { Star, Lock, Mail, ArrowRight, User, PenBox, MapPin, Eye, EyeOff } from 'lucide-react'
+import { useClerk } from '../mockClerk'
+import toast from 'react-hot-toast'
 
 const Login = () => {
-  const { openSignIn } = useClerk();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  console.log("Login Component Rendered - Version 2.0");
+  const { openSignIn, openSignUp } = useClerk()
+  const [isSignup, setIsSignup] = useState(false)
+  const [isForgotPassword, setIsForgotPassword] = useState(false)
+  const [forgotPasswordStep, setForgotPasswordStep] = useState(1) // 1: Email, 2: OTP, 3: New Password
+
+  const [email, setEmail] = useState('')
+  const [otp, setOtp] = useState('')
+  const [generatedOtp, setGeneratedOtp] = useState('')
+  const [password, setPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [username, setUsername] = useState('')
+  const [location, setLocation] = useState('')
+
+  const [profilePreview, setProfilePreview] = useState(null)
+  const [profileBase64, setProfileBase64] = useState('')
+  const [profileFile, setProfileFile] = useState(null)
+
+  const [coverPreview, setCoverPreview] = useState(null)
+  const [coverBase64, setCoverBase64] = useState('')
+  const [coverFile, setCoverFile] = useState(null)
+
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const { resetPassword, checkUser, sendOtp } = useClerk()
+
+  const handleProfileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setProfileFile(file)
+      setProfilePreview(URL.createObjectURL(file))
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setProfileBase64(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setCoverFile(file)
+      setCoverPreview(URL.createObjectURL(file))
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setCoverBase64(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const res = await openSignIn({ email, password });
-    if (res.success) {
-      toast.success('Welcome to Astra Social!');
-      navigate('/');
-    } else {
-      toast.error(res.message || 'Login failed');
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      if (isForgotPassword) {
+        if (forgotPasswordStep === 1) {
+          const userCheck = await checkUser(email)
+          if (userCheck.success) {
+            const newOtp = Math.floor(100000 + Math.random() * 900000).toString()
+            setGeneratedOtp(newOtp)
+
+            // Send OTP to user's email
+            const res = await sendOtp(email, newOtp);
+            if (res.success) {
+              toast.success(`OTP sent to your email address!`, { duration: 6000 })
+              setForgotPasswordStep(2)
+            } else {
+              toast.error("Failed to send OTP email.");
+            }
+          } else {
+            toast.error("User not found with this email.")
+          }
+        } else if (forgotPasswordStep === 2) {
+          if (otp === generatedOtp) {
+            toast.success("OTP verified successfully!")
+            setForgotPasswordStep(3)
+          } else {
+            toast.error("Invalid OTP. Please try again.")
+          }
+        } else if (forgotPasswordStep === 3) {
+          const res = await resetPassword({ email, newPassword })
+          if (res.success) {
+            toast.success("Password reset successfully! Please sign in.")
+            setIsForgotPassword(false)
+            setForgotPasswordStep(1)
+            setOtp('')
+            setNewPassword('')
+          } else {
+            toast.error(res.message || "User not found with this email.")
+            setForgotPasswordStep(1)
+          }
+        }
+      } else if (isSignup) {
+        const res = await openSignUp({
+          email,
+          fullName,
+          username,
+          location,
+          password,
+          profile_picture: profileBase64,
+          profileFile: profileFile,
+          cover_picture: coverBase64,
+          coverFile: coverFile
+        })
+        if (res.success) {
+          toast.success("Account created successfully!")
+        } else {
+          toast.error(res.message || "Failed to create account")
+        }
+      } else {
+        const res = await openSignIn({ email, password })
+        if (res.success) {
+          toast.success("Successfully logged in!")
+        } else {
+          toast.error(res.message || "Account not found. Please sign up first!")
+        }
+      }
+    } catch (error) {
+      console.error("Auth error:", error)
+      toast.error("An error occurred during authentication.")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false);
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-6 relative overflow-hidden font-body">
-      {/* Background Orbs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full primary-gradient opacity-10 blur-[120px] animate-pulse"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary opacity-10 blur-[100px] animate-pulse delay-500"></div>
+    <div className='min-h-screen flex flex-col md:flex-row relative bg-white'>
+      {/* Background Image - Optimized for Mobile */}
+      <img
+        src={assets.bgImage}
+        alt="Background"
+        loading="lazy"
+        decoding="async"
+        className='absolute top-0 left-0 z-0 w-full h-full object-cover opacity-10 md:opacity-100 mix-blend-multiply'
+      />
 
-      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-        {/* Left Side: Branding */}
-        <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
-          <div className="space-y-2">
-            <span className="text-xl font-black text-primary tracking-widest uppercase font-headline">Astra Social</span>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-on-surface leading-none font-headline">
-              The Digital <br/>
-              <span className="text-transparent bg-clip-text editorial-gradient">Curator.</span>
-            </h1>
-          </div>
-          <p className="text-xl text-on-surface-variant max-w-lg leading-relaxed">
-            Welcome to the intersection of brutalist architecture and organic minimalism. Share what matters.
+      {/* Left Section - Hero (Hidden on Mobile) */}
+      <div className='hidden md:flex flex-1 flex-col items-start justify-between p-6 md:p-12 lg:pl-32 z-10'>
+        <img src={assets.logo} alt="Logo" className='h-12 object-contain' />
+
+        <div className='mt-20 md:mt-0'>
+          <h1 className='text-7xl font-bold leading-tight'>
+            <span className='bg-gradient-to-r from-indigo-950 to-indigo-700 bg-clip-text text-transparent'>
+              Aura evolution
+            </span>
+          </h1>
+          <p className='text-4xl text-indigo-900 font-light mt-2 max-w-lg'>
+            Illuminate your digital presence on Aura
           </p>
-          <div className="flex items-center gap-6 pt-4">
-             <div className="flex -space-x-3">
-               {[1,2,3,4].map(i => (
-                 <div key={i} className="w-12 h-12 rounded-full border-4 border-surface bg-surface-container-low overflow-hidden">
-                   <img src={`https://i.pravatar.cc/150?u=${i}`} alt="User" />
-                 </div>
-               ))}
-             </div>
-             <p className="font-bold text-on-surface/60 text-sm">Joined by 12k curators weekly</p>
+
+          <div className='flex items-center gap-4 mt-8'>
+            <div className='flex -space-x-3'>
+              {[1, 2, 3, 4, 5].map((_, i) => (
+                <div key={i} className='w-10 h-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden'>
+                  <img src={`https://i.pravatar.cc/100?img=${i + 10}`} className='w-full h-full object-cover' alt="" />
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className='flex gap-0.5'>
+                {Array(5).fill(0).map((_, i) => (
+                  <Star key={i} className='size-4 fill-amber-400 text-amber-400' />
+                ))}
+              </div>
+              <p className='text-sm text-gray-600 font-medium'>Trusted by 12k+ developers</p>
+            </div>
           </div>
         </div>
+        <div></div>
+      </div>
 
-        {/* Right Side: Auth Card */}
-        <div className="bg-surface-container-lowest p-10 md:p-14 rounded-[40px] shadow-2xl shadow-primary/10 border border-white/20 animate-in fade-in slide-in-from-right-8 duration-1000">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-black font-headline text-on-surface mb-2">Welcome Back</h2>
-            <p className="text-on-surface-variant font-medium">Continue your curation journey.</p>
+      {/* Right Section - Login Form */}
+      <div className='flex-1 flex items-center justify-center p-6 sm:p-12 z-10'>
+        <div className='w-full max-w-md bg-white/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-white/50'>
+
+          {/* Mobile Logo */}
+          <div className='md:hidden flex justify-center mb-6'>
+            <img src={assets.logo} alt="Logo" className='h-8 object-contain' />
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Email Address</label>
-              <input 
-                className="w-full bg-surface-container-low border-0 rounded-2xl px-6 py-4 text-on-surface focus:ring-2 focus:ring-primary/30 transition-all font-medium outline-hidden" 
-                placeholder="nina@astrasocial.com"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Password</label>
-                <a href="#" className="text-primary text-xs font-bold hover:underline">Forgot?</a>
+          <div className='text-center mb-8'>
+            <h2 className='text-2xl font-bold text-gray-800'>
+              {isForgotPassword ? (forgotPasswordStep === 1 ? 'Reset Password' : forgotPasswordStep === 2 ? 'Verify OTP' : 'New Password') : (isSignup ? 'Create Account' : 'Welcome Back')}
+            </h2>
+            <p className='text-gray-500 text-sm mt-1'>
+              {isForgotPassword ? (forgotPasswordStep === 1 ? 'Enter your email to receive an OTP' : forgotPasswordStep === 2 ? 'Enter the 6-digit OTP sent to your email' : 'Create a new secure password') : (isSignup ? 'Join our community today' : 'Please sign in to your account')}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className='space-y-5'>
+            {isSignup && (
+              <div className="flex flex-col gap-4 mb-4">
+                {/* Cover Photo */}
+                <div className='relative w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200'>
+                  {coverPreview ? (
+                    <img src={coverPreview} className='w-full h-full object-cover' alt="Cover" />
+                  ) : (
+                    <div className='flex items-center justify-center h-full text-gray-400 text-xs'>Cover Photo</div>
+                  )}
+                  <label htmlFor="coverPhoto" className='absolute bottom-2 right-2 bg-black/50 text-white p-1.5 rounded-full cursor-pointer hover:bg-black/70 transition'>
+                    <PenBox className='w-3 h-3' />
+                    <input
+                      type="file"
+                      id="coverPhoto"
+                      hidden
+                      accept="image/*"
+                      onChange={handleCoverChange}
+                    />
+                  </label>
+                </div>
+
+                {/* Profile Photo */}
+                <div className='flex flex-col items-center -mt-12'>
+                  <div className='relative group'>
+                    <div className='w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-gray-100 flex items-center justify-center shadow-md'>
+                      {profilePreview ? (
+                        <img src={profilePreview} className='w-full h-full object-cover' alt="Preview" />
+                      ) : (
+                        <User className='w-12 h-12 text-gray-400' />
+                      )}
+                    </div>
+                    <label htmlFor="profilePhoto" className='absolute bottom-0 right-0 bg-indigo-600 text-white p-1.5 rounded-full cursor-pointer hover:bg-indigo-700 transition shadow-lg'>
+                      <PenBox className='w-4 h-4' />
+                      <input
+                        type="file"
+                        id="profilePhoto"
+                        hidden
+                        accept="image/*"
+                        onChange={handleProfileChange}
+                      />
+                    </label>
+                  </div>
+                  <p className='text-xs text-gray-500 mt-2 font-medium'>Upload Profile</p>
+                </div>
               </div>
-              <input 
-                className="w-full bg-surface-container-low border-0 rounded-2xl px-6 py-4 text-on-surface focus:ring-2 focus:ring-primary/30 transition-all font-medium outline-hidden" 
-                placeholder="••••••••"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-              />
-            </div>
+            )}
 
-            <button 
+            {isSignup && (
+              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
+                <label htmlFor="fullName" className='block text-sm font-medium text-gray-700 mb-1.5'>Full Name</label>
+                <div className='relative'>
+                  <User className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    autoComplete="name"
+                    required={isSignup}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your name"
+                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                  />
+                </div>
+              </div>
+            )}
+
+            {isSignup && (
+              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
+                <label htmlFor="username" className='block text-sm font-medium text-gray-700 mb-1.5'>Username</label>
+                <div className='relative'>
+                  <User className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    autoComplete="username"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Choose a username"
+                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                  />
+                </div>
+              </div>
+            )}
+
+            {isSignup && (
+              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
+                <label htmlFor="location" className='block text-sm font-medium text-gray-700 mb-1.5'>Location</label>
+                <div className='relative'>
+                  <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Your location"
+                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                  />
+                </div>
+              </div>
+            )}
+
+            {(!isForgotPassword || forgotPasswordStep === 1) && (
+              <div>
+                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1.5'>Email or Username</label>
+                <div className='relative'>
+                  <Mail className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type="text"
+                    id="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                  />
+                </div>
+              </div>
+            )}
+
+            {isForgotPassword && forgotPasswordStep === 2 && (
+              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
+                <label htmlFor="otp" className='block text-sm font-medium text-gray-700 mb-1.5'>Verification Code</label>
+                <div className='relative'>
+                  <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type="text"
+                    id="otp"
+                    required
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter 6-digit OTP"
+                    maxLength={6}
+                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono tracking-widest'
+                  />
+                </div>
+              </div>
+            )}
+
+            {!isForgotPassword && (
+              <div>
+                <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-1.5'>Password</label>
+                <div className='relative'>
+                  <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className='w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {!isSignup && (
+                  <div className='flex justify-end mt-1'>
+                    <button
+                      type="button"
+                      onClick={() => setIsForgotPassword(true)}
+                      className='text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-transparent border-none cursor-pointer'
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isForgotPassword && forgotPasswordStep === 3 && (
+              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
+                <label htmlFor="newPassword" className='block text-sm font-medium text-gray-700 mb-1.5'>New Password</label>
+                <div className='relative'>
+                  <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    id="newPassword"
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter your new password"
+                    className='w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  >
+                    {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="submit"
               disabled={loading}
-              className="w-full primary-gradient text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all duration-300 mt-4 disabled:opacity-50"
+              className='w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed'
             >
-              {loading ? 'Authenticating...' : 'Sign In'}
+              {loading ? (
+                <span className='animate-pulse'>Processing...</span>
+              ) : (
+                <>
+                  {isForgotPassword ? (forgotPasswordStep === 1 ? 'Send OTP' : forgotPasswordStep === 2 ? 'Verify OTP' : 'Reset Password') : (isSignup ? 'Create Account' : 'Sign In')}
+                  <ArrowRight className='w-5 h-5' />
+                </>
+              )}
             </button>
-
-
-            <div className="relative flex items-center justify-center py-6">
-              <div className="w-full border-t border-surface-container-high"></div>
-              <span className="absolute bg-surface-container-lowest px-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest">Or Continue With</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center gap-3 py-4 rounded-2xl bg-white border border-surface-container-high hover:bg-surface-container-low transition-colors font-bold text-sm shadow-sm group">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google"/>
-                Google
-              </button>
-              <button className="flex items-center justify-center gap-3 py-4 rounded-2xl bg-white border border-surface-container-high hover:bg-surface-container-low transition-colors font-bold text-sm shadow-sm group">
-                <img src="https://www.svgrepo.com/show/448203/apple.svg" className="w-5 h-5" alt="Apple"/>
-                Apple ID
-              </button>
-            </div>
           </form>
 
-          <p className="text-center mt-10 text-on-surface-variant font-medium">
-            New to the circles? <a href="#" className="text-primary font-bold hover:underline">Apply for Invite</a>
-          </p>
+          <div className='mt-8 pt-6 border-t border-gray-100 text-center'>
+            <p className='text-sm text-gray-500'>
+              {isForgotPassword ? (
+                <button
+                  onClick={() => {
+                    setIsForgotPassword(false)
+                    setForgotPasswordStep(1)
+                  }}
+                  className='font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer'
+                >
+                  Back to sign in
+                </button>
+              ) : (
+                <>
+                  {isSignup ? 'Already have an account? ' : "Don't have an account? "}
+                  <button
+                    onClick={() => setIsSignup(!isSignup)}
+                    className='font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer'
+                  >
+                    {isSignup ? 'Sign in' : 'Create account'}
+                  </button>
+                </>
+              )}
+            </p>
+          </div>
         </div>
       </div>
-      
-      {/* Decorative Elements */}
-      <div className="fixed bottom-10 left-10 text-[10px] text-on-surface-variant/40 font-bold uppercase tracking-widest pointer-events-none">
-        © 2024 Astra Social Circles
-      </div>
-      <div className="fixed bottom-10 right-10 flex gap-4 text-[10px] text-on-surface-variant/40 font-bold uppercase tracking-widest pointer-events-none">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

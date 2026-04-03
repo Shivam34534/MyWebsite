@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from './api/axios';
 
 const AuthContext = createContext();
@@ -26,7 +26,7 @@ export const MockClerkProvider = ({ children }) => {
         setIsLoaded(true);
     }, []);
 
-    const signIn = useCallback(async ({ email, password }) => {
+    const signIn = async ({ email, password }) => {
         try {
             const { data } = await api.post('/api/auth/login', { email, password });
             if (data.success) {
@@ -41,9 +41,9 @@ export const MockClerkProvider = ({ children }) => {
             console.error("Login error:", error);
             return { success: false, message: error.response?.data?.message || "Server connection failed" };
         }
-    }, []);
+    };
 
-    const signUp = useCallback(async (userData) => {
+    const signUp = async (userData) => {
         try {
             const { data } = await api.post('/api/auth/register', {
                 fullName: userData.fullName,
@@ -67,25 +67,21 @@ export const MockClerkProvider = ({ children }) => {
             console.error("Signup error:", error);
             return { success: false, message: error.response?.data?.message || "Server connection failed" };
         }
-    }, []);
+    };
 
-    const signOut = useCallback(async () => {
+    const signOut = async () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setIsSignedIn(false);
         setUser(null);
-    }, []);
+    };
 
-    const resetPassword = useCallback(async ({ email, newPassword }) => {
+    const resetPassword = async ({ email, newPassword }) => {
         // Not implemented in backend yet, keeping mock interface
         return { success: false, message: "Password reset not fully implemented in real backend." };
-    }, []);
+    };
 
-    const getToken = useCallback(async () => {
-        return localStorage.getItem('token');
-    }, []);
-
-    const value = useMemo(() => ({
+    const value = {
         isSignedIn,
         isLoaded,
         user,
@@ -93,8 +89,10 @@ export const MockClerkProvider = ({ children }) => {
         signUp,
         signOut,
         resetPassword,
-        getToken,
-    }), [isSignedIn, isLoaded, user, signIn, signUp, signOut, resetPassword, getToken]);
+        getToken: async () => {
+            return localStorage.getItem('token');
+        },
+    };
 
     return (
         <AuthContext.Provider value={value}>
