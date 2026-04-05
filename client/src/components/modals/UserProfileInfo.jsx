@@ -49,35 +49,37 @@ const UserProfileInfo = ({ user, posts, profileId, setShowEdit, onUpdate }) => {
   const isFollowsYou = user && currentUser && user.following?.includes(currentUser._id)
 
   return (
-    <div className='relative py-6 px-6 md:px-12 bg-white/40 backdrop-blur-sm'>
-      <div className='flex flex-col md:flex-row items-center md:items-start gap-8'>
+    <div className='relative py-8 px-6 md:px-12 bg-white dark:bg-stone-950 rounded-b-[2.5rem] shadow-sm'>
+      <div className='flex flex-col md:flex-row items-center md:items-start gap-10'>
 
-        {/* Profile Avatar with Premium Frame */}
-        <div className='relative z-20 -mt-24 md:-mt-32'>
-          <div className='w-40 h-40 md:w-48 md:h-48 rounded-[3rem] border-[6px] border-white shadow-2xl overflow-hidden glass-card p-0'>
-            <img src={user.profile_picture || assets.sample_profile}
-              onError={(e) => { e.target.src = assets.sample_profile }}
-              alt="" className='w-full h-full object-cover' />
+        {/* Profile Avatar with Gallery Styling */}
+        <div className='relative z-20 -mt-24 md:-mt-36'>
+          <div className='w-44 h-44 md:w-52 md:h-52 rounded-full story-ring p-[4px] shadow-2xl transition-transform hover:scale-105 duration-500'>
+            <div className='w-full h-full rounded-full border-4 border-white overflow-hidden bg-white'>
+              <img src={user.profile_picture || assets.sample_profile}
+                onError={(e) => { e.target.src = assets.sample_profile }}
+                alt="" className='w-full h-full object-cover' />
+            </div>
           </div>
           {isFollowing && (
-            <div className='absolute -bottom-2 -right-2 bg-indigo-600 text-white p-2 rounded-2xl shadow-xl border-4 border-white'>
-              <UserCheck className='w-5 h-5' />
+            <div className='absolute bottom-2 right-2 bg-primary text-on-primary p-2 rounded-full shadow-lg border-4 border-white flex items-center justify-center'>
+              <span className="material-symbols-outlined text-[18px] font-bold">check</span>
             </div>
           )}
         </div>
 
-        <div className='flex-1 w-full pt-2 md:pt-4'>
-          <div className='flex flex-col md:flex-row items-center md:items-start justify-between gap-4'>
+        <div className='flex-1 w-full pt-4'>
+          <div className='flex flex-col md:flex-row items-center md:items-start justify-between gap-6'>
             <div className='text-center md:text-left'>
-              <div className='flex items-center justify-center md:justify-start gap-2'>
-                <h1 className='text-3xl md:text-4xl font-black text-slate-900 tracking-tight'>{user.full_name}</h1>
-                <Verified className='w-6 h-6 text-indigo-500 fill-indigo-50' />
+              <div className='flex items-center justify-center md:justify-start gap-3'>
+                <h1 className='text-3xl md:text-4xl font-headline font-black text-stone-900 dark:text-stone-50 tracking-tight'>{user.full_name}</h1>
+                <span className="material-symbols-outlined text-primary text-2xl" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
               </div>
               <div className='flex items-center justify-center md:justify-start gap-3 mt-1'>
-                <p className='text-indigo-600 font-bold text-sm'>{user.username ? `@${user.username}` : '@username'}</p>
+                <p className='text-primary font-bold text-base'>{user.username ? `@${user.username}` : '@username'}</p>
                 {isFollowsYou && (
-                  <span className='bg-indigo-50 text-indigo-500 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border border-indigo-100'>
-                    Follows you
+                  <span className='bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border border-primary/20'>
+                    Mutual Follow
                   </span>
                 )}
               </div>
@@ -85,53 +87,56 @@ const UserProfileInfo = ({ user, posts, profileId, setShowEdit, onUpdate }) => {
 
             <div className='flex gap-3'>
                 {!profileId ? (
-                  <button onClick={() => setShowEdit(true)} className='premium-button px-8 py-3 bg-slate-900 text-white !rounded-2xl'>
+                  <button onClick={() => setShowEdit(true)} className='flex items-center gap-2 px-8 py-3 bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-950 font-bold rounded-full transition-transform active:scale-95 shadow-lg'>
+                    <span className="material-symbols-outlined text-[18px]">edit_note</span>
                     Edit Profile
                   </button>
                 ) : (
                   <button 
                     onClick={handleFollow} 
                     disabled={loading} 
-                    className={`px-8 py-3 rounded-2xl font-black text-sm tracking-wide transition-all active:scale-95 shadow-lg ${
+                    className={`px-10 py-3 rounded-full font-bold text-sm tracking-wide transition-all active:scale-95 shadow-xl ${
                       isFollowing 
-                      ? 'bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 shadow-slate-200/50' 
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
+                      ? 'bg-stone-100 text-stone-900 border border-stone-200 hover:bg-stone-200' 
+                      : 'bg-primary text-on-primary hover:opacity-90'
                     }`}
                   >
-                    {isFollowing ? 'Following' : 'Follow User'}
+                    {isFollowing ? 'Following' : 'Follow'}
                   </button>
                 )}
+                <button className="p-3 rounded-full bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors">
+                  <span className="material-symbols-outlined text-[20px]">share</span>
+                </button>
             </div>
           </div>
 
-          <p className='text-slate-600 text-sm md:text-base font-medium mt-4 max-w-xl leading-relaxed text-center md:text-left'>
-            {user.bio || "No bio added yet. Explore the world of Aura."}
+          <p className='text-stone-600 dark:text-stone-400 text-sm md:text-base font-medium mt-6 max-w-xl leading-relaxed text-center md:text-left'>
+            {user.bio || "Crafting digital experiences and exploring the intersections of art and technology."}
           </p>
 
-          <div className='flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6'>
-            <div className='flex items-center gap-2 text-slate-400 group'>
-              <MapPin className='w-4 h-4 group-hover:text-indigo-500 transition-colors' />
-              <span className='text-xs font-bold uppercase tracking-wider'>{user.location || 'Unknown Earth'}</span>
+          <div className='flex flex-wrap items-center justify-center md:justify-start gap-8 mt-8 pb-8 border-b border-stone-100/50'>
+            <div className='flex flex-col md:flex-row items-center gap-1 md:gap-2 group cursor-pointer'>
+              <span className='text-xl font-headline font-black text-stone-900 dark:text-stone-50'>{posts?.length || 0}</span>
+              <span className='text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]'>Posts</span>
             </div>
-            <div className='flex items-center gap-2 text-slate-400 group'>
-              <Calendar className='w-4 h-4 group-hover:text-indigo-500 transition-colors' />
-              <span className='text-xs font-bold uppercase tracking-wider'>Aura Joined {moment(user.createdAt).format('MMM YYYY')}</span>
+            <div className='flex flex-col md:flex-row items-center gap-1 md:gap-2 group cursor-pointer'>
+              <span className='text-xl font-headline font-black text-stone-900 dark:text-stone-50'>{user.followers?.length || 0}</span>
+              <span className='text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]'>Followers</span>
+            </div>
+            <div className='flex flex-col md:flex-row items-center gap-1 md:gap-2 group cursor-pointer'>
+              <span className='text-xl font-headline font-black text-stone-900 dark:text-stone-50'>{user.following?.length || 0}</span>
+              <span className='text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]'>Following</span>
             </div>
           </div>
 
-          {/* Stats Bar */}
-          <div className='flex items-center justify-around md:justify-start md:gap-12 mt-8 pt-6 border-t border-slate-100'>
-            <div className='flex flex-col md:flex-row items-center gap-1 md:gap-2'>
-              <span className='text-xl font-black text-slate-900'>{posts?.length || 0}</span>
-              <span className='text-[10px] font-bold text-slate-400 uppercase tracking-widest'>Posts</span>
+          <div className='flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6'>
+            <div className='flex items-center gap-2 text-stone-400'>
+              <span className="material-symbols-outlined text-[16px]">location_on</span>
+              <span className='text-[11px] font-bold uppercase tracking-wider'>{user.location || 'Editorial Studio'}</span>
             </div>
-            <div className='flex flex-col md:flex-row items-center gap-1 md:gap-2'>
-              <span className='text-xl font-black text-slate-900'>{user.followers?.length || 0}</span>
-              <span className='text-[10px] font-bold text-slate-400 uppercase tracking-widest'>Followers</span>
-            </div>
-            <div className='flex flex-col md:flex-row items-center gap-1 md:gap-2'>
-              <span className='text-xl font-black text-slate-900'>{user.following?.length || 0}</span>
-              <span className='text-[10px] font-bold text-slate-400 uppercase tracking-widest'>Following</span>
+            <div className='flex items-center gap-2 text-stone-400'>
+              <span className="material-symbols-outlined text-[16px]">calendar_today</span>
+              <span className='text-[11px] font-bold uppercase tracking-wider'>Aura Artist Since {moment(user.createdAt).format('MMM YYYY')}</span>
             </div>
           </div>
         </div>

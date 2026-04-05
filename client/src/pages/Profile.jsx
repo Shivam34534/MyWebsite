@@ -53,20 +53,20 @@ const Profile = () => {
   }, [profileId, currentUser])
 
   return user ? (
-    <div className='relative h-full overflow-y-scroll no-scrollbar bg-slate-50/50 p-4 md:p-8'>
-      <div className='max-w-4xl mx-auto'>
+    <div className='lg:ml-64 relative min-h-screen bg-surface p-4 md:p-8 overflow-y-auto no-scrollbar'>
+      <div className='max-w-4xl mx-auto flex flex-col gap-8'>
 
-        <div className='glass-card rounded-[2.5rem] overflow-hidden border border-white/40 shadow-2xl shadow-indigo-100/50'>
+        <div className='bg-surface-container-lowest rounded-[3rem] overflow-hidden border border-stone-200/10 shadow-xl'>
 
-          {/* Enhanced Cover Section */}
-          <div className='h-48 md:h-64 relative group'>
-            <div className='absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-orange-500/20 mix-blend-overlay' />
+          {/* Cover Section */}
+          <div className='h-52 md:h-72 relative group overflow-hidden'>
+            <div className='absolute inset-0 bg-stone-900/10 mix-blend-overlay' />
             {user.cover_picture ? (
-              <img src={user.cover_picture} alt="" className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105' />
+              <img src={user.cover_picture} alt="" className='w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110' />
             ) : (
-              <div className='w-full h-full bg-gradient-to-r from-indigo-100 to-purple-100 animate-pulse' />
+              <div className='w-full h-full bg-gradient-to-br from-stone-100 via-stone-200 to-stone-300' />
             )}
-            <div className='absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white/80 to-transparent' />
+            <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
           </div>
 
           <UserProfileInfo 
@@ -79,56 +79,57 @@ const Profile = () => {
         </div>
 
         {/* Tab System */}
-        <div className='mt-8'>
-          <div className='glass-card rounded-2xl p-1.5 flex max-w-sm mx-auto shadow-sm border-white/60'>
+        <div className='flex flex-col gap-8'>
+          <div className='flex items-center justify-center gap-10 border-b border-stone-200/20'>
             {["posts", "media", "likes"].map((tab) => (
               <button 
                 onClick={() => setActiveTab(tab)} 
                 key={tab} 
-                className={`flex-1 px-6 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 cursor-pointer ${
+                className={`pb-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 relative ${
                   activeTab === tab 
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 translate-y-[-1px]" 
-                  : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+                  ? "text-primary scale-110" 
+                  : "text-stone-400 hover:text-stone-600"
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab}
+                {activeTab === tab && (
+                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary animate-in fade-in zoom-in-50" />
+                )}
               </button>
             ))}
           </div>
 
-          <div className='mt-10'>
+          <div className='pb-20'>
             {activeTab === 'posts' && (
-              <div className='flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+              <div className='flex flex-col items-center gap-10 animate-in fade-in slide-in-from-bottom-6 duration-700'>
                 {posts.length > 0 ? (
                   posts.map((post) => (
                     <PostCard key={post._id} post={post} />
                   ))
                 ) : (
-                  <div className='glass-card p-12 rounded-3xl text-center opacity-60'>
-                    <p className='text-slate-500 font-medium'>No posts shared yet.</p>
+                  <div className='py-20 text-center flex flex-col items-center gap-4 opacity-40'>
+                    <span className="material-symbols-outlined text-6xl">photo_library</span>
+                    <p className='text-stone-500 font-headline font-bold text-lg'>No stories captured yet.</p>
                   </div>
                 )}
               </div>
             )}
 
             {activeTab === 'media' && (
-              <div className='grid grid-cols-2 md:grid-cols-3 gap-3 animate-in fade-in zoom-in-95 duration-500'>
+              <div className='grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-2 animate-in fade-in zoom-in-95 duration-700'>
                 {posts.filter((post) => post.image_urls?.length > 0).map((post) => (
                   <React.Fragment key={post._id}>
                     {post.image_urls.map((image, index) => (
-                      <Link 
-                        target='_blank' 
-                        to={image} 
+                      <div 
+                        onClick={() => window.open(image, '_blank')}
                         key={index} 
-                        className='relative group overflow-hidden rounded-2xl aspect-square glass-card border-none'
+                        className='relative group overflow-hidden aspect-square cursor-pointer bg-stone-100'
                       >
-                        <img src={image} className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110' alt="" />
-                        <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4'>
-                          <p className='text-white text-[10px] font-bold uppercase tracking-widest'>
-                            {moment(post.createdAt).fromNow()}
-                          </p>
+                        <img src={image} className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-110' alt="" />
+                        <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center'>
+                          <span className="material-symbols-outlined text-white text-3xl">open_in_full</span>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </React.Fragment>
                 ))}
@@ -136,34 +137,36 @@ const Profile = () => {
             )}
 
             {activeTab === 'likes' && (
-              <div className='flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-6 duration-700'>
                 {likedPosts.length > 0 ? (
                   likedPosts.map((post) => (
-                    <div key={post._id} className="premium-card flex items-center justify-between p-4 w-full max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                    <div key={post._id} className="bg-surface-container-lowest p-4 rounded-2xl flex items-center justify-between border border-stone-200/10 hover:shadow-lg transition-all group">
                         <div className='flex items-center gap-4'>
-                            <Link to={`/profile/${post.user._id}`}>
-                              <img
-                                src={post.user.profile_picture || assets.sample_profile}
-                                onError={(e) => { e.target.src = assets.sample_profile }}
-                                alt=""
-                                className='w-12 h-12 rounded-full border-2 border-indigo-100 object-cover shadow-sm'
-                              />
-                            </Link>
+                            <img
+                              src={post.user.profile_picture || assets.sample_profile}
+                              onError={(e) => { e.target.src = assets.sample_profile }}
+                              alt=""
+                              className='w-12 h-12 rounded-full object-cover transition-transform group-hover:scale-105'
+                            />
                             <div className='flex flex-col'>
-                              <Link to={`/profile/${post.user._id}`} className='font-bold text-slate-900 hover:text-indigo-600 transition-colors'>
-                                {post.user.full_name}
-                              </Link>
-                              <span className='text-xs text-slate-500 font-medium'>@{post.user.username}</span>
+                              <span onClick={() => navigate(`/profile/${post.user._id}`)} className='font-bold text-stone-900 cursor-pointer hover:text-primary transition-colors'>
+                                {post.user.username}
+                              </span>
+                              <span className='text-[10px] uppercase font-bold text-stone-400 tracking-widest'>{post.user.full_name}</span>
                             </div>
                         </div>
-                        <Link to={`/profile/${post.user._id}`} className='px-4 py-2 bg-slate-50 text-slate-600 text-xs font-bold rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all'>
-                            View Post
-                        </Link>
+                        <button 
+                          onClick={() => navigate(`/profile/${post.user._id}`)}
+                          className='p-2 rounded-full hover:bg-stone-100 text-stone-400 hover:text-primary transition-all'
+                        >
+                            <span className="material-symbols-outlined">arrow_forward</span>
+                        </button>
                     </div>
                   ))
                 ) : (
-                  <div className='glass-card p-12 rounded-3xl text-center opacity-60'>
-                    <p className='text-slate-500 font-medium'>No liked posts to show.</p>
+                  <div className='col-span-full py-20 text-center flex flex-col items-center gap-4 opacity-40'>
+                    <span className="material-symbols-outlined text-6xl">favorite</span>
+                    <p className='text-stone-500 font-headline font-bold text-lg'>Discover what inspires you.</p>
                   </div>
                 )}
               </div>

@@ -78,93 +78,93 @@ const PostCard = ({ post }) => {
     }
 
     return (
-        <div className='bg-white border border-gray-100 sm:rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 w-full max-w-[550px] mx-auto group/card'>
-            {/* User Info Header */}
-            <div className='px-5 py-4 flex items-center justify-between'>
-                <div onClick={() => navigate('/profile/' + post.user._id)} className='flex items-center gap-3 cursor-pointer group'>
-                    <div className='relative'>
-                        <div className='w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-yellow-400 via-rose-400 to-indigo-600 p-[2.5px] transition-transform duration-500 group-hover:rotate-12'>
-                            <img src={post.user.profile_picture || assets.sample_profile} alt="Profile" className='w-full h-full rounded-full object-cover border-2 border-white' />
-                        </div>
-                        <div className='absolute -bottom-1 -right-1 w-4 h-4 bg-indigo-500 border-2 border-white rounded-full flex items-center justify-center'>
-                            <div className='w-1.5 h-1.5 bg-white rounded-full animate-pulse'></div>
+        <article className="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm transition-all duration-500 hover:shadow-xl hover:shadow-stone-200/40">
+            {/* Post Header */}
+            <div className="flex items-center justify-between p-4">
+                <div onClick={() => navigate('/profile/' + post.user._id)} className="flex items-center gap-3 cursor-pointer group">
+                    <div className="w-10 h-10 rounded-full story-ring p-[1.5px]">
+                        <div className="w-full h-full rounded-full border border-white overflow-hidden bg-stone-50">
+                            <img 
+                                className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                                src={post.user.profile_picture || assets.sample_profile} 
+                                onError={(e) => { e.target.src = assets.sample_profile }}
+                                alt={post.user.username} 
+                            />
                         </div>
                     </div>
-                    <div className='flex flex-col'>
-                        <span className='font-bold text-[15px] text-slate-900 leading-tight group-hover:text-indigo-600 transition-colors'>
-                            {post.user.username}
-                        </span>
-                        <span className='text-[11px] text-slate-400 font-medium'>{moment(post.createdAt).fromNow()}</span>
+                    <div>
+                        <h3 className="font-headline font-bold text-sm leading-tight text-on-surface group-hover:text-primary transition-colors">{post.user.username}</h3>
+                        <p className="text-[11px] text-on-surface-variant leading-tight">{post.location || 'Editorial Studio'}</p>
                     </div>
                 </div>
-                <button className='p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400'>
-                    <BadgeCheck className='w-5 h-5 text-indigo-500' />
+                <button className="text-on-surface-variant hover:text-on-surface transition-colors p-2 hover:bg-surface-container-low rounded-full">
+                    <span className="material-symbols-outlined text-[20px]">more_horiz</span>
                 </button>
             </div>
 
-            {/* Media (Images/Videos) */}
+            {/* Media Canvas */}
             {post.image_urls && post.image_urls.length > 0 && (
-                <div className={`relative w-full bg-slate-50 overflow-hidden ${post.image_urls.length > 1 ? 'grid grid-cols-2 gap-1' : ''}`}>
-                    {post.image_urls.map((url, index) => {
-                        const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(url);
-                        return (
-                            <div key={index} className='aspect-square overflow-hidden group/media'>
-                                {isVideo ? (
-                                    <video src={url} controls className='w-full h-full object-cover' />
-                                ) : (
-                                    <img
-                                        src={url}
-                                        className='w-full h-full object-cover transition-transform duration-700 group-hover/media:scale-110'
-                                        alt=""
-                                    />
-                                )}
-                            </div>
-                        )
-                    })}
+                <div className="w-full aspect-square bg-surface-container overflow-hidden relative group">
+                    <img 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 cursor-pointer" 
+                        src={post.image_urls[0]} 
+                        alt="" 
+                    />
+                    {post.image_urls.length > 1 && (
+                        <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[10px] font-bold tracking-widest uppercase">
+                            Gallery 1 / {post.image_urls.length}
+                        </div>
+                    )}
                 </div>
             )}
 
-            {/* Actions Bar */}
-            <div className='px-5 pt-4 pb-3 flex items-center justify-between'>
-                <div className='flex items-center gap-6'>
-                    <button onClick={handleLike} className='flex items-center gap-1.5 group/btn transition-transform active:scale-90'>
-                        <Heart className={`w-7 h-7 transition-all duration-300 ${likes.includes(currentUser._id) ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-700 group-hover/btn:text-rose-500'}`} />
-                        <span className='text-xs font-bold text-slate-600'>{likes.length}</span>
-                    </button>
-
-                    <button onClick={() => setShowComments(!showComments)} className='flex items-center gap-1.5 group/btn transition-transform active:scale-90'>
-                        <MessageCircle className='w-7 h-7 text-slate-700 group-hover/btn:text-indigo-500 transition-colors' />
-                        <span className='text-xs font-bold text-slate-600'>{commentCount}</span>
-                    </button>
-
-                    <button onClick={handleShare} className='flex items-center gap-1.5 group/btn transition-transform active:scale-90'>
-                        <Share2 className='w-7 h-7 text-slate-700 group-hover/btn:text-emerald-500 transition-colors' />
-                        <span className='text-xs font-bold text-slate-600'>{shareCount}</span>
+            {/* Post Actions & Content */}
+            <div className="p-4 flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-5">
+                        <button onClick={handleLike} className="transition-transform active:scale-90 flex items-center justify-center">
+                            <span 
+                                className={`material-symbols-outlined text-[28px] transition-all ${likes.includes(currentUser?._id) ? 'text-red-500' : 'text-on-surface-variant hover:text-red-500'}`} 
+                                style={{ fontVariationSettings: `'FILL' ${likes.includes(currentUser?._id) ? 1 : 0}` }}
+                            >
+                                favorite
+                            </span>
+                        </button>
+                        <button onClick={() => setShowComments(!showComments)} className="transition-transform active:scale-90 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+                            <span className="material-symbols-outlined text-[28px]">chat_bubble</span>
+                        </button>
+                        <button onClick={handleShare} className="transition-transform active:scale-90 flex items-center justify-center text-on-surface-variant hover:text-emerald-500 transition-colors">
+                            <span className="material-symbols-outlined text-[28px]">send</span>
+                        </button>
+                    </div>
+                    <button className="transition-transform active:scale-90 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+                        <span className="material-symbols-outlined text-[28px]">bookmark</span>
                     </button>
                 </div>
-            </div>
 
-            {/* Content Area */}
-            <div className='px-5 pb-6'>
-                {post.content && (
-                    <div className='text-[14px] text-slate-800 leading-relaxed'>
-                        <span onClick={() => navigate('/profile/' + post.user._id)} className='font-bold cursor-pointer hover:text-indigo-600 transition-colors mr-2'>
-                            {post.user.username}
-                        </span>
-                        <span className='whitespace-pre-wrap break-words inline text-slate-600' dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
+                {/* Engagement Context */}
+                <div className="flex flex-col gap-1.5">
+                    <p onClick={() => setShowLikes(true)} className="text-sm font-extrabold cursor-pointer hover:underline text-on-surface">{likes.length.toLocaleString()} likes</p>
+                    <div className="text-[14px] text-on-surface leading-relaxed">
+                        <span onClick={() => navigate('/profile/' + post.user._id)} className="font-bold mr-2 cursor-pointer hover:text-primary transition-colors">{post.user.username}</span> 
+                        <span className="whitespace-pre-wrap break-words text-on-surface font-medium" dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
                     </div>
-                )}
+                </div>
 
-                {commentCount > 0 && (
-                    <button onClick={() => setShowComments(true)} className='text-xs font-bold text-indigo-500 mt-3 hover:text-indigo-700 transition-colors'>
-                        View all {commentCount} discussions
-                    </button>
-                )}
+                {/* Metadata & Footer */}
+                <div className="flex flex-col gap-2 mt-1">
+                    {commentCount > 0 && (
+                        <button onClick={() => setShowComments(true)} className="text-on-surface-variant text-sm text-left hover:text-on-surface transition-colors font-medium">View all {commentCount} comments</button>
+                    )}
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold opacity-60">
+                        {moment(post.createdAt).fromNow()}
+                    </span>
+                </div>
             </div>
 
             {showLikes && <PostLikesList likes={likes} setShowLikes={setShowLikes} />}
             {showComments && <PostCommentsList postId={post._id} setShowComments={setShowComments} onCommentAdded={() => setCommentCount(prev => prev + 1)} />}
-        </div>
+        </article>
     )
 }
 

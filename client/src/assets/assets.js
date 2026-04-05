@@ -16,9 +16,11 @@ export const assets = {
 }
 
 export const menuItemsData = [
-    { to: '/', label: 'Home', Icon: Home },
-    { to: '/messages', label: 'Messages', Icon: MessageCircle },
-    { to: '/connections', label: 'Connections', Icon: Users },
-    { to: '/discover', label: 'Discover', Icon: Search },
-    { to: '/profile', label: 'Profile', Icon: UserIcon },
+    { to: '/', label: 'Home', icon: 'home' },
+    { to: '/search', label: 'Search', icon: 'search' },
+    { to: '/discover', label: 'Explore', icon: 'explore' },
+    { to: '/reels', label: 'Reels', icon: 'movie' },
+    { to: '/messages', label: 'Messages', icon: 'chat_bubble' },
+    { to: '/notifications', label: 'Notifications', icon: 'favorite' },
+    { to: '/profile', label: 'Profile', icon: 'account_circle' },
 ];

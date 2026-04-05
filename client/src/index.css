@@ -1,59 +1,79 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Set Outfit as the default font */
-  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  /* Fonts */
+  --font-headline: "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   
-  /* Teal Palette - Darkened for Visibility */
-  --color-indigo-50: #effcfd;
-  --color-indigo-100: #dff6f8;
-  --color-indigo-200: #bdeaf0;
-  --color-indigo-300: #8ddbe4;
-  --color-indigo-400: #5ad1db;
-  --color-indigo-500: #388E96;
-  --color-indigo-600: #2C7A80;
-  --color-indigo-700: #246368;
-  --color-indigo-800: #1C4D52;
-  --color-indigo-900: #15393D;
-  --color-indigo-950: #0E2528;
+  /* Primary Gallery Palette */
+  --color-primary: #8037b1;
+  --color-primary-dim: #7329a4;
+  --color-primary-container: #cb80fe;
+  
+  --color-secondary: #b6004f;
+  --color-secondary-dim: #a00045;
+  --color-secondary-container: #ffc2cd;
+  
+  --color-tertiary: #815100;
+  --color-tertiary-dim: #714600;
+  --color-tertiary-container: #ffb147;
 
-  /* Salmon/Red Palette - Darkened for Visibility */
-  --color-purple-50: #fff1f2;
-  --color-purple-100: #ffe4e6;
-  --color-purple-200: #fecdd3;
-  --color-purple-300: #fda4af;
-  --color-purple-400: #fb7185;
-  --color-purple-500: #E85D60;
-  --color-purple-600: #C94044;
-  --color-purple-700: #A83236;
-  --color-purple-800: #8A2529;
-  --color-purple-900: #6E1B1E;
-  --color-purple-950: #420D10;
+  /* Surface & Background */
+  --color-surface: #f9f6f5;
+  --color-surface-bright: #f9f6f5;
+  --color-surface-dim: #d6d4d3;
+  --color-surface-variant: #dfdcdc;
+  
+  --color-surface-container: #eae7e7;
+  --color-surface-container-low: #f3f0ef;
+  --color-surface-container-high: #e5e2e1;
+  --color-surface-container-highest: #dfdcdc;
+  --color-surface-container-lowest: #ffffff;
 
-  /* Yellow/Orange Palette */
-  --color-amber-500: #eab308;
-  --color-amber-600: #ca8a04;
-  --color-orange-500: #f97316;
-  --color-orange-600: #ea580c;
+  /* On Colors */
+  --color-on-surface: #2f2e2e;
+  --color-on-surface-variant: #5c5b5b;
+  --color-on-primary: #fdeeff;
+  --color-on-primary-container: #3a005c;
+  
+  /* Others */
+  --color-outline: #787676;
+  --color-outline-variant: #afacac;
 }
 
 @layer base {
   body {
-    @apply font-sans text-slate-900 antialiased bg-slate-50;
+    @apply font-sans text-on-surface antialiased bg-surface selection:bg-primary-container selection:text-on-primary-container;
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl;
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    @apply align-middle;
   }
-  
-  .premium-button {
-    @apply px-6 py-3 bg-slate-950 text-white rounded-2xl font-bold transition-all active:scale-95 hover:bg-slate-800 shadow-lg shadow-slate-200 cursor-pointer;
+
+  .story-ring {
+    background: linear-gradient(45deg, #8037b1, #E1306C, #FF8C00);
+    @apply p-[2px] rounded-full;
   }
-  
+
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl;
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .editorial-shadow {
+    box-shadow: 0 32px 64px -12px rgba(92, 91, 91, 0.08);
   }
 }

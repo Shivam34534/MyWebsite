@@ -4,22 +4,24 @@ import { NavLink } from 'react-router-dom'
 
 const MenuItems = ({ setSidebarOpen }) => {
   return (
-    <div className='px-4 text-slate-600 space-y-1.5'>
+    <div className='flex flex-col gap-1'>
       {
-        menuItemsData.map(({ to, label, Icon }) => (
+        menuItemsData.map(({ to, label, icon }) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/'}
             onClick={() => setSidebarOpen(false)}
-            className={({ isActive }) => `px-5 py-3 flex items-center justify-between
-                rounded-2xl transition-all duration-300 group ${isActive ? 'bg-indigo-50 text-indigo-600 shadow-sm' :
-                'hover:bg-slate-50 hover:text-slate-900'}`}
+            className={({ isActive }) => `flex items-center gap-4 p-3 rounded-xl transition-all duration-200 group ${
+              isActive 
+                ? 'bg-stone-100/50 dark:bg-stone-900/50 text-stone-950 dark:text-stone-50 font-extrabold shadow-sm border border-stone-200/20' 
+                : 'text-stone-500 dark:text-stone-400 font-medium hover:bg-stone-200/50'
+            } active:scale-95`}
           >
-            <div className='flex items-center gap-4'>
-              <Icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110`} />
-              <span className='font-bold text-sm tracking-tight'>{label}</span>
-            </div>
+            <span className="material-symbols-outlined transition-transform duration-200 group-hover:scale-110" style={isActive ? {fontVariationSettings: "'FILL' 1"} : {}}>
+              {icon}
+            </span>
+            <span className='font-headline tracking-tight text-base'>{label}</span>
           </NavLink>
         ))
       }
@@ -28,3 +30,4 @@ const MenuItems = ({ setSidebarOpen }) => {
 }
 
 export default MenuItems
+
