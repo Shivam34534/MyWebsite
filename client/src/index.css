@@ -2,6 +2,9 @@
 @import "tailwindcss";
 
 @theme {
+  /* Set Outfit as the default font */
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  
   /* Teal Palette - Darkened for Visibility */
   --color-indigo-50: #effcfd;
   --color-indigo-100: #dff6f8;
@@ -9,9 +12,7 @@
   --color-indigo-300: #8ddbe4;
   --color-indigo-400: #5ad1db;
   --color-indigo-500: #388E96;
-  /* Darker Teal */
   --color-indigo-600: #2C7A80;
-  /* Darker Teal for Text/Buttons */
   --color-indigo-700: #246368;
   --color-indigo-800: #1C4D52;
   --color-indigo-900: #15393D;
@@ -24,35 +25,35 @@
   --color-purple-300: #fda4af;
   --color-purple-400: #fb7185;
   --color-purple-500: #E85D60;
-  /* Darker Salmon */
   --color-purple-600: #C94044;
-  /* Darker Red for Text/Buttons */
   --color-purple-700: #A83236;
   --color-purple-800: #8A2529;
   --color-purple-900: #6E1B1E;
   --color-purple-950: #420D10;
 
-  /* Yellow Palette - Replacing Amber */
-  --color-amber-50: #fefce8;
-  --color-amber-100: #fef9c3;
-  --color-amber-200: #fef08a;
-  --color-amber-300: #fde047;
-  --color-amber-400: #FAD575;
-  /* Base Yellow from image */
+  /* Yellow/Orange Palette */
   --color-amber-500: #eab308;
   --color-amber-600: #ca8a04;
-
-  /* Orange Palette - Replacing Orange */
-  --color-orange-400: #F8A56A;
-  /* Base Orange from image */
   --color-orange-500: #f97316;
   --color-orange-600: #ea580c;
 }
 
-* {
-  font-family: "Outfit", sans-serif;
+@layer base {
+  body {
+    @apply font-sans text-slate-900 antialiased bg-slate-50;
+  }
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+@layer components {
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl;
+  }
+  
+  .premium-button {
+    @apply px-6 py-3 bg-slate-950 text-white rounded-2xl font-bold transition-all active:scale-95 hover:bg-slate-800 shadow-lg shadow-slate-200 cursor-pointer;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
