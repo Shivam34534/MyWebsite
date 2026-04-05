@@ -26,7 +26,7 @@ export const MockClerkProvider = ({ children }) => {
         setIsLoaded(true);
     }, []);
 
-    const signIn = async ({ email, password }) => {
+    const signIn = React.useCallback(async ({ email, password }) => {
         try {
             const { data } = await api.post('/api/auth/login', { email, password });
             if (data.success) {
@@ -41,9 +41,9 @@ export const MockClerkProvider = ({ children }) => {
             console.error("Login error:", error);
             return { success: false, message: error.response?.data?.message || "Server connection failed" };
         }
-    };
+    }, []);
 
-    const signUp = async (userData) => {
+    const signUp = React.useCallback(async (userData) => {
         try {
             const { data } = await api.post('/api/auth/register', {
                 fullName: userData.fullName,
@@ -51,7 +51,7 @@ export const MockClerkProvider = ({ children }) => {
                 password: userData.password,
                 username: userData.username,
                 location: userData.location,
-                profile_picture: userData.profile_picture || userData.profileFile, // Simple fallback for now
+                profile_picture: userData.profile_picture || userData.profileFile, 
                 cover_picture: userData.cover_picture || userData.coverFile
             });
 
@@ -67,21 +67,24 @@ export const MockClerkProvider = ({ children }) => {
             console.error("Signup error:", error);
             return { success: false, message: error.response?.data?.message || "Server connection failed" };
         }
-    };
+    }, []);
 
-    const signOut = async () => {
+    const signOut = React.useCallback(async () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setIsSignedIn(false);
         setUser(null);
-    };
+    }, []);
 
-    const resetPassword = async ({ email, newPassword }) => {
-        // Not implemented in backend yet, keeping mock interface
+    const resetPassword = React.useCallback(async ({ email, newPassword }) => {
         return { success: false, message: "Password reset not fully implemented in real backend." };
-    };
+    }, []);
 
-    const value = {
+    const getToken = React.useCallback(async () => {
+        return localStorage.getItem('token');
+    }, []);
+
+    const value = React.useMemo(() => ({
         isSignedIn,
         isLoaded,
         user,
@@ -89,10 +92,8 @@ export const MockClerkProvider = ({ children }) => {
         signUp,
         signOut,
         resetPassword,
-        getToken: async () => {
-            return localStorage.getItem('token');
-        },
-    };
+        getToken,
+    }), [isSignedIn, isLoaded, user, signIn, signUp, signOut, resetPassword, getToken]);
 
     return (
         <AuthContext.Provider value={value}>

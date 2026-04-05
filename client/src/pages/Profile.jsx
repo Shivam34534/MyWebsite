@@ -53,92 +53,122 @@ const Profile = () => {
   }, [profileId, currentUser])
 
   return user ? (
-    <div className='relative h-full overflow-y-scroll bg-gray-50 p-6'>
-      <div className='max-w-3xl mx-auto'>
+    <div className='relative h-full overflow-y-scroll no-scrollbar bg-slate-50/50 p-4 md:p-8'>
+      <div className='max-w-4xl mx-auto'>
 
-        <div className='bg-white rounded-2xl shadow overflow-hidden'>
+        <div className='glass-card rounded-[2.5rem] overflow-hidden border border-white/40 shadow-2xl shadow-indigo-100/50'>
 
-          <div className='h-40 md:h-56 bg-gradient-to-r from-indigo-200
-            via-purple-200 to-orange-200'>
-            {user.cover_picture && <img src={user.cover_picture} alt=""
-              className='w-full h-full object-cover' />}
+          {/* Enhanced Cover Section */}
+          <div className='h-48 md:h-64 relative group'>
+            <div className='absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-orange-500/20 mix-blend-overlay' />
+            {user.cover_picture ? (
+              <img src={user.cover_picture} alt="" className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105' />
+            ) : (
+              <div className='w-full h-full bg-gradient-to-r from-indigo-100 to-purple-100 animate-pulse' />
+            )}
+            <div className='absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white/80 to-transparent' />
           </div>
 
-          <UserProfileInfo user={user} posts={posts} profileId={profileId}
-            setShowEdit={setShowEdit} onUpdate={() => fetchUser(profileId || currentUser._id)} />
+          <UserProfileInfo 
+            user={user} 
+            posts={posts} 
+            profileId={profileId}
+            setShowEdit={setShowEdit} 
+            onUpdate={() => fetchUser(profileId || currentUser._id)} 
+          />
         </div>
 
-        <div className='mt-6'>
-          <div className='bg-white rounded-xl shadow p-1 flex max-w-md mx-auto'>
+        {/* Tab System */}
+        <div className='mt-8'>
+          <div className='glass-card rounded-2xl p-1.5 flex max-w-sm mx-auto shadow-sm border-white/60'>
             {["posts", "media", "likes"].map((tab) => (
-              <button onClick={() => setActiveTab(tab)} key={tab} className={`flex-1 px-4 py-2 text-sm font-medium
-                rounded-lg transition-colors cursor-pointer ${activeTab === tab ?
-                  "bg-indigo-600 text-white" : "text-gray-600 hover:text-gray-900"}`}>
+              <button 
+                onClick={() => setActiveTab(tab)} 
+                key={tab} 
+                className={`flex-1 px-6 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 cursor-pointer ${
+                  activeTab === tab 
+                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 translate-y-[-1px]" 
+                  : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+                }`}
+              >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
 
-          {activeTab === 'posts' && (
+          <div className='mt-10'>
+            {activeTab === 'posts' && (
+              <div className='flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+                {posts.length > 0 ? (
+                  posts.map((post) => (
+                    <PostCard key={post._id} post={post} />
+                  ))
+                ) : (
+                  <div className='glass-card p-12 rounded-3xl text-center opacity-60'>
+                    <p className='text-slate-500 font-medium'>No posts shared yet.</p>
+                  </div>
+                )}
+              </div>
+            )}
 
-            <div className='mt-6 flex flex-col items-center gap-6'>
-              {posts.length > 0 ? (
-                posts.map((post) => (
-                  <PostCard key={post._id} post={post} />
-                ))
-              ) : (
-                <p className='text-gray-500'>No posts yet.</p>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'media' && (
-            <div className='flex flex-wrap mt-6 max-w-6xl gap-1'>
-              {
-                posts.filter((post) => post.image_urls?.length > 0).map((post) => (
+            {activeTab === 'media' && (
+              <div className='grid grid-cols-2 md:grid-cols-3 gap-3 animate-in fade-in zoom-in-95 duration-500'>
+                {posts.filter((post) => post.image_urls?.length > 0).map((post) => (
                   <React.Fragment key={post._id}>
                     {post.image_urls.map((image, index) => (
-                      <Link target='_blank' to={image} key={index} className='relative group '>
-                        <img src={image} className='w-63 aspect-video
-                        object-cover' alt="" />
-                        <p className='absolute bottom-0 right-0 text-xs p-1 px-3
-                        backdrop-blur-xl text-white opacity-0 group-hover:opacity-100
-                        transition duration-300'>Posted {moment(post.createdAt).
-                            fromNow()}</p>
+                      <Link 
+                        target='_blank' 
+                        to={image} 
+                        key={index} 
+                        className='relative group overflow-hidden rounded-2xl aspect-square glass-card border-none'
+                      >
+                        <img src={image} className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110' alt="" />
+                        <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4'>
+                          <p className='text-white text-[10px] font-bold uppercase tracking-widest'>
+                            {moment(post.createdAt).fromNow()}
+                          </p>
+                        </div>
                       </Link>
                     ))}
                   </React.Fragment>
-                ))
-              }
-            </div>
-          )}
+                ))}
+              </div>
+            )}
 
-          {activeTab === 'likes' && (
-            <div className='mt-6 flex flex-col items-center gap-6'>
-              {likedPosts.length > 0 ? (
-                likedPosts.map((post) => (
-                  <div key={post._id} className="flex items-center gap-3 p-3 w-full bg-white rounded-lg shadow-sm border border-gray-100">
-                    <Link to={`/profile/${post.user._id}`}>
-                      <img
-                        src={post.user.profile_picture || assets.sample_profile}
-                        onError={(e) => { e.target.src = assets.sample_profile }}
-                        alt=""
-                        className='w-10 h-10 rounded-full object-cover'
-                      />
-                    </Link>
-                    <div className='flex flex-col'>
-                      <Link to={`/profile/${post.user._id}`} className='font-semibold text-gray-900 hover:underline'>
-                        {post.user.full_name}
-                      </Link>
-                      <span className='text-sm text-gray-500'>@{post.user.username}</span>
+            {activeTab === 'likes' && (
+              <div className='flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+                {likedPosts.length > 0 ? (
+                  likedPosts.map((post) => (
+                    <div key={post._id} className="premium-card flex items-center justify-between p-4 w-full max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div className='flex items-center gap-4'>
+                            <Link to={`/profile/${post.user._id}`}>
+                              <img
+                                src={post.user.profile_picture || assets.sample_profile}
+                                onError={(e) => { e.target.src = assets.sample_profile }}
+                                alt=""
+                                className='w-12 h-12 rounded-full border-2 border-indigo-100 object-cover shadow-sm'
+                              />
+                            </Link>
+                            <div className='flex flex-col'>
+                              <Link to={`/profile/${post.user._id}`} className='font-bold text-slate-900 hover:text-indigo-600 transition-colors'>
+                                {post.user.full_name}
+                              </Link>
+                              <span className='text-xs text-slate-500 font-medium'>@{post.user.username}</span>
+                            </div>
+                        </div>
+                        <Link to={`/profile/${post.user._id}`} className='px-4 py-2 bg-slate-50 text-slate-600 text-xs font-bold rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all'>
+                            View Post
+                        </Link>
                     </div>
+                  ))
+                ) : (
+                  <div className='glass-card p-12 rounded-3xl text-center opacity-60'>
+                    <p className='text-slate-500 font-medium'>No liked posts to show.</p>
                   </div>
-                ))
-              ) : (
-                <p className='text-gray-500'>No liked posts yet.</p>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
