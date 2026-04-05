@@ -197,12 +197,6 @@ const Login = () => {
             <p className='text-gray-500 text-sm mt-1'>
               {isForgotPassword ? (forgotPasswordStep === 1 ? 'Enter your email to receive an OTP' : forgotPasswordStep === 2 ? 'Enter the 6-digit OTP sent to your email' : 'Create a new secure password') : (isSignup ? 'Join our community today' : 'Please sign in to your account')}
             </p>
-            {!isSignup && !isForgotPassword && (
-              <div className='mt-4 p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl'>
-                <p className='text-[10px] text-indigo-400 font-bold uppercase tracking-wider mb-1'>Developer Test Account</p>
-                <code className='text-xs text-indigo-600 font-medium'>shivam@aura.com / shivam123</code>
-              </div>
-            )}
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-5'>
