@@ -18,10 +18,17 @@ const MenuItems = ({ setSidebarOpen }) => {
                 : 'text-stone-500 dark:text-stone-400 font-medium hover:bg-stone-200/50'
             } active:scale-95`}
           >
-            <span className="material-symbols-outlined transition-transform duration-200 group-hover:scale-110" style={isActive ? {fontVariationSettings: "'FILL' 1"} : {}}>
-              {icon}
-            </span>
-            <span className='font-headline tracking-tight text-base'>{label}</span>
+            {({ isActive }) => (
+              <>
+                <span 
+                    className="material-symbols-outlined transition-transform duration-200 group-hover:scale-110" 
+                    style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+                >
+                  {icon}
+                </span>
+                <span className='font-headline tracking-tight text-base'>{label}</span>
+              </>
+            )}
           </NavLink>
         ))
       }
@@ -30,4 +37,3 @@ const MenuItems = ({ setSidebarOpen }) => {
 }
 
 export default MenuItems
-
