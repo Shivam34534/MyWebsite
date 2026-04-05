@@ -1,61 +1,39 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets'
-import { Star, Lock, Mail, ArrowRight, User, PenBox, MapPin, Eye, EyeOff } from 'lucide-react'
 import { useClerk } from '../mockClerk'
 import toast from 'react-hot-toast'
 
 const Login = () => {
-  console.log("Login Component Rendered - Version 2.0");
   const { openSignIn, openSignUp } = useClerk()
   const [isSignup, setIsSignup] = useState(false)
-  const [isForgotPassword, setIsForgotPassword] = useState(false)
-  const [forgotPasswordStep, setForgotPasswordStep] = useState(1) // 1: Email, 2: OTP, 3: New Password
-
-  const [email, setEmail] = useState('')
-  const [otp, setOtp] = useState('')
-  const [generatedOtp, setGeneratedOtp] = useState('')
-  const [password, setPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [username, setUsername] = useState('')
-  const [location, setLocation] = useState('')
-
-  const [profilePreview, setProfilePreview] = useState(null)
-  const [profileBase64, setProfileBase64] = useState('')
-  const [profileFile, setProfileFile] = useState(null)
-
-  const [coverPreview, setCoverPreview] = useState(null)
-  const [coverBase64, setCoverBase64] = useState('')
-  const [coverFile, setCoverFile] = useState(null)
-
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const { resetPassword, checkUser, sendOtp } = useClerk()
 
-  const handleProfileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setProfileFile(file)
-      setProfilePreview(URL.createObjectURL(file))
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setProfileBase64(reader.result)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
+  // Form State
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    username: '',
+    location: '',
+    profileFile: null,
+    coverFile: null,
+    profilePreview: null,
+    coverPreview: null
+  })
 
-  const handleCoverChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setCoverFile(file)
-      setCoverPreview(URL.createObjectURL(file))
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setCoverBase64(reader.result)
-      }
-      reader.readAsDataURL(file)
+  const handleChange = (e) => {
+    const { name, value, files } = e.target
+    if (files) {
+      const file = files[0]
+      const preview = URL.createObjectURL(file)
+      setFormData(prev => ({
+        ...prev,
+        [name]: file,
+        [`${name.replace('File', '')}Preview`]: preview
+      }))
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }))
     }
   }
 
@@ -64,389 +42,220 @@ const Login = () => {
     setLoading(true)
 
     try {
-      if (isForgotPassword) {
-        if (forgotPasswordStep === 1) {
-          const userCheck = await checkUser(email)
-          if (userCheck.success) {
-            const newOtp = Math.floor(100000 + Math.random() * 900000).toString()
-            setGeneratedOtp(newOtp)
-
-            // Send OTP to user's email
-            const res = await sendOtp(email, newOtp);
-            if (res.success) {
-              toast.success(`OTP sent to your email address!`, { duration: 6000 })
-              setForgotPasswordStep(2)
-            } else {
-              toast.error("Failed to send OTP email.");
-            }
-          } else {
-            toast.error("User not found with this email.")
-          }
-        } else if (forgotPasswordStep === 2) {
-          if (otp === generatedOtp) {
-            toast.success("OTP verified successfully!")
-            setForgotPasswordStep(3)
-          } else {
-            toast.error("Invalid OTP. Please try again.")
-          }
-        } else if (forgotPasswordStep === 3) {
-          const res = await resetPassword({ email, newPassword })
-          if (res.success) {
-            toast.success("Password reset successfully! Please sign in.")
-            setIsForgotPassword(false)
-            setForgotPasswordStep(1)
-            setOtp('')
-            setNewPassword('')
-          } else {
-            toast.error(res.message || "User not found with this email.")
-            setForgotPasswordStep(1)
-          }
-        }
-      } else if (isSignup) {
+      if (isSignup) {
         const res = await openSignUp({
-          email,
-          fullName,
-          username,
-          location,
-          password,
-          profile_picture: profileBase64,
-          profileFile: profileFile,
-          cover_picture: coverBase64,
-          coverFile: coverFile
+          email: formData.email,
+          fullName: formData.fullName,
+          username: formData.username,
+          location: formData.location,
+          password: formData.password,
+          profileFile: formData.profileFile,
+          coverFile: formData.coverFile
         })
         if (res.success) {
-          toast.success("Account created successfully!")
+          toast.success("Welcome to the Gallery!")
         } else {
-          toast.error(res.message || "Failed to create account")
+          toast.error(res.message || "Failed to curate account")
         }
       } else {
-        const res = await openSignIn({ email, password })
+        const res = await openSignIn({ 
+            email: formData.email, 
+            password: formData.password 
+        })
         if (res.success) {
-          toast.success("Successfully logged in!")
+          toast.success("Access granted")
         } else {
-          toast.error(res.message || "Account not found. Please sign up first!")
+          toast.error(res.message || "Invalid credentials")
         }
       }
     } catch (error) {
       console.error("Auth error:", error)
-      toast.error("An error occurred during authentication.")
+      toast.error("An authentication error occurred")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className='min-h-screen flex flex-col md:flex-row relative bg-white'>
-      {/* Background Image - Optimized for Mobile */}
-      <img
-        src={assets.bgImage}
-        alt="Background"
-        loading="lazy"
-        decoding="async"
-        className='absolute top-0 left-0 z-0 w-full h-full object-cover opacity-10 md:opacity-100 mix-blend-multiply'
-      />
-
-      {/* Left Section - Hero (Hidden on Mobile) */}
-      <div className='hidden md:flex flex-1 flex-col items-start justify-between p-6 md:p-12 lg:pl-32 z-10'>
-        <img src={assets.logo} alt="Logo" className='h-12 object-contain' />
-
-        <div className='mt-20 md:mt-0'>
-          <h1 className='text-7xl font-bold leading-tight'>
-            <span className='bg-gradient-to-r from-indigo-950 to-indigo-700 bg-clip-text text-transparent'>
-              Aura evolution
-            </span>
-          </h1>
-          <p className='text-4xl text-indigo-900 font-light mt-2 max-w-lg'>
-            Illuminate your digital presence on Aura
-          </p>
-
-          <div className='flex items-center gap-4 mt-8'>
-            <div className='flex -space-x-3'>
-              {[1, 2, 3, 4, 5].map((_, i) => (
-                <div key={i} className='w-10 h-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden'>
-                  <img src={`https://i.pravatar.cc/100?img=${i + 10}`} className='w-full h-full object-cover' alt="" />
-                </div>
-              ))}
-            </div>
-            <div>
-              <div className='flex gap-0.5'>
-                {Array(5).fill(0).map((_, i) => (
-                  <Star key={i} className='size-4 fill-amber-400 text-amber-400' />
-                ))}
-              </div>
-              <p className='text-sm text-gray-600 font-medium'>Trusted by 12k+ developers</p>
-            </div>
-          </div>
+    <div className='min-h-screen bg-stone-950 flex flex-col lg:flex-row font-sans selection:bg-primary/20 overflow-hidden'>
+      
+      {/* Visual Identity Layer - Left Side */}
+      <div className='hidden lg:flex lg:w-[45%] p-16 flex-col justify-between relative overflow-hidden'>
+        {/* Cinematic Backdrop */}
+        <div className='absolute inset-0 opacity-40 mix-blend-overlay grayscale hover:grayscale-0 transition-all duration-1000 scale-105'>
+             <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" className='w-full h-full object-cover' alt="Gallery Aesthetic" />
         </div>
-        <div></div>
+        <div className='absolute inset-0 bg-gradient-to-b from-stone-950 via-transparent to-stone-950 opacity-60' />
+
+        <div className='z-10 flex flex-col gap-8'>
+             <div className="flex flex-col">
+                <h1 className='text-7xl font-black font-headline tracking-tighter text-white leading-[0.85] uppercase'>
+                    Gallery<br/><span className='text-primary drop-shadow-[0_0_30px_rgba(128,55,177,0.3)]'>Curator</span>
+                </h1>
+                <p className='text-white/30 text-[10px] font-bold uppercase tracking-[0.6em] mt-6 ml-1'>Global Creative Registry — v2.0</p>
+             </div>
+        </div>
+
+        <div className='z-10 flex flex-col gap-6 max-w-sm'>
+            <div className='h-px w-12 bg-primary/40' />
+            <p className='text-white/60 text-lg font-medium leading-relaxed tracking-tight'>
+                A curated ecosystem where visual storytelling meets high-fidelity digital interaction.
+            </p>
+            <div className='flex items-center gap-4 mt-2'>
+                <div className='flex -space-x-3'>
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className='w-10 h-10 rounded-full border-2 border-stone-800 bg-stone-900 overflow-hidden'>
+                            <img src={`https://i.pravatar.cc/100?img=${i + 20}`} className='w-full h-full object-cover' alt="" />
+                        </div>
+                    ))}
+                </div>
+                <span className='text-[10px] font-bold text-white/40 uppercase tracking-widest'>Join 4k+ Curators</span>
+            </div>
+        </div>
       </div>
 
-      {/* Right Section - Login Form */}
-      <div className='flex-1 flex items-center justify-center p-6 sm:p-12 z-10'>
-        <div className='w-full max-w-md bg-white/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-white/50'>
-
-          {/* Mobile Logo */}
-          <div className='md:hidden flex justify-center mb-6'>
-            <img src={assets.logo} alt="Logo" className='h-8 object-contain' />
+      {/* Authentication Stage - Right Side */}
+      <div className='flex-1 flex items-center justify-center p-6 sm:p-12 bg-surface-container-low'>
+        <div className='w-full max-w-md bg-white p-10 sm:p-12 rounded-[3.5rem] shadow-[0_32px_80px_-20px_rgba(0,0,0,0.1)] border border-stone-200/20 animate-in fade-in zoom-in-95 duration-1000 relative overflow-hidden'>
+          
+          {/* Brand Mark (Mobile Only) */}
+          <div className='lg:hidden flex flex-col items-center mb-10'>
+              <h2 className='text-3xl font-black font-headline text-primary tracking-tighter uppercase'>Gallery</h2>
+              <div className='h-0.5 w-8 bg-primary/20 mt-2' />
           </div>
 
-          <div className='text-center mb-8'>
-            <h2 className='text-2xl font-bold text-gray-800'>
-              {isForgotPassword ? (forgotPasswordStep === 1 ? 'Reset Password' : forgotPasswordStep === 2 ? 'Verify OTP' : 'New Password') : (isSignup ? 'Create Account' : 'Welcome Back')}
+          <div className='text-center mb-12 flex flex-col gap-2'>
+            <h2 className='text-4xl font-black font-headline text-on-surface tracking-tighter uppercase'>
+                {isSignup ? 'New Account' : 'Welcome Back'}
             </h2>
-            <p className='text-gray-500 text-sm mt-1'>
-              {isForgotPassword ? (forgotPasswordStep === 1 ? 'Enter your email to receive an OTP' : forgotPasswordStep === 2 ? 'Enter the 6-digit OTP sent to your email' : 'Create a new secure password') : (isSignup ? 'Join our community today' : 'Please sign in to your account')}
+            <p className='text-on-surface-variant/40 text-[10px] font-bold uppercase tracking-[0.3em]'>
+                {isSignup ? 'Register your creative studio' : 'Resume your curation process'}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className='space-y-5'>
+          <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
             {isSignup && (
-              <div className="flex flex-col gap-4 mb-4">
-                {/* Cover Photo */}
-                <div className='relative w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200'>
-                  {coverPreview ? (
-                    <img src={coverPreview} className='w-full h-full object-cover' alt="Cover" />
-                  ) : (
-                    <div className='flex items-center justify-center h-full text-gray-400 text-xs'>Cover Photo</div>
-                  )}
-                  <label htmlFor="coverPhoto" className='absolute bottom-2 right-2 bg-black/50 text-white p-1.5 rounded-full cursor-pointer hover:bg-black/70 transition'>
-                    <PenBox className='w-3 h-3' />
-                    <input
-                      type="file"
-                      id="coverPhoto"
-                      hidden
-                      accept="image/*"
-                      onChange={handleCoverChange}
-                    />
-                  </label>
-                </div>
-
-                {/* Profile Photo */}
-                <div className='flex flex-col items-center -mt-12'>
-                  <div className='relative group'>
-                    <div className='w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-gray-100 flex items-center justify-center shadow-md'>
-                      {profilePreview ? (
-                        <img src={profilePreview} className='w-full h-full object-cover' alt="Preview" />
-                      ) : (
-                        <User className='w-12 h-12 text-gray-400' />
-                      )}
-                    </div>
-                    <label htmlFor="profilePhoto" className='absolute bottom-0 right-0 bg-indigo-600 text-white p-1.5 rounded-full cursor-pointer hover:bg-indigo-700 transition shadow-lg'>
-                      <PenBox className='w-4 h-4' />
-                      <input
-                        type="file"
-                        id="profilePhoto"
-                        hidden
-                        accept="image/*"
-                        onChange={handleProfileChange}
-                      />
+              <div className="flex flex-col gap-8 mb-4 animate-in slide-in-from-top-4 duration-500">
+                {/* Media Uploads */}
+                <div className="grid grid-cols-1 gap-4">
+                    <label className='relative group h-32 rounded-3xl overflow-hidden bg-stone-50 border border-stone-200/10 cursor-pointer shadow-inner'>
+                        <img 
+                            src={formData.coverPreview || "https://images.unsplash.com/photo-1541701494587-cb58502866ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"} 
+                            className={`w-full h-full object-cover transition-transform group-hover:scale-105 duration-700 ${!formData.coverPreview && 'opacity-20 grayscale'}`}
+                            alt="" 
+                        />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <span className="material-symbols-outlined text-white text-3xl">add_a_photo</span>
+                             <span className="text-[8px] text-white font-bold uppercase tracking-widest mt-1">Banner</span>
+                        </div>
+                        <input type="file" name="coverFile" hidden accept="image/*" onChange={handleChange} />
                     </label>
-                  </div>
-                  <p className='text-xs text-gray-500 mt-2 font-medium'>Upload Profile</p>
-                </div>
-              </div>
-            )}
 
-            {isSignup && (
-              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
-                <label htmlFor="fullName" className='block text-sm font-medium text-gray-700 mb-1.5'>Full Name</label>
-                <div className='relative'>
-                  <User className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    autoComplete="name"
-                    required={isSignup}
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your name"
-                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
-                  />
+                    <div className="flex items-center gap-6 -mt-10 px-4">
+                        <label className='relative group w-20 h-20 rounded-full border-4 border-white shadow-2xl bg-white cursor-pointer overflow-hidden'>
+                            <img 
+                                src={formData.profilePreview || assets.sample_profile} 
+                                className='w-full h-full object-cover' 
+                                alt="" 
+                            />
+                            <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <span className="material-symbols-outlined text-white text-xl">edit</span>
+                            </div>
+                            <input type="file" name="profileFile" hidden accept="image/*" onChange={handleChange} />
+                        </label>
+                        <div className="mt-6">
+                            <h4 className="text-xs font-headline font-black text-on-surface uppercase tracking-tight">Profile Canvas</h4>
+                            <p className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest mt-0.5">Upload your mark</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            )}
 
-            {isSignup && (
-              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
-                <label htmlFor="username" className='block text-sm font-medium text-gray-700 mb-1.5'>Username</label>
-                <div className='relative'>
-                  <User className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    autoComplete="username"
-                    required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Choose a username"
-                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      name="fullName"
+                      required
+                      placeholder="FULL NAME"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      className='w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300'
+                    />
+                    <input
+                      type="text"
+                      name="username"
+                      required
+                      placeholder="ALIAS"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className='w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300'
+                    />
                 </div>
-              </div>
-            )}
-
-            {isSignup && (
-              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
-                <label htmlFor="location" className='block text-sm font-medium text-gray-700 mb-1.5'>Location</label>
-                <div className='relative'>
-                  <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                  <input
+                <input
                     type="text"
-                    id="location"
                     name="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Your location"
-                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
-                  />
-                </div>
+                    placeholder="STUDIO LOCATION"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className='w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300'
+                />
               </div>
             )}
 
-            {(!isForgotPassword || forgotPasswordStep === 1) && (
-              <div>
-                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1.5'>Email or Username</label>
+            <div className="flex flex-col gap-4">
                 <div className='relative'>
-                  <Mail className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                  <input
-                    type="text"
-                    id="email"
-                    name="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
-                  />
+                    <input
+                        type="text"
+                        name="email"
+                        required
+                        placeholder="IDENTIFIER (EMAIL/USER)"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className='w-full p-5 bg-stone-50 border border-stone-200/10 rounded-[1.5rem] text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300 pl-14'
+                    />
+                    <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-stone-300 text-[22px]">alternate_email</span>
                 </div>
-              </div>
-            )}
 
-            {isForgotPassword && forgotPasswordStep === 2 && (
-              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
-                <label htmlFor="otp" className='block text-sm font-medium text-gray-700 mb-1.5'>Verification Code</label>
                 <div className='relative'>
-                  <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                  <input
-                    type="text"
-                    id="otp"
-                    required
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    placeholder="Enter 6-digit OTP"
-                    maxLength={6}
-                    className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono tracking-widest'
-                  />
-                </div>
-              </div>
-            )}
-
-            {!isForgotPassword && (
-              <div>
-                <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-1.5'>Password</label>
-                <div className='relative'>
-                  <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className='w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {!isSignup && (
-                  <div className='flex justify-end mt-1'>
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        required
+                        placeholder="ACCESS KEY"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className='w-full p-5 bg-stone-50 border border-stone-200/10 rounded-[1.5rem] text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300 pl-14 pr-14'
+                    />
+                    <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-stone-300 text-[22px]">lock</span>
                     <button
-                      type="button"
-                      onClick={() => setIsForgotPassword(true)}
-                      className='text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-transparent border-none cursor-pointer'
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-stone-300 hover:text-primary transition-colors h-full flex items-center"
                     >
-                      Forgot password?
+                        <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                     </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {isForgotPassword && forgotPasswordStep === 3 && (
-              <div className='animate-in fade-in slide-in-from-top-4 duration-300'>
-                <label htmlFor="newPassword" className='block text-sm font-medium text-gray-700 mb-1.5'>New Password</label>
-                <div className='relative'>
-                  <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    id="newPassword"
-                    required
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter your new password"
-                    className='w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all'
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                  >
-                    {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
                 </div>
-              </div>
-            )}
+            </div>
 
             <button
               type="submit"
               disabled={loading}
-              className='w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed'
+              className='w-full p-5 bg-primary text-white text-[11px] font-black uppercase tracking-[0.3em] rounded-[1.5rem] shadow-2xl shadow-primary/30 active:scale-[0.97] transition-all flex items-center justify-center gap-3 mt-4 disabled:opacity-50 group overflow-hidden relative'
             >
-              {loading ? (
-                <span className='animate-pulse'>Processing...</span>
-              ) : (
-                <>
-                  {isForgotPassword ? (forgotPasswordStep === 1 ? 'Send OTP' : forgotPasswordStep === 2 ? 'Verify OTP' : 'Reset Password') : (isSignup ? 'Create Account' : 'Sign In')}
-                  <ArrowRight className='w-5 h-5' />
-                </>
-              )}
+              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+              <span className="relative z-10">{loading ? 'Processing Agent...' : isSignup ? 'Curate Account' : 'Request Access'}</span>
+              {!loading && <span className="material-symbols-outlined relative z-10 text-[18px]">arrow_forward</span>}
             </button>
           </form>
 
-          <div className='mt-8 pt-6 border-t border-gray-100 text-center'>
-            <p className='text-sm text-gray-500'>
-              {isForgotPassword ? (
-                <button
-                  onClick={() => {
-                    setIsForgotPassword(false)
-                    setForgotPasswordStep(1)
-                  }}
-                  className='font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer'
-                >
-                  Back to sign in
-                </button>
-              ) : (
-                <>
-                  {isSignup ? 'Already have an account? ' : "Don't have an account? "}
-                  <button
-                    onClick={() => setIsSignup(!isSignup)}
-                    className='font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer'
-                  >
-                    {isSignup ? 'Sign in' : 'Create account'}
-                  </button>
-                </>
-              )}
-            </p>
+          <div className='mt-12 text-center'>
+            <button
+                onClick={() => setIsSignup(!isSignup)}
+                className='text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-[0.3em] hover:text-primary transition-colors bg-transparent border-none cursor-pointer flex items-center justify-center gap-3 w-full group'
+            >
+                <div className='h-px flex-1 bg-stone-100 group-hover:bg-primary/10 transition-colors' />
+                <span>{isSignup ? 'Return To Registry' : 'Establish Studio'}</span>
+                <div className='h-px flex-1 bg-stone-100 group-hover:bg-primary/10 transition-colors' />
+            </button>
           </div>
         </div>
       </div>

@@ -22,7 +22,7 @@ const registerSchema = z.object({
 });
 
 const loginSchema = z.object({
-    email: z.string().trim().email("Invalid email format"),
+    email: z.string().trim().min(3, "Identifier must be at least 3 characters"),
     password: z.string().trim().min(1, "Password is required"),
 });
 
