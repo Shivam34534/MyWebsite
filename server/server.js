@@ -79,7 +79,33 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 4000;
 
 if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, () => console.log(`Server is running on port: http://localhost:${PORT}`));
+    app.listen(PORT, async () => {
+        console.log(`Server is running on port: http://localhost:${PORT}`);
+        
+        // 🛡️ DEV HOOK: Ensure an admin user exists for testing
+        try {
+            const User = (await import('./models/User.js')).default;
+            const bcrypt = (await import('bcrypt')).default;
+            const crypto = (await import('crypto')).default;
+            
+            const adminEmail = 'shivam@aura.com';
+            const exists = await User.findOne({ email: adminEmail });
+            if (!exists) {
+                console.log("Creating default dev user: shivam@aura.com / shivam123");
+                const hashedPassword = await bcrypt.hash('shivam123', 10);
+                await User.create({
+                    _id: crypto.randomUUID(),
+                    full_name: 'Shivam Dev',
+                    email: adminEmail,
+                    password: hashedPassword,
+                    username: 'shivam',
+                    role: 'admin'
+                });
+            }
+        } catch (err) {
+            console.error("Dev Hook Error:", err);
+        }
+    });
 }
 
 export default app;
