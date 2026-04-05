@@ -1,15 +1,18 @@
+import React from 'react'
+
 const Loading = () => {
   return (
-    <div className='flex items-center justify-center h-screen bg-slate-50/50 backdrop-blur-sm'>
-        <div className='flex flex-col items-center gap-4'>
-            <div className='relative'>
-                <div className='w-14 h-14 rounded-2xl border-4 border-indigo-100' />
-                <div className='w-14 h-14 rounded-2xl border-4 border-indigo-600 border-t-transparent animate-spin absolute inset-0' />
-                <div className='absolute inset-0 flex items-center justify-center'>
-                    <div className='w-6 h-6 bg-indigo-500 rounded-full animate-pulse' />
+    <div className='fixed inset-0 flex items-center justify-center bg-surface/50 backdrop-blur-xl z-[200]'>
+        <div className='flex flex-col items-center gap-6 animate-in fade-in duration-1000'>
+            <div className='relative flex flex-col items-center'>
+                <h1 className='text-4xl font-black font-headline tracking-tighter bg-gradient-to-tr from-[#8037b1] via-[#E1306C] to-[#FF8C00] bg-clip-text text-transparent animate-pulse'>
+                    Gallery
+                </h1>
+                <div className='w-16 h-0.5 bg-stone-200/20 rounded-full mt-2 relative overflow-hidden'>
+                    <div className='absolute inset-0 bg-primary/40 w-1/2 animate-loading-bar'></div>
                 </div>
             </div>
-            <p className='text-xs font-bold text-slate-400 tracking-[0.2em] uppercase animate-pulse'>Aura is loading</p>
+            <p className='text-[10px] font-bold uppercase tracking-[0.5em] text-on-surface-variant/30 animate-pulse'>Curating your moment</p>
         </div>
     </div>
   )
