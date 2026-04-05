@@ -1,8 +1,8 @@
 import { ArrowLeft, Sparkle, TextIcon, Upload } from 'lucide-react'
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
-import { useAuth } from '../mockClerk'
-import api from '../api/axios'
+import { useAuth } from '../../mockClerk'
+import api from '../../api/axios'
 
 const StoryModel = ({ setShowModel, fetchStories }) => {
 

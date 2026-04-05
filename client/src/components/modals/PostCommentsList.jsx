@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { X, Send } from 'lucide-react'
 import { useSelector } from 'react-redux'
-import { assets } from '../assets/assets'
-import api from '../api/axios'
-import { useAuth } from '../mockClerk'
+import { assets } from '../../assets/assets'
+import api from '../../api/axios'
+import { useAuth } from '../../mockClerk'
 
 const PostCommentsList = ({ setShowComments, postId, onCommentAdded }) => {
     const currentUser = useSelector((state) => state.user.value)

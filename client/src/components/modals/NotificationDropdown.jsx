@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Bell } from 'lucide-react';
-import api from '../api/axios';
-import { useAuth } from '../mockClerk';
+import api from '../../api/axios';
+import { useAuth } from '../../mockClerk';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
@@ -69,8 +69,8 @@ const NotificationDropdown = () => {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button 
-                onClick={handleOpen} 
+            <button
+                onClick={handleOpen}
                 className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition relative cursor-pointer"
             >
                 <Bell className="w-5 h-5 text-slate-700" />
@@ -89,15 +89,15 @@ const NotificationDropdown = () => {
                             <p className="p-6 text-center text-gray-500 text-sm">No new notifications</p>
                         ) : (
                             notifications.map(n => (
-                                <div 
-                                    key={n._id} 
+                                <div
+                                    key={n._id}
                                     onClick={() => handleNotificationClick(n)}
                                     className={`flex items-start gap-3 p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition ${!n.isRead ? 'bg-indigo-50/30' : ''}`}
                                 >
-                                    <img 
-                                        src={n.sender?.profile_picture || 'https://via.placeholder.com/150'} 
+                                    <img
+                                        src={n.sender?.profile_picture || 'https://via.placeholder.com/150'}
                                         className="w-10 h-10 rounded-full object-cover"
-                                        alt="" 
+                                        alt=""
                                     />
                                     <div className="flex-1">
                                         <p className="text-sm text-slate-800 leading-tight">

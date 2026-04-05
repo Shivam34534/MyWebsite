@@ -1,6 +1,6 @@
 import { BadgeCheck, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { assets } from '../assets/assets'
+import { assets } from '../../assets/assets'
 
 const StoryViewer = ({ stories, setViewStory }) => {
 

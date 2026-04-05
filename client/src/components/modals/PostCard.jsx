@@ -3,9 +3,9 @@ import React, { use, useState } from 'react'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import api from '../api/axios'
-import { useUser, useAuth } from '../mockClerk'
-import { assets } from '../assets/assets'
+import api from '../../api/axios'
+import { useUser, useAuth } from '../../mockClerk'
+import { assets } from '../../assets/assets'
 import toast from 'react-hot-toast'
 import PostLikesList from './PostLikesList'
 import PostCommentsList from './PostCommentsList'
@@ -87,7 +87,7 @@ const PostCard = ({ post }) => {
                             <img src={post.user.profile_picture || assets.sample_profile} alt="Profile" className='w-full h-full rounded-full object-cover border-2 border-white' />
                         </div>
                         <div className='absolute -bottom-1 -right-1 w-4 h-4 bg-indigo-500 border-2 border-white rounded-full flex items-center justify-center'>
-                           <div className='w-1.5 h-1.5 bg-white rounded-full animate-pulse'></div>
+                            <div className='w-1.5 h-1.5 bg-white rounded-full animate-pulse'></div>
                         </div>
                     </div>
                     <div className='flex flex-col'>
@@ -112,10 +112,10 @@ const PostCard = ({ post }) => {
                                 {isVideo ? (
                                     <video src={url} controls className='w-full h-full object-cover' />
                                 ) : (
-                                    <img 
-                                        src={url} 
-                                        className='w-full h-full object-cover transition-transform duration-700 group-hover/media:scale-110' 
-                                        alt="" 
+                                    <img
+                                        src={url}
+                                        className='w-full h-full object-cover transition-transform duration-700 group-hover/media:scale-110'
+                                        alt=""
                                     />
                                 )}
                             </div>
@@ -154,7 +154,7 @@ const PostCard = ({ post }) => {
                         <span className='whitespace-pre-wrap break-words inline text-slate-600' dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
                     </div>
                 )}
-                
+
                 {commentCount > 0 && (
                     <button onClick={() => setShowComments(true)} className='text-xs font-bold text-indigo-500 mt-3 hover:text-indigo-700 transition-colors'>
                         View all {commentCount} discussions

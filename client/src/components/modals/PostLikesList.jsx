@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import UserCard from './UserCard'
 import { useSelector } from 'react-redux'
-import { assets } from '../assets/assets'
-import api from '../api/axios'
-import { useAuth } from '../mockClerk'
+import { assets } from '../../assets/assets'
+import api from '../../api/axios'
+import { useAuth } from '../../mockClerk'
 import Loading from './Loading'
 
 const PostLikesList = ({ likes, setShowLikes }) => {

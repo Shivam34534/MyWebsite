@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
-import api from '../api/axios'
-import { useUser, useAuth } from '../mockClerk.jsx'
-import { assets } from '../assets/assets'
+import api from '../../api/axios.js'
+import { useUser, useAuth } from '../../mockClerk.jsx'
+import { assets } from '../../assets/assets.js'
 import toast from 'react-hot-toast'
 
 const RecentMessages = () => {

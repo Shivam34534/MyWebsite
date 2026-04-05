@@ -28,15 +28,16 @@ const App = () => {
       if (user) {
         const token = await getToken()
         const action = await dispatch(fetchUser(token))
-        // If server returns null (user not found), force logout to clear stale client state
-        if (fetchUser.fulfilled.match(action) && !action.payload) {
+        
+        // 🚨 Security: If token is expired (401) or user not found, clear state and redirect to login
+        if (fetchUser.rejected.match(action) || (fetchUser.fulfilled.match(action) && !action.payload)) {
           signOut();
         }
       }
     }
     fetchData()
 
-  }, [user, getToken, dispatch])
+  }, [user, getToken, dispatch, signOut])
   
   // A sleek loading spinner to display while chunks are downloading
   const LoadingScreen = () => (

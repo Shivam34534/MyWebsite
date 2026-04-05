@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { MapPin, MessageCircle, Plus, UserPlus } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
-import api from '../api/axios'
-import { useAuth } from '../mockClerk'
+import api from '../../api/axios'
+import { useAuth } from '../../mockClerk'
 import toast from 'react-hot-toast'
-import { fetchUser } from '../features/user/userSlice'
-import { assets } from '../assets/assets'
+import { fetchUser } from '../../features/user/userSlice'
+import { assets } from '../../assets/assets'
 
 const UserCard = ({ user }) => {
     const currentUser = useSelector((state) => state.user.value)

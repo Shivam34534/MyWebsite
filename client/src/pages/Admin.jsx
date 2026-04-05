@@ -5,7 +5,7 @@ import api from '../api/axios';
 import { useAuth, useUser } from '../mockClerk';
 import toast from 'react-hot-toast';
 import { Users, FileText, LayoutDashboard, Trash2 } from 'lucide-react';
-import Loading from '../components/Loading';
+import Loading from '../components/modals/Loading';
 
 const Admin = () => {
     const { getToken, user } = useAuth();

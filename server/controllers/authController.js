@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'supersecretkey', { expiresIn: '7d' });
+    return jwt.sign({ id }, process.env.JWT_SECRET || 'supersecretkey', { expiresIn: '30d' });
 };
 
 export const registerUser = async (req, res) => {

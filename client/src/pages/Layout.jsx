@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import Sidebar from '../components/Sidebar'
+import Sidebar from '../components/modals/Sidebar'
 import { Outlet } from 'react-router-dom'
 import { useAuth } from '../mockClerk';
-import Loading from '../components/Loading';
+import Loading from '../components/modals/Loading';
 import { useSelector } from 'react-redux';
 import { Menu, X } from 'lucide-react';
 

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 import { Calendar, MapPin, PenBox, Verified, UserPlus, UserCheck } from 'lucide-react'
 import { useSelector, useDispatch } from 'react-redux'
-import { assets } from '../assets/assets'
-import api from '../api/axios'
-import { useAuth } from '../mockClerk'
+import { assets } from '../../assets/assets'
+import api from '../../api/axios'
+import { useAuth } from '../../mockClerk'
 import toast from 'react-hot-toast'
-import { fetchUser } from '../features/user/userSlice'
+import { fetchUser } from '../../features/user/userSlice'
 
 const UserProfileInfo = ({ user, posts, profileId, setShowEdit, onUpdate }) => {
   const currentUser = useSelector((state) => state.user.value)

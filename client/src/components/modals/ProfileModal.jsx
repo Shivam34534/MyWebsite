@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Pencil } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
-import api from '../api/axios'
-import { useAuth, useUser } from '../mockClerk'
+import api from '../../api/axios'
+import { useAuth, useUser } from '../../mockClerk'
 import toast from 'react-hot-toast'
-import { fetchUser } from '../features/user/userSlice'
+import { fetchUser } from '../../features/user/userSlice'
 
-import { assets } from '../assets/assets'
+import { assets } from '../../assets/assets'
 
 const ProfileModal = ({ setShowEdit }) => {
 
