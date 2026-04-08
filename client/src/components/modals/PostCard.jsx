@@ -78,87 +78,94 @@ const PostCard = ({ post }) => {
     }
 
     return (
-        <article className="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm transition-all duration-500 hover:shadow-xl hover:shadow-stone-200/40">
-            {/* Post Header */}
-            <div className="flex items-center justify-between p-4">
-                <div onClick={() => navigate('/profile/' + post.user._id)} className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-10 h-10 rounded-full story-ring p-[1.5px]">
-                        <div className="w-full h-full rounded-full border border-white overflow-hidden bg-stone-50">
+        <article className="bg-white rounded-[2rem] overflow-hidden border border-stone-200/40 shadow-sm transition-all duration-700 hover:editorial-shadow border-transparent hover:border-stone-200/60 group/card">
+            {/* 🏷️ Card Header */}
+            <header className="flex items-center justify-between p-5 lg:p-6 pb-4">
+                <div onClick={() => navigate('/profile/' + post.user._id)} className="flex items-center gap-4 cursor-pointer group">
+                    <div className="w-12 h-12 rounded-full story-ring p-[2px] transition-transform duration-500 group-hover:scale-105">
+                        <div className="w-full h-full rounded-full border-[2.5px] border-white overflow-hidden bg-stone-50">
                             <img 
-                                className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                                className="w-full h-full object-cover" 
                                 src={post.user.profile_picture || assets.sample_profile} 
                                 onError={(e) => { e.target.src = assets.sample_profile }}
                                 alt={post.user.username} 
                             />
                         </div>
                     </div>
-                    <div>
-                        <h3 className="font-headline font-bold text-sm leading-tight text-on-surface group-hover:text-primary transition-colors">{post.user.username}</h3>
-                        <p className="text-[11px] text-on-surface-variant leading-tight">{post.location || 'Editorial Studio'}</p>
+                    <div className='flex flex-col'>
+                        <div className='flex items-center gap-1.5'>
+                            <h3 className="font-headline font-black text-[15px] leading-tight text-on-surface group-hover:text-primary transition-colors tracking-tight">{post.user.username}</h3>
+                            <BadgeCheck className='w-3.5 h-3.5 text-primary-dim fill-primary/10' />
+                        </div>
+                        <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest">{post.location || 'Editorial Gallery'}</p>
                     </div>
                 </div>
-                <button className="text-on-surface-variant hover:text-on-surface transition-colors p-2 hover:bg-surface-container-low rounded-full">
-                    <span className="material-symbols-outlined text-[20px]">more_horiz</span>
+                <button className="text-stone-300 hover:text-on-surface transition-all p-2.5 hover:bg-stone-50 rounded-2xl active:scale-90">
+                    <span className="material-symbols-outlined text-[24px]">more_horiz</span>
                 </button>
-            </div>
+            </header>
 
-            {/* Media Canvas */}
+            {/* 📽️ Content Canvas */}
             {post.image_urls && post.image_urls.length > 0 && (
-                <div className="w-full aspect-square bg-surface-container overflow-hidden relative group">
+                <div className="w-full aspect-square bg-stone-50 overflow-hidden relative group/image">
                     <img 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 cursor-pointer" 
+                        className="w-full h-full object-cover group-hover/image:scale-[1.03] transition-transform duration-[2000ms] ease-out cursor-pointer" 
                         src={post.image_urls[0]} 
                         alt="" 
+                        onClick={() => navigate('/profile/' + post.user._id)}
                     />
                     {post.image_urls.length > 1 && (
-                        <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[10px] font-bold tracking-widest uppercase">
-                            Gallery 1 / {post.image_urls.length}
+                        <div className="absolute top-6 right-6 bg-white/60 backdrop-blur-xl px-3.5 py-1.5 rounded-full text-stone-900 text-[10px] font-black tracking-[0.2em] uppercase border border-white/40 shadow-sm">
+                            Curated Series {post.image_urls.length}
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Post Actions & Content */}
-            <div className="p-4 flex flex-col gap-4">
+            {/* ⚡ Interaction Stage */}
+            <div className="p-6 lg:p-8 pt-6 flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-5">
-                        <button onClick={handleLike} className="transition-transform active:scale-90 flex items-center justify-center">
+                    <div className="flex items-center gap-6">
+                        <button onClick={handleLike} className="group/btn transition-transform active:scale-75 flex items-center justify-center">
                             <span 
-                                className={`material-symbols-outlined text-[28px] transition-all ${likes.includes(currentUser?._id) ? 'text-red-500' : 'text-on-surface-variant hover:text-red-500'}`} 
+                                className={`material-symbols-outlined text-[32px] transition-all duration-300 ${likes.includes(currentUser?._id) ? 'text-red-500 scale-110' : 'text-on-surface-variant hover:text-red-500'}`} 
                                 style={{ fontVariationSettings: `'FILL' ${likes.includes(currentUser?._id) ? 1 : 0}` }}
                             >
                                 favorite
                             </span>
                         </button>
-                        <button onClick={() => setShowComments(!showComments)} className="transition-transform active:scale-90 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
-                            <span className="material-symbols-outlined text-[28px]">chat_bubble</span>
+                        <button onClick={() => setShowComments(!showComments)} className="group/btn transition-transform active:scale-75 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300">
+                            <span className="material-symbols-outlined text-[32px] group-hover/btn:scale-110">chat_bubble</span>
                         </button>
-                        <button onClick={handleShare} className="transition-transform active:scale-90 flex items-center justify-center text-on-surface-variant hover:text-emerald-500 transition-colors">
-                            <span className="material-symbols-outlined text-[28px]">send</span>
+                        <button onClick={handleShare} className="group/btn transition-transform active:scale-75 flex items-center justify-center text-on-surface-variant hover:text-emerald-500 transition-all duration-300">
+                            <span className="material-symbols-outlined text-[32px] group-hover/btn:scale-110">send</span>
                         </button>
                     </div>
-                    <button className="transition-transform active:scale-90 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
-                        <span className="material-symbols-outlined text-[28px]">bookmark</span>
+                    <button className="group/btn transition-transform active:scale-75 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300">
+                        <span className="material-symbols-outlined text-[32px] group-hover/btn:scale-110">bookmark</span>
                     </button>
                 </div>
 
-                {/* Engagement Context */}
-                <div className="flex flex-col gap-1.5">
-                    <p onClick={() => setShowLikes(true)} className="text-sm font-extrabold cursor-pointer hover:underline text-on-surface">{likes.length.toLocaleString()} likes</p>
-                    <div className="text-[14px] text-on-surface leading-relaxed">
-                        <span onClick={() => navigate('/profile/' + post.user._id)} className="font-bold mr-2 cursor-pointer hover:text-primary transition-colors">{post.user.username}</span> 
-                        <span className="whitespace-pre-wrap break-words text-on-surface font-medium" dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
+                {/* 📝 Narrative Section */}
+                <div className="flex flex-col gap-2">
+                    <button onClick={() => setShowLikes(true)} className="text-[15px] font-black cursor-pointer hover:text-primary text-on-surface text-left transition-colors tracking-tight">{likes.length.toLocaleString()} Appreciation Points</button>
+                    <div className="text-[15px] text-on-surface leading-loose">
+                        <span onClick={() => navigate('/profile/' + post.user._id)} className="font-headline font-black mr-2.5 cursor-pointer hover:text-primary transition-colors tracking-tight lowercase">{post.user.username}</span> 
+                        <span className="whitespace-pre-wrap break-words text-on-surface font-medium opacity-90" dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
                     </div>
                 </div>
 
-                {/* Metadata & Footer */}
-                <div className="flex flex-col gap-2 mt-1">
+                {/* 💬 Discussion Feed */}
+                <div className="flex flex-col gap-3 mt-1">
                     {commentCount > 0 && (
-                        <button onClick={() => setShowComments(true)} className="text-on-surface-variant text-sm text-left hover:text-on-surface transition-colors font-medium">View all {commentCount} comments</button>
+                        <button onClick={() => setShowComments(true)} className="text-stone-400 text-sm text-left hover:text-primary transition-colors font-bold uppercase tracking-widest text-[11px]">View all {commentCount} comments</button>
                     )}
-                    <span className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold opacity-60">
-                        {moment(post.createdAt).fromNow()}
-                    </span>
+                    <div className='flex items-center gap-3'>
+                        <span className="h-[1px] w-4 bg-stone-200" />
+                        <span className="text-[10px] text-stone-400 uppercase tracking-widest font-black">
+                            {moment(post.createdAt).fromNow()}
+                        </span>
+                    </div>
                 </div>
             </div>
 
