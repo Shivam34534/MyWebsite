@@ -59,35 +59,57 @@ export const loginUser = async (req, res) => {
         const startTime = Date.now();
 
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: 'All fields are required' });
+            return res.status(400).json({ success: false, message: 'All fields are required', reason: 'EMPTY_FIELDS' });
         }
 
         email = email.trim().toLowerCase();
 
-        // Optimized query to match either exact email or exact (case-insensitive) username
-        // Using $or with indexed fields is fast
+        // Optimized query with collation for case-insensitivity
         const user = await User.findOne({
             $or: [
                 { email: email },
                 { username: email }
             ]
-        }).collation({ locale: 'en', strength: 2 }); // Collation for case-insensitive username match
+        }).collation({ locale: 'en', strength: 2 });
 
         if (!user) {
             console.log(`[LOGIN] User not found for: ${email}`);
-            return res.status(404).json({ success: false, message: 'Invalid credentials' });
+            return res.status(404).json({ success: false, message: 'Invalid credentials', reason: 'USER_NOT_FOUND' });
         }
 
         if (!user.password) {
             console.log(`[LOGIN] Missing password (Clerk account) for: ${email}`);
-            return res.status(400).json({ success: false, message: 'This account was originally created via third-party login (Clerk). Please reset your password or create a new account.' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'This account was originally created via Clerk. Please use a password reset.',
+                reason: 'CLERK_ACCOUNT_NO_PASSWORD' 
+            });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        const duration = Date.now() - startTime;
-        console.log(`[LOGIN] Attempt for ${email}: ${isMatch ? 'SUCCESS' : 'FAILED'} (Time: ${duration}ms)`);
+        // 1. Try Bcrypt comparison
+        let isMatch = await bcrypt.compare(password, user.password).catch(() => false);
+        let wasPlainText = false;
 
-        if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
+        // 2. SELF-HEALING: If bcrypt fails, check if the DB password is plain text (for migration support)
+        if (!isMatch && password === user.password) {
+            isMatch = true;
+            wasPlainText = true;
+            console.log(`[LOGIN] Plain-text match detected for ${email}. Upgrading to hash...`);
+        }
+
+        const duration = Date.now() - startTime;
+        console.log(`[LOGIN] Attempt for ${email}: ${isMatch ? 'SUCCESS' : 'FAILED'} (Time: ${duration}ms, UPGRADED: ${wasPlainText})`);
+
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Invalid credentials', reason: 'PASSWORD_MISMATCH' });
+        }
+
+        // 3. BACKGROUND UPGRADE: If it matched as plain text, hash it now for next time
+        if (wasPlainText) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+            await user.save().catch(err => console.error("[DB] Failed to upgrade password hash:", err));
+        }
 
         res.status(200).json({
             success: true,
@@ -95,7 +117,7 @@ export const loginUser = async (req, res) => {
             token: generateToken(user._id)
         });
     } catch (error) {
-        console.error(`[LOGIN] Unexpected error for ${req.body.email}:`, error);
+        console.error(`[LOGIN] Unexpected error for ${req.body?.email}:`, error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
