@@ -86,7 +86,7 @@ const Login = () => {
                 <img 
                     alt="Gallery Editorial" 
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-[4000ms] hover:scale-105" 
-                    src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV2gsvrP96A6-aIVLEWsfCroeE04950FbGkyUDwU2_ftI3I-FACdypCZ1AaMgT73zn4w99w41aTjmmeXvhFPH6Ubzc58duteYJlAwLjsiaj_EtzFUPblFtf-rpImyc2s6gBhW4FDGPJPJ-MK-4iLEHNxLgYLZOhwxszQ6a8av30jyCfpcjiSiFUingbpG_EVPJ1ZzkG7sS5FB8rF32URklP_XOH04EJpTsuOFzlW8Rzoqa-zv7USbXQgX5tcpViVvuRDwrvI-TvknO"
                 />
                 <div className="absolute inset-0 bg-black/10 mix-blend-multiply" />
                 
