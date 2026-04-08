@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
     _id: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true, index: true },
     password: { type: String },
     full_name: { type: String, required: true },
-    username: { type: String, unique: true },
+    username: { type: String, unique: true, index: true },
     bio: { type: String, default: 'Hey there! I am using Aura.' },
     profile_picture: { type: String, default: '' },
     cover_picture: { type: String, default: '' },

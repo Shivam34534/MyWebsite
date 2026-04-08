@@ -56,24 +56,37 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     try {
         let { email, password } = req.body;
+        const startTime = Date.now();
+
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
 
         email = email.trim().toLowerCase();
 
+        // Optimized query to match either exact email or exact (case-insensitive) username
+        // Using $or with indexed fields is fast
         const user = await User.findOne({
             $or: [
                 { email: email },
-                { username: new RegExp(`^${email}$`, 'i') }
+                { username: email }
             ]
-        });
+        }).collation({ locale: 'en', strength: 2 }); // Collation for case-insensitive username match
 
-        if (!user) return res.status(404).json({ success: false, message: 'Invalid credentials' });
-
+        if (!user) {
+            console.log(`[LOGIN] User not found for: ${email}`);
+            return res.status(404).json({ success: false, message: 'Invalid credentials' });
+        }
 
         if (!user.password) {
+            console.log(`[LOGIN] Missing password (Clerk account) for: ${email}`);
             return res.status(400).json({ success: false, message: 'This account was originally created via third-party login (Clerk). Please reset your password or create a new account.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
+        const duration = Date.now() - startTime;
+        console.log(`[LOGIN] Attempt for ${email}: ${isMatch ? 'SUCCESS' : 'FAILED'} (Time: ${duration}ms)`);
+
         if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
 
         res.status(200).json({
@@ -82,6 +95,7 @@ export const loginUser = async (req, res) => {
             token: generateToken(user._id)
         });
     } catch (error) {
+        console.error(`[LOGIN] Unexpected error for ${req.body.email}:`, error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
