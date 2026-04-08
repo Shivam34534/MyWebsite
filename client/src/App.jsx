@@ -65,8 +65,11 @@ const App = () => {
             <Route index element={<Feed />} />
             <Route path='messages' element={<Messages />} />
             <Route path='messages/:id' element={<ChatBox />} />
-            <Route path='connections' element={<Connections />} />
             <Route path='discover' element={<Discover />} />
+            <Route path='search' element={<Discover />} />
+            <Route path='notifications' element={<Feed />} />
+            <Route path='reels' element={<Feed />} />
+            <Route path='connections' element={<Connections />} />
             <Route path='profile' element={<Profile />} />
             <Route path='profile/:profileId' element={<Profile />} />
             <Route path='create-post' element={<CreatePost />} />
