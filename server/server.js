@@ -1,4 +1,5 @@
 import 'dotenv/config.js';
+import express from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cors from 'cors';
