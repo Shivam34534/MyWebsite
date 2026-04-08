@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { assets } from '../assets/assets'
 import { useClerk } from '../mockClerk'
 import toast from 'react-hot-toast'
-import { X, Eye, EyeOff, LayoutPanelTop, GalleryHorizontalEnd } from 'lucide-react'
+import { X, Eye, EyeOff, LayoutPanelTop, GalleryHorizontalEnd, Camera } from 'lucide-react'
 
 const Login = () => {
   const { openSignIn, openSignUp } = useClerk()
@@ -15,8 +15,6 @@ const Login = () => {
     email: '',
     password: '',
     fullName: '',
-    username: '',
-    location: '',
   })
 
   const handleChange = (e) => {
@@ -33,7 +31,7 @@ const Login = () => {
         const res = await openSignUp({
           email: formData.email,
           fullName: formData.fullName,
-          username: formData.fullName.split(' ')[0].toLowerCase() + Math.floor(Math.random() * 1000), // Auto-generate username for simplicity in this UI
+          username: formData.fullName.split(' ')[0].toLowerCase() + Math.floor(Math.random() * 1000),
           password: formData.password,
         })
         if (res.success) {
@@ -61,65 +59,78 @@ const Login = () => {
   }
 
   return (
-    <div className="bg-surface font-body text-on-surface antialiased min-h-screen flex items-center justify-center p-4 md:p-8 selection:bg-primary/20">
+    <div className="bg-[#f0f0f0] font-body text-on-surface antialiased min-h-screen flex items-center justify-center p-4 md:p-8 selection:bg-primary/20">
       
       <style>{`
         .signature-gradient {
             background: linear-gradient(135deg, #8037b1 0%, #b6004f 50%, #ffb147 100%);
         }
         .ghost-border {
-            border: 1px solid rgba(175, 172, 172, 0.15);
-        }
-        .backdrop-dim {
-            background-color: rgba(14, 14, 14, 0.6);
-            backdrop-filter: blur(8px);
+            border: 1px solid rgba(175, 172, 172, 0.2);
         }
       `}</style>
 
       {/* 📝 SIGN UP VIEW */}
       {isSignup ? (
-        <main className="relative w-full max-w-6xl bg-surface-container-lowest rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-[0_32px_128px_rgba(92,91,91,0.1)] min-h-[700px] animate-in fade-in zoom-in-95 duration-700">
-            {/* Close / Toggle Action */}
-            <button onClick={() => setIsSignup(false)} className="absolute top-6 right-6 z-50 p-3 rounded-full hover:bg-surface-container-high transition-all text-on-surface-variant active:scale-90">
-                <X className="w-6 h-6" />
+        <main className="relative w-full max-w-5xl bg-white rounded-[1rem] overflow-hidden flex flex-col md:flex-row shadow-[0_32px_64px_rgba(0,0,0,0.06)] min-h-[640px] animate-in fade-in zoom-in-95 duration-500">
+            {/* Close toggle */}
+            <button onClick={() => setIsSignup(false)} className="absolute top-5 right-5 z-50 p-1.5 rounded-full hover:bg-stone-50 transition-all text-stone-400">
+                <X className="w-5 h-5" />
             </button>
 
-            {/* Left Column: Editorial Image Content */}
-            <div className="relative w-full md:w-1/2 min-h-[300px] md:min-h-full overflow-hidden">
+            {/* Left Column: Editorial Image */}
+            <div className="relative w-full md:w-[50%] min-h-[300px] md:min-h-full overflow-hidden bg-[#b9bcad]">
                 <img 
-                    alt="Editorial Aesthetic" 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] hover:scale-105" 
-                    src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
+                    alt="Abstract Art" 
+                    className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-90" 
+                    src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
                 />
                 
-                {/* Floating Editorial Badge */}
-                <div className="absolute bottom-8 left-8 p-8 bg-surface-container-lowest/80 backdrop-blur-2xl rounded-[2rem] max-w-xs hidden lg:block shadow-xl border border-white/40">
-                    <span className="font-headline font-black text-[10px] tracking-[0.4em] text-primary uppercase mb-3 block">Curated Volume I</span>
-                    <p className="font-headline text-xl font-bold leading-tight text-on-surface">"The essence of light is the frame of the moment."</p>
+                {/* Quote Card (Bottom Left) */}
+                <div className="absolute bottom-6 left-6 p-6 bg-[#f0f0f0]/90 backdrop-blur-md rounded-xl max-w-[280px] shadow-sm border border-white/20">
+                    <span className="font-headline font-black text-[9px] tracking-[0.2em] text-[#8037b1] uppercase mb-2 block">Curated Volume I</span>
+                    <p className="font-headline text-[15px] font-bold leading-tight text-on-surface">"The essence of light is the frame of the moment."</p>
                 </div>
             </div>
 
-            {/* Right Column: Focused Sign Up Form */}
-            <div className="w-full md:w-1/2 p-10 md:p-16 lg:p-20 flex flex-col justify-center">
-                {/* Branding Anchor */}
-                <div className="mb-12 flex items-center gap-3">
-                    <div className="w-10 h-10 signature-gradient rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                        <GalleryHorizontalEnd className="w-5 h-5" />
+            {/* Right Column: Sign Up Form */}
+            <div className="w-full md:w-[50%] p-10 md:p-12 flex flex-col justify-center">
+                {/* Brand Identity */}
+                <div className="mb-8 flex items-center gap-2.5">
+                    <div className="w-9 h-9 signature-gradient rounded-xl flex items-center justify-center text-white shadow-md">
+                        <Camera className="w-4.5 h-4.5" />
                     </div>
                     <span className="font-headline text-2xl font-black italic tracking-tighter text-on-surface">Gallery</span>
                 </div>
 
-                <div className="mb-10">
-                    <h1 className="font-headline text-4xl font-black tracking-tight mb-3 text-on-surface">Create Account</h1>
-                    <p className="text-on-surface-variant font-medium text-sm leading-relaxed">Join the world's most curated digital space for visual storytelling.</p>
+                <div className="mb-8">
+                    <h1 className="font-headline text-[28px] font-black tracking-tight mb-2 text-stone-800">Create Account</h1>
+                    <p className="text-stone-500 font-medium text-[13px] leading-relaxed">Join the world's most curated digital space for visual storytelling.</p>
                 </div>
 
-                {/* Registration Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="block text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.2em] ml-1" htmlFor="fullName">Full Name</label>
+                {/* Social Logins */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                    <button className="ghost-border flex items-center justify-center gap-2.5 py-3 rounded-lg hover:bg-stone-50 transition-all font-bold text-xs text-stone-700">
+                        <img src="https://www.google.com/favicon.ico" className="w-3.5 h-3.5 grayscale" alt="" />
+                        Google
+                    </button>
+                    <button className="ghost-border flex items-center justify-center gap-2.5 py-3 rounded-lg hover:bg-stone-50 transition-all font-bold text-xs text-stone-700">
+                        <span className="material-symbols-outlined text-[18px]">phone_iphone</span>
+                        Apple
+                    </button>
+                </div>
+
+                <div className="relative mb-6 flex items-center">
+                    <div className="flex-grow border-t border-stone-100"></div>
+                    <span className="px-3 text-[9px] font-black text-stone-300 uppercase tracking-widest">or</span>
+                    <div className="flex-grow border-t border-stone-100"></div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-1.5">
+                        <label className="block text-[9px] font-black text-stone-400 uppercase tracking-widest ml-0.5" htmlFor="fullName">Full Name</label>
                         <input 
-                            className="w-full bg-surface-container-low border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary/20 placeholder:text-stone-300 transition-all outline-none font-medium text-on-surface" 
+                            className="w-full bg-[#f4f2f1] border-none rounded-lg px-4 py-3 placeholder:text-stone-300 outline-none font-medium text-sm text-stone-600 focus:ring-1 focus:ring-primary/10 transition-all" 
                             id="fullName" 
                             name="fullName"
                             placeholder="Evelyn Thorne" 
@@ -129,10 +140,10 @@ const Login = () => {
                             onChange={handleChange}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <label className="block text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.2em] ml-1" htmlFor="email">Email Address</label>
+                    <div className="space-y-1.5">
+                        <label className="block text-[9px] font-black text-stone-400 uppercase tracking-widest ml-0.5" htmlFor="email">Email Address</label>
                         <input 
-                            className="w-full bg-surface-container-low border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary/20 placeholder:text-stone-300 transition-all outline-none font-medium text-on-surface" 
+                            className="w-full bg-[#f4f2f1] border-none rounded-lg px-4 py-3 placeholder:text-stone-300 outline-none font-medium text-sm text-stone-600 focus:ring-1 focus:ring-primary/10 transition-all" 
                             id="email" 
                             name="email"
                             placeholder="evelyn@gallery.art" 
@@ -142,11 +153,11 @@ const Login = () => {
                             onChange={handleChange}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <label className="block text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.2em] ml-1" htmlFor="password">Password</label>
+                    <div className="space-y-1.5">
+                        <label className="block text-[9px] font-black text-stone-400 uppercase tracking-widest ml-0.5" htmlFor="password">Password</label>
                         <div className="relative">
                             <input 
-                                className="w-full bg-surface-container-low border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary/20 placeholder:text-stone-300 transition-all outline-none font-medium text-on-surface" 
+                                className="w-full bg-[#f4f2f1] border-none rounded-lg px-4 py-3 placeholder:text-stone-300 outline-none font-medium text-sm text-stone-600 focus:ring-1 focus:ring-primary/10 transition-all" 
                                 id="password" 
                                 name="password"
                                 placeholder="••••••••" 
@@ -157,120 +168,106 @@ const Login = () => {
                             />
                             <button 
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-primary transition-colors" 
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors" 
                                 type="button"
                             >
-                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                <span className="material-symbols-outlined text-[18px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                             </button>
                         </div>
                     </div>
                     
-                    <div className="pt-6">
+                    <div className="pt-4">
                         <button 
                             disabled={loading}
-                            className="w-full signature-gradient text-white font-headline font-black py-5 rounded-full shadow-[0_16px_32px_-8px_rgba(128,55,177,0.3)] hover:opacity-90 active:scale-[0.97] transition-all uppercase tracking-widest text-xs" 
+                            className="w-full signature-gradient text-white font-headline font-black py-4 rounded-full shadow-lg hover:opacity-90 active:scale-[0.98] transition-all text-sm" 
                             type="submit"
                         >
-                            {loading ? 'Curating...' : 'Sign Up'}
+                            {loading ? 'Archiving...' : 'Sign Up'}
                         </button>
                     </div>
                 </form>
 
-                {/* Footer Link */}
-                <p className="mt-10 text-center text-sm font-medium text-on-surface-variant/60">
+                <p className="mt-6 text-center text-[13px] font-medium text-stone-500">
                     Already have an account? 
-                    <button onClick={() => setIsSignup(false)} className="text-primary font-black ml-2 hover:underline underline-offset-8 transition-all px-1">Log In</button>
+                    <button onClick={() => setIsSignup(false)} className="text-[#8037b1] font-bold ml-1.5 hover:underline underline-offset-4">Log In</button>
                 </p>
+
+                <div className="mt-10 flex items-center justify-center gap-6 text-[9px] font-black text-stone-300 tracking-widest uppercase">
+                    <a href="#" className="hover:text-stone-400">Privacy</a>
+                    <a href="#" className="hover:text-stone-400">Terms</a>
+                    <a href="#" className="hover:text-stone-400">Contact</a>
+                </div>
             </div>
         </main>
       ) : (
         /* 🔑 LOGIN VIEW */
-        <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
-            {/* Background Content (Simulated Gallery View) */}
-            <div className="fixed inset-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 p-6 opacity-10 grayscale pointer-events-none scale-110">
-                {[1,2,3,4,5,6,7,8,9,10,11,12].map(i => (
-                    <div key={i} className="aspect-[3/4] bg-surface-container-highest rounded-3xl overflow-hidden shadow-sm">
-                        <img 
-                            className="w-full h-full object-cover" 
-                            src={`https://images.unsplash.com/photo-${1500000000000 + i * 100000}?auto=format&fit=crop&w=400&q=20`} 
-                            alt="" 
-                        />
-                    </div>
-                ))}
+        <div className="relative w-full max-w-md bg-white p-12 rounded-[1.5rem] shadow-[0_32px_64px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
+            {/* Brand Mark */}
+            <div className="mb-10 text-center">
+                <h1 className="text-3xl font-black italic tracking-tighter text-on-surface font-headline mb-2">Gallery</h1>
+                <p className="text-stone-800 font-headline text-2xl font-bold tracking-tight">Welcome Back</p>
+                <div className="h-0.5 w-6 bg-primary/20 mx-auto mt-4" />
             </div>
 
-            {/* Modal Container */}
-            <div className="relative w-full max-w-md bg-white p-10 md:p-14 rounded-[3.5rem] shadow-[0_64px_128px_-32px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col items-center border border-stone-100 animate-in fade-in zoom-in-95 duration-1000">
-                {/* Brand Identity */}
-                <div className="mb-12 text-center">
-                    <h1 className="text-4xl font-black italic tracking-tighter text-on-surface font-headline mb-4">Gallery</h1>
-                    <p className="text-on-surface font-headline text-2xl font-bold tracking-tight">Welcome Back</p>
-                    <div className="h-0.5 w-8 bg-primary/20 mx-auto mt-4" />
+            <form onSubmit={handleSubmit} className="w-full space-y-5">
+                <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-stone-400 px-0.5" htmlFor="email">Email</label>
+                    <input 
+                        className="w-full h-12 px-4 bg-[#f4f2f1] border-none rounded-lg text-sm font-medium text-stone-600 outline-none focus:ring-1 focus:ring-primary/10 transition-all" 
+                        id="email" 
+                        name="email"
+                        placeholder="name@example.com" 
+                        type="email" 
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                    />
                 </div>
-
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="w-full space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 px-1" htmlFor="email">Email</label>
+                <div className="space-y-1.5">
+                    <div className="flex justify-between items-center px-0.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-stone-400" htmlFor="password">Password</label>
+                        <a className="text-[9px] font-black text-primary uppercase tracking-widest" href="#">Forgot?</a>
+                    </div>
+                    <div className="relative">
                         <input 
-                            className="w-full h-14 px-6 bg-surface-container-low border-none focus:ring-2 focus:ring-primary/20 rounded-2xl text-on-surface placeholder:text-stone-300 transition-all outline-none font-medium" 
-                            id="email" 
-                            name="email"
-                            placeholder="name@example.com" 
-                            type="email" 
+                            className="w-full h-12 px-4 bg-[#f4f2f1] border-none rounded-lg text-sm font-medium text-stone-600 outline-none focus:ring-1 focus:ring-primary/10 transition-all" 
+                            id="password" 
+                            name="password"
+                            placeholder="••••••••" 
+                            type={showPassword ? "text" : "password"} 
                             required
-                            value={formData.email}
+                            value={formData.password}
                             onChange={handleChange}
                         />
+                        <button 
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400" 
+                            type="button"
+                        >
+                           <span className="material-symbols-outlined text-[18px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                        </button>
                     </div>
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center px-1">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40" htmlFor="password">Password</label>
-                            <a className="text-[10px] font-black text-primary hover:opacity-70 transition-all uppercase tracking-widest" href="#">Forgot?</a>
-                        </div>
-                        <div className="relative">
-                            <input 
-                                className="w-full h-14 px-6 bg-surface-container-low border-none focus:ring-2 focus:ring-primary/20 rounded-2xl text-on-surface placeholder:text-stone-300 transition-all outline-none font-medium" 
-                                id="password" 
-                                name="password"
-                                placeholder="••••••••" 
-                                type={showPassword ? "text" : "password"} 
-                                required
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-                            <button 
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-primary transition-colors" 
-                                type="button"
-                            >
-                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                            </button>
-                        </div>
-                    </div>
-
-                    <button 
-                        disabled={loading}
-                        className="w-full h-14 mt-4 bg-gradient-to-r from-primary to-primary-dim text-white font-black rounded-full hover:opacity-90 active:scale-[0.97] transition-all duration-300 shadow-xl shadow-primary/20 uppercase tracking-widest text-xs" 
-                        type="submit"
-                    >
-                        {loading ? 'Verifying...' : 'Request Access'}
-                    </button>
-                </form>
-
-                {/* Divider */}
-                <div className="relative w-full flex items-center justify-center my-12">
-                    <div className="w-full h-[1.5px] bg-stone-100"></div>
-                    <span className="absolute bg-white px-4 text-[10px] font-black text-stone-300 uppercase tracking-[0.4em]">or</span>
                 </div>
 
-                {/* Footer */}
-                <div className="text-center">
-                    <p className="text-sm font-medium text-on-surface-variant/60">
-                        Don't have an account? 
-                        <button onClick={() => setIsSignup(true)} className="font-black text-primary ml-2 hover:underline underline-offset-8 decoration-2 transition-all px-1">Establish Studio</button>
-                    </p>
-                </div>
+                <button 
+                    disabled={loading}
+                    className="w-full h-12 mt-4 signature-gradient text-white font-black rounded-full hover:opacity-90 active:scale-[0.98] transition-all shadow-md text-sm" 
+                    type="submit"
+                >
+                    {loading ? 'Verifying...' : 'Log In'}
+                </button>
+            </form>
+
+            <div className="relative w-full flex items-center justify-center my-10">
+                <div className="w-full h-[1px] bg-stone-100"></div>
+                <span className="absolute bg-white px-3 text-[9px] font-black text-stone-300 uppercase tracking-widest">or</span>
+            </div>
+
+            <div className="text-center">
+                <p className="text-sm font-medium text-stone-500">
+                    Don't have an account? 
+                    <button onClick={() => setIsSignup(true)} className="font-bold text-[#8037b1] ml-1.5 hover:underline underline-offset-4">Sign Up</button>
+                </p>
             </div>
         </div>
       )}
