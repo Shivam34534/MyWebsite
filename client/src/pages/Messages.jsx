@@ -55,7 +55,7 @@ const Messages = () => {
     if (loading) return <Loading />
 
     return (
-        <main className="lg:ml-64 flex h-screen overflow-hidden bg-surface">
+        <main className="w-full flex h-screen overflow-hidden bg-surface">
             {/* Conversations List */}
             <section className={`${id ? 'hidden md:flex' : 'flex'} w-full md:w-80 lg:w-96 flex-shrink-0 flex flex-col bg-surface border-r border-stone-200/15`}>
                 <div className="px-6 py-8 flex flex-col gap-6">

@@ -53,7 +53,7 @@ const Profile = () => {
   if (loading && !user) return <Loading />
 
   return user ? (
-    <div className='lg:ml-64 relative min-h-screen bg-surface p-4 md:p-8 flex flex-col gap-10 overflow-y-auto no-scrollbar pb-24'>
+    <div className='w-full relative min-h-screen bg-surface p-4 md:p-8 flex flex-col gap-10 overflow-y-auto no-scrollbar pb-24'>
       <div className='max-w-4xl mx-auto w-full flex flex-col gap-10'>
 
         {/* Profile Shell */}

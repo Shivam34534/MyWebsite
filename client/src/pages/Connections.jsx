@@ -171,102 +171,92 @@ const Connections = () => {
   if (loading) return <Loading />
 
   return (
-    <div className='min-h-screen bg-slate-50'>
-      <div className='max-w-6xl mx-auto p-6'>
+    <div className='min-h-screen bg-surface w-full p-4 sm:p-8 lg:p-12'>
+      <div className='max-w-6xl mx-auto flex flex-col gap-12'>
 
-        {/* Title */}
-        <div>
-          <h1 className='text-3xl font-bold text-slate-900 mb-2'>Connections</h1>
-          <p className='text-slate-600'>Manage your network and discover new
-            connections</p>
+        {/* Branding & Header */}
+        <div className='flex flex-col gap-2'>
+          <h1 className='text-4xl font-black font-headline tracking-tighter text-on-surface uppercase'>Network</h1>
+          <p className='text-[10px] font-bold uppercase tracking-[0.4em] text-on-surface-variant/40 pl-0.5'>Manage your gallery connections</p>
         </div>
 
-        {/* Counts */}
-        <div className='mb-8 flex flex-wrap gap-6'>
-          {dataArray.map((item, index) => (
-            <div key={index} className='flex flex items-center justify-center 
-            gap-1 border h-20 w-40 border-gray-200 bg-white shadow rounded-md'>
-              <b>{item.value.length}</b>
-              <p className='text-slate-600'>{item.label}</p>
-            </div>
+        {/* Tab Selection Strategy */}
+        <div className='inline-flex flex-wrap items-center gap-2 bg-surface-container-low p-2 rounded-[2rem] border border-stone-200/5 shadow-sm transition-all'>
+          {dataArray.map((tab) => (
+            <button 
+              onClick={() => setCurrentTab(tab.label)} 
+              key={tab.label}
+              className={`flex items-center gap-3 px-6 py-2.5 rounded-full text-sm font-headline font-bold transition-all duration-300 ${
+                currentTab === tab.label 
+                ? 'bg-white text-primary shadow-lg shadow-primary/5 scale-[1.05]' 
+                : 'text-stone-400 hover:text-on-surface hover:bg-stone-50'
+              }`}
+            >
+              <tab.icon className='w-4 h-4' />
+              <span className='tracking-tight'>{tab.label}</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full ${currentTab === tab.label ? 'bg-primary/10 text-primary' : 'bg-stone-100 text-stone-400'}`}>
+                {tab.value.length}
+              </span>
+            </button>
           ))}
         </div>
 
-        {/* Tabs */}
-        {/* Tabs */}
-        <div className='inline-flex flex-wrap items-center border border-gray-200 rounded-md p-1 bg-white shadow-sm'>
-          {
-            dataArray.map((tab) => (
-              <button onClick={() => setCurrentTab(tab.label)} key={tab.label}
-                className={`cursor-pointer flex items-center px-3 py-1 text-sm rounded-md
-                    transition-colors ${currentTab === tab.label ?
-                    'bg-white font-medium text-black' :
-                    'text-gray-500 hover:text-black'}`}>
-                <tab.icon className='w-4 h-4' />
-                <span className='ml-1'>{tab.label}</span>
-                {tab.count !== undefined && (
-                  <span className='ml-2 text-xs bg-gray-100 text-gray-700 px-2 py-0.5
-                      rounded-full'>{tab.count}</span>
-                )}
-              </button>
-            ))
-          }
-        </div>
-
-        {/* Connections*/}
-        <div className='flex wrap gap-6  mt-6'>
+        {/* Connection Grid Stage */}
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-8 duration-700'>
           {dataArray.find((item) => item.label === currentTab)?.value.length === 0 ? (
-            <p className='text-gray-500 text-center py-8 w-full'>No {currentTab.toLowerCase()} yet.</p>
+            <div className='col-span-full py-32 text-center flex flex-col items-center gap-6 opacity-30'>
+              <span className="material-symbols-outlined text-8xl">group_off</span>
+              <div className='flex flex-col gap-2'>
+                  <h3 className='font-headline font-black text-2xl text-on-surface'>No archives found</h3>
+                  <p className='text-sm font-medium'>Start connecting with other curators in the gallery.</p>
+              </div>
+            </div>
           ) : (
             dataArray.find((item) => item.label === currentTab)?.value.map((user) => (
-              <div key={user._id} className='w-full max-w-88 flex gap-5 p-6 bg-white
-            shadow rounded-md'>
-                <img src={user.profile_picture || assets.sample_profile} alt=""
-                  onError={(e) => { e.target.src = assets.sample_profile }}
-                  className="rounded-full w-12 h-12 shadow-md mx-auto" />
-                <div className='flex-1'>
-                  <p className='font-medium text-slate-700'>{user.full_name}</p>
-                  <p className='text-slate-500'>@{user.username}</p>
-                  {user.bio && <p className='text-slate-500'>{user.bio.slice(0, 30)}...</p>}
-                  <div className='flex max-sm:flex-col gap-2 mt-4'>
-                    {
-                      <button onClick={() => navigate(`/profile/${user._id}`)} className='w-full p-2 text-sm rounded
-                    bg-gradient-to-r from-indigo-500 to-purple-600
-                    hover:from-indigo-600 hover:to-purple-700 active:scale-95
-                    transition text-white cursor-pointer'>
-                        View Profile
-                      </button>
-                    }
-                    {
-                      currentTab === 'Following' && (
-                        <button onClick={() => handleUnfollow(user._id)} className='w-full p-2 text-sm rounded bg-slate-100 
-                      hover:bg-slate-200 text-black active:scale-95 transition 
-                      cursor-pointer'>
-                          Unfollow
-                        </button>
-                      )
-                    }
-                    {
-                      currentTab === 'Pending' && (
-                        <button onClick={() => handleAcceptConnection(user._id)} className='w-full p-2 text-sm rounded bg-slate-100 
-                      hover:bg-slate-200 text-black active:scale-95 transition 
-                      cursor-pointer'>
-                          Accept
-                        </button>
-                      )
-                    }
-                    {
-                      currentTab === 'Connections' && (
-                        <button onClick={() => navigate(`/messages/${user._id}`)} className='w-full p-2 text-sm rounded bg-slate-100 
-                      hover:bg-slate-200 text-slate-800 active:scale-95 transition 
-                      cursor-pointer flex items-center justify-center gap-1'>
-                          <MessageSquare className='w-4 h-4' />
-                          Message
-                        </button>
-                      )
-                    }
+              <div key={user._id} className='bg-surface-container-lowest p-8 rounded-[3rem] border border-stone-200/5 shadow-xl transition-all hover:editorial-shadow hover:translate-y-[-4px] flex flex-col gap-8 group'>
+                <div className='flex items-center gap-6'>
+                    <div className='relative p-0.5 rounded-full border-[1.5px] border-stone-200 shadow-sm transition-transform group-hover:scale-105'>
+                        <img 
+                            src={user.profile_picture || assets.sample_profile} 
+                            onError={(e) => { e.target.src = assets.sample_profile }}
+                            alt="" 
+                            className="w-16 h-16 rounded-full object-cover" 
+                        />
+                        <div className='absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-4 border-white rounded-full' />
+                    </div>
+                    <div className='flex flex-col overflow-hidden'>
+                      <h4 className='font-headline font-black text-on-surface text-lg leading-tight truncate group-hover:text-primary transition-colors'>{user.full_name}</h4>
+                      <p className='text-stone-400 font-bold uppercase text-[10px] tracking-widest mt-1'>@{user.username}</p>
+                    </div>
+                </div>
 
-                  </div>
+                {user.bio && (
+                    <p className='text-on-surface-variant font-medium text-sm leading-relaxed line-clamp-2 opacity-80 italic'>"{user.bio}"</p>
+                )}
+
+                <div className='grid grid-cols-2 gap-3 pt-4 border-t border-stone-200/10'>
+                    <button 
+                        onClick={() => navigate(`/profile/${user._id}`)} 
+                        className='px-4 py-3 bg-stone-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-lg shadow-stone-200'
+                    >
+                        Visit Studio
+                    </button>
+                    {currentTab === 'Following' && (
+                        <button onClick={() => handleUnfollow(user._id)} className='px-4 py-3 bg-stone-50 text-stone-500 hover:text-red-500 hover:bg-red-50 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 border border-stone-100'>
+                            Unfollow
+                        </button>
+                    )}
+                    {currentTab === 'Pending' && (
+                        <button onClick={() => handleAcceptConnection(user._id)} className='px-4 py-3 bg-primary text-white rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-primary/20'>
+                            Accept
+                        </button>
+                    )}
+                    {currentTab === 'Connections' && (
+                        <button onClick={() => navigate(`/messages/${user._id}`)} className='px-4 py-3 bg-primary/5 text-primary hover:bg-primary/10 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 border border-primary/10 flex items-center justify-center gap-2'>
+                            <MessageSquare className='w-3 h-3' />
+                            Message
+                        </button>
+                    )}
                 </div>
               </div>
             ))

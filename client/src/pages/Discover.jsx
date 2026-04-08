@@ -67,7 +67,7 @@ const Discover = () => {
   }, [input, getToken]);
 
   return (
-    <div className='lg:ml-64 min-h-screen bg-surface px-6 py-10 flex flex-col gap-12 overflow-y-auto no-scrollbar'>
+    <div className='w-full min-h-screen bg-surface px-4 sm:px-8 py-10 flex flex-col gap-12 overflow-y-auto no-scrollbar'>
       {/* Title Section */}
       <div className='flex flex-col gap-2'>
           <h1 className='text-4xl font-black font-headline tracking-tighter text-on-surface uppercase'>Discover</h1>
