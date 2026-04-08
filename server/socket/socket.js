@@ -1,12 +1,14 @@
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import express from 'express';
-import Message from '../models/Message.js';
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
-    cors: { origin: "*" }
+    cors: { 
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
 });
 
 const userSocketMap = {}; // { userId: socketId }
@@ -20,22 +22,7 @@ io.on('connection', async (socket) => {
     
     if (userId && userId !== "undefined") {
         userSocketMap[userId] = socket.id;
-
-        try {
-            // Track when message reaches receiver -> delivered
-            const updated = await Message.updateMany(
-                { to_user_id: userId, status: 'sent' },
-                { $set: { status: 'delivered' } }
-            );
-            
-            // If we wanted to alert every sender of delivery immediately, we could aggregate distinct senders and emit, 
-            // but tracking it correctly locally is the primary requirement.
-            if(updated.modifiedCount > 0){
-                // Could emit global or targeted update if required
-            }
-        } catch (err) {
-            console.error("Error updating delivered status:", err);
-        }
+        console.log(`[SOCKET] User connected: ${userId} (Socket: ${socket.id})`);
     }
 
     // Broadcast online users status to everyone
@@ -57,7 +44,10 @@ io.on('connection', async (socket) => {
     });
 
     socket.on('disconnect', () => {
-        delete userSocketMap[userId];
+        if (userId) {
+            console.log(`[SOCKET] User disconnected: ${userId}`);
+            delete userSocketMap[userId];
+        }
         io.emit('getOnlineUsers', Object.keys(userSocketMap));
     });
 });

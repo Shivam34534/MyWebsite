@@ -1,10 +1,12 @@
-import express from 'express';
+import 'dotenv/config.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cors from 'cors';
-import 'dotenv/config.js';
 import connectDB from './configs/db.js';
 import path from 'path'
+import { app, server } from './socket/socket.js'; // Unified App and Server
+
+// Routers
 import userRouter from './routes/userRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import storyRouter from './routes/storyRoutes.js';
@@ -12,52 +14,46 @@ import messageRouter from './routes/messageRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 import searchRouter from './routes/searchRoutes.js';
+import authRouter from './routes/authRoute.js';
+import devRouter from './routes/devRoutes.js'
 import { errorHandler } from './middlewares/errorHandler.js';
 
-import authRouter from './routes/authRoute.js';
-// Dev-only routes
-import devRouter from './routes/devRoutes.js'
+const PORT = process.env.PORT || 4000;
 
-const app = express();
+// Connect to Database
+console.log("[DB] Attempting connection to Atlas...");
+connectDB().then(() => {
+    console.log("[DB] Database connected and ready.");
+}).catch(err => {
+    console.error("[DB] Critical connection failure:", err);
+});
 
-console.log("Attempting to connect to DB...");
-try {
-    connectDB();
-    console.log("DB connection initiated.");
-} catch (error) {
-    console.error("DB connection failed immediately:", error);
-}
-
-// Apply Helmet for strict security HTTP headers while allowing cross-origin image requests
+// Middleware Configuration
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-// Apply global rate limiting to protect against brute-force DDoS attacks
 const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes window
-    max: 150, // Limit each IP to 150 requests per window
+    windowMs: 15 * 60 * 1000, 
+    max: 200, 
     message: 'Too many requests from this IP, please try again after 15 minutes',
     standardHeaders: true, 
     legacyHeaders: false, 
 });
 app.use('/api', apiLimiter);
 
-app.use(express.json({ limit: '50mb' }));
-
-// Highly dynamic CORS configuration to reflect the exact requesting Origin, ensuring zero blocks while maintaining security tokens
 app.use(cors({ 
-    origin: (origin, callback) => {
-        // Automatically accept the incoming origin
-        callback(null, true);
-    },
+    origin: (origin, callback) => callback(null, true),
     credentials: true 
 }));
 
-// Serve uploaded files from the uploads directory
+app.use(express.json({ limit: '10mb' }));
+
+// Serve static assets
 const uploadsDirPath = path.resolve(process.cwd(), 'uploads');
 app.use('/uploads', express.static(uploadsDirPath));
 
-app.get('/', (req, res) => res.send('Server is running...'));
+app.get('/', (req, res) => res.send('Gallery API is operational and waiting for curations...'));
 
+// API Routes
 app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
 app.use('/api/post', postRouter)
@@ -67,18 +63,16 @@ app.use('/api/comment', commentRouter)
 app.use('/api/notification', notificationRouter)
 app.use('/api/search', searchRouter)
 
-// Expose development helper routes only in non-production environments
+// Development Helper Routes
 if (process.env.NODE_ENV !== 'production') {
     app.use('/api/dev', devRouter)
 }
 
-// Global Exception error-handling middleware is ALWAYS the last middleware
+// Final Error Handling
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 4000;
-
 if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, () => console.log(`Server is running on port: http://localhost:${PORT}`));
+    server.listen(PORT, () => console.log(`[SERVER] Running and radiating on: http://localhost:${PORT}`));
 }
 
 export default app;

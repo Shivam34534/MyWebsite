@@ -10,7 +10,10 @@ const connectDB = async () => {
         );
 
         await mongoose.connect(baseUrl, {
-            dbName: 'Aura'
+            dbName: 'Aura',
+            maxPoolSize: 10, // Increase pool for higher concurrency
+            serverSelectionTimeoutMS: 5000, // Fail fast if DB is down
+            socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
         });
     } catch (error) {
         console.log("MongoDB connection error:", error.message);
