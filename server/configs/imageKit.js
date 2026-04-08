@@ -18,15 +18,40 @@ if (process.env.IMAGEKIT_PRIVATE_KEY) {
 
 export const getImageKitUrl = (uploadResponse, transformation = []) => {
     if (!uploadResponse) return '';
+
+    // Standardize transformation keys for maximum compatibility
+    const optimizedTransformations = transformation.map(t => {
+        const entry = {};
+        if (t.height) entry.h = t.height;
+        else if (t.h) entry.h = t.h;
+        if (t.width) entry.w = t.width;
+        else if (t.w) entry.w = t.w;
+        if (t.quality) entry.q = t.quality;
+        else if (t.q) entry.q = t.q;
+        if (t.format) entry.f = t.format;
+        return Object.keys(entry).length > 0 ? entry : t;
+    });
+
+    const options = {
+        transformation: optimizedTransformations,
+        transformationPostPosition: "path" // Critical for video support
+    };
+
     if (uploadResponse.url) {
-        return imagekit.url({ src: uploadResponse.url, transformation });
+        options.src = uploadResponse.url;
+    } else {
+        let filePath = uploadResponse.filePath || uploadResponse.path || uploadResponse.name || '';
+        if (!filePath) return '';
+        if (!filePath.startsWith('/')) filePath = `/${filePath}`;
+        options.path = filePath;
     }
-    let filePath = uploadResponse.filePath || uploadResponse.path || uploadResponse.name || '';
-    if (!filePath) return '';
-    if (!filePath.startsWith('/')) {
-        filePath = `/${filePath}`;
+
+    try {
+        return imagekit.url(options);
+    } catch (err) {
+        console.error("[ImageKit] URL generation failed:", err);
+        return uploadResponse.url || '';
     }
-    return imagekit.url({ path: filePath, transformation });
 };
 
 export default imagekit;
