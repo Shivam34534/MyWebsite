@@ -85,9 +85,27 @@ export const getStories = async (req, res) => {
         const stories = await Story.find({
             user: { $in: userIds },
             createdAt: { $gte: twentyFourHoursAgo }
-        }).populate('user').sort({ createdAt: -1 })
+        }).populate('user', 'username profile_picture full_name').sort({ createdAt: -1 });
 
-        res.json({ success: true, data: stories, stories });
+        // Auto-fix legacy URLs on the fly for immediate player compatibility
+        const fixedStories = stories.map(story => {
+            const storyObj = story.toObject();
+            if (storyObj.media_url && storyObj.media_url.includes('?tr=')) {
+                // Convert legacy: ...mp4?tr=h-720:q-auto -> optimized: .../tr:h-720,q-auto/stories/...mp4
+                try {
+                    const baseUrl = process.env.IMAGEKIT_URL_ENDPOINT || 'https://ik.imagekit.io/shivam657';
+                    const parts = storyObj.media_url.split('?tr=');
+                    const pathPart = parts[0].replace(baseUrl, '');
+                    const trPart = parts[1].replace(':', ',');
+                    storyObj.media_url = `${baseUrl}/tr:${trPart}${pathPart}`;
+                } catch (e) {
+                    console.error("[MIGRATION] URL repair failed for story:", storyObj._id);
+                }
+            }
+            return storyObj;
+        });
+
+        res.json({ success: true, data: fixedStories, stories: fixedStories });
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message })
