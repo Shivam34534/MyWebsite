@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { assets } from '../assets/assets'
 import { useClerk } from '../mockClerk'
 import toast from 'react-hot-toast'
+import { X, Eye, EyeOff, LayoutPanelTop, GalleryHorizontalEnd } from 'lucide-react'
 
 const Login = () => {
   const { openSignIn, openSignUp } = useClerk()
@@ -16,25 +17,11 @@ const Login = () => {
     fullName: '',
     username: '',
     location: '',
-    profileFile: null,
-    coverFile: null,
-    profilePreview: null,
-    coverPreview: null
   })
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target
-    if (files) {
-      const file = files[0]
-      const preview = URL.createObjectURL(file)
-      setFormData(prev => ({
-        ...prev,
-        [name]: file,
-        [`${name.replace('File', '')}Preview`]: preview
-      }))
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }))
-    }
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e) => {
@@ -46,11 +33,8 @@ const Login = () => {
         const res = await openSignUp({
           email: formData.email,
           fullName: formData.fullName,
-          username: formData.username,
-          location: formData.location,
+          username: formData.fullName.split(' ')[0].toLowerCase() + Math.floor(Math.random() * 1000), // Auto-generate username for simplicity in this UI
           password: formData.password,
-          profileFile: formData.profileFile,
-          coverFile: formData.coverFile
         })
         if (res.success) {
           toast.success("Welcome to the Gallery!")
@@ -77,188 +61,219 @@ const Login = () => {
   }
 
   return (
-    <div className='min-h-screen bg-stone-950 flex flex-col lg:flex-row font-sans selection:bg-primary/20 overflow-hidden'>
+    <div className="bg-surface font-body text-on-surface antialiased min-h-screen flex items-center justify-center p-4 md:p-8 selection:bg-primary/20">
       
-      {/* Visual Identity Layer - Left Side */}
-      <div className='hidden lg:flex lg:w-[45%] p-16 flex-col justify-between relative overflow-hidden'>
-        {/* Cinematic Backdrop */}
-        <div className='absolute inset-0 opacity-40 mix-blend-overlay grayscale hover:grayscale-0 transition-all duration-1000 scale-105'>
-             <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" className='w-full h-full object-cover' alt="Gallery Aesthetic" />
-        </div>
-        <div className='absolute inset-0 bg-gradient-to-b from-stone-950 via-transparent to-stone-950 opacity-60' />
+      <style>{`
+        .signature-gradient {
+            background: linear-gradient(135deg, #8037b1 0%, #b6004f 50%, #ffb147 100%);
+        }
+        .ghost-border {
+            border: 1px solid rgba(175, 172, 172, 0.15);
+        }
+        .backdrop-dim {
+            background-color: rgba(14, 14, 14, 0.6);
+            backdrop-filter: blur(8px);
+        }
+      `}</style>
 
-        <div className='z-10 flex flex-col gap-8'>
-             <div className="flex flex-col">
-                <h1 className='text-7xl font-black font-headline tracking-tighter text-white leading-[0.85] uppercase'>
-                    Gallery<br/><span className='text-primary drop-shadow-[0_0_30px_rgba(128,55,177,0.3)]'>Curator</span>
-                </h1>
-                <p className='text-white/30 text-[10px] font-bold uppercase tracking-[0.6em] mt-6 ml-1'>Global Creative Registry — v2.0</p>
-             </div>
-        </div>
+      {/* 📝 SIGN UP VIEW */}
+      {isSignup ? (
+        <main className="relative w-full max-w-6xl bg-surface-container-lowest rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-[0_32px_128px_rgba(92,91,91,0.1)] min-h-[700px] animate-in fade-in zoom-in-95 duration-700">
+            {/* Close / Toggle Action */}
+            <button onClick={() => setIsSignup(false)} className="absolute top-6 right-6 z-50 p-3 rounded-full hover:bg-surface-container-high transition-all text-on-surface-variant active:scale-90">
+                <X className="w-6 h-6" />
+            </button>
 
-        <div className='z-10 flex flex-col gap-6 max-w-sm'>
-            <div className='h-px w-12 bg-primary/40' />
-            <p className='text-white/60 text-lg font-medium leading-relaxed tracking-tight'>
-                A curated ecosystem where visual storytelling meets high-fidelity digital interaction.
-            </p>
-            <div className='flex items-center gap-4 mt-2'>
-                <div className='flex -space-x-3'>
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className='w-10 h-10 rounded-full border-2 border-stone-800 bg-stone-900 overflow-hidden'>
-                            <img src={`https://i.pravatar.cc/100?img=${i + 20}`} className='w-full h-full object-cover' alt="" />
-                        </div>
-                    ))}
+            {/* Left Column: Editorial Image Content */}
+            <div className="relative w-full md:w-1/2 min-h-[300px] md:min-h-full overflow-hidden">
+                <img 
+                    alt="Editorial Aesthetic" 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] hover:scale-105" 
+                    src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
+                />
+                
+                {/* Floating Editorial Badge */}
+                <div className="absolute bottom-8 left-8 p-8 bg-surface-container-lowest/80 backdrop-blur-2xl rounded-[2rem] max-w-xs hidden lg:block shadow-xl border border-white/40">
+                    <span className="font-headline font-black text-[10px] tracking-[0.4em] text-primary uppercase mb-3 block">Curated Volume I</span>
+                    <p className="font-headline text-xl font-bold leading-tight text-on-surface">"The essence of light is the frame of the moment."</p>
                 </div>
-                <span className='text-[10px] font-bold text-white/40 uppercase tracking-widest'>Join 4k+ Curators</span>
             </div>
-        </div>
-      </div>
 
-      {/* Authentication Stage - Right Side */}
-      <div className='flex-1 flex items-center justify-center p-6 sm:p-12 bg-surface-container-low'>
-        <div className='w-full max-w-md bg-white p-10 sm:p-12 rounded-[3.5rem] shadow-[0_32px_80px_-20px_rgba(0,0,0,0.1)] border border-stone-200/20 animate-in fade-in zoom-in-95 duration-1000 relative overflow-hidden'>
-          
-          {/* Brand Mark (Mobile Only) */}
-          <div className='lg:hidden flex flex-col items-center mb-10'>
-              <h2 className='text-3xl font-black font-headline text-primary tracking-tighter uppercase'>Gallery</h2>
-              <div className='h-0.5 w-8 bg-primary/20 mt-2' />
-          </div>
+            {/* Right Column: Focused Sign Up Form */}
+            <div className="w-full md:w-1/2 p-10 md:p-16 lg:p-20 flex flex-col justify-center">
+                {/* Branding Anchor */}
+                <div className="mb-12 flex items-center gap-3">
+                    <div className="w-10 h-10 signature-gradient rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                        <GalleryHorizontalEnd className="w-5 h-5" />
+                    </div>
+                    <span className="font-headline text-2xl font-black italic tracking-tighter text-on-surface">Gallery</span>
+                </div>
 
-          <div className='text-center mb-12 flex flex-col gap-2'>
-            <h2 className='text-4xl font-black font-headline text-on-surface tracking-tighter uppercase'>
-                {isSignup ? 'New Account' : 'Welcome Back'}
-            </h2>
-            <p className='text-on-surface-variant/40 text-[10px] font-bold uppercase tracking-[0.3em]'>
-                {isSignup ? 'Register your creative studio' : 'Resume your curation process'}
-            </p>
-          </div>
+                <div className="mb-10">
+                    <h1 className="font-headline text-4xl font-black tracking-tight mb-3 text-on-surface">Create Account</h1>
+                    <p className="text-on-surface-variant font-medium text-sm leading-relaxed">Join the world's most curated digital space for visual storytelling.</p>
+                </div>
 
-          <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
-            {isSignup && (
-              <div className="flex flex-col gap-8 mb-4 animate-in slide-in-from-top-4 duration-500">
-                {/* Media Uploads */}
-                <div className="grid grid-cols-1 gap-4">
-                    <label className='relative group h-32 rounded-3xl overflow-hidden bg-stone-50 border border-stone-200/10 cursor-pointer shadow-inner'>
-                        <img 
-                            src={formData.coverPreview || "https://images.unsplash.com/photo-1541701494587-cb58502866ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"} 
-                            className={`w-full h-full object-cover transition-transform group-hover:scale-105 duration-700 ${!formData.coverPreview && 'opacity-20 grayscale'}`}
-                            alt="" 
+                {/* Registration Form */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="block text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.2em] ml-1" htmlFor="fullName">Full Name</label>
+                        <input 
+                            className="w-full bg-surface-container-low border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary/20 placeholder:text-stone-300 transition-all outline-none font-medium text-on-surface" 
+                            id="fullName" 
+                            name="fullName"
+                            placeholder="Evelyn Thorne" 
+                            type="text" 
+                            required
+                            value={formData.fullName}
+                            onChange={handleChange}
                         />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
-                             <span className="material-symbols-outlined text-white text-3xl">add_a_photo</span>
-                             <span className="text-[8px] text-white font-bold uppercase tracking-widest mt-1">Banner</span>
-                        </div>
-                        <input type="file" name="coverFile" hidden accept="image/*" onChange={handleChange} />
-                    </label>
-
-                    <div className="flex items-center gap-6 -mt-10 px-4">
-                        <label className='relative group w-20 h-20 rounded-full border-4 border-white shadow-2xl bg-white cursor-pointer overflow-hidden'>
-                            <img 
-                                src={formData.profilePreview || assets.sample_profile} 
-                                className='w-full h-full object-cover' 
-                                alt="" 
+                    </div>
+                    <div className="space-y-2">
+                        <label className="block text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.2em] ml-1" htmlFor="email">Email Address</label>
+                        <input 
+                            className="w-full bg-surface-container-low border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary/20 placeholder:text-stone-300 transition-all outline-none font-medium text-on-surface" 
+                            id="email" 
+                            name="email"
+                            placeholder="evelyn@gallery.art" 
+                            type="email" 
+                            required
+                            value={formData.email}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="block text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.2em] ml-1" htmlFor="password">Password</label>
+                        <div className="relative">
+                            <input 
+                                className="w-full bg-surface-container-low border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary/20 placeholder:text-stone-300 transition-all outline-none font-medium text-on-surface" 
+                                id="password" 
+                                name="password"
+                                placeholder="••••••••" 
+                                type={showPassword ? "text" : "password"} 
+                                required
+                                value={formData.password}
+                                onChange={handleChange}
                             />
-                            <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="material-symbols-outlined text-white text-xl">edit</span>
-                            </div>
-                            <input type="file" name="profileFile" hidden accept="image/*" onChange={handleChange} />
-                        </label>
-                        <div className="mt-6">
-                            <h4 className="text-xs font-headline font-black text-on-surface uppercase tracking-tight">Profile Canvas</h4>
-                            <p className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest mt-0.5">Upload your mark</p>
+                            <button 
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-primary transition-colors" 
+                                type="button"
+                            >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
                         </div>
                     </div>
-                </div>
+                    
+                    <div className="pt-6">
+                        <button 
+                            disabled={loading}
+                            className="w-full signature-gradient text-white font-headline font-black py-5 rounded-full shadow-[0_16px_32px_-8px_rgba(128,55,177,0.3)] hover:opacity-90 active:scale-[0.97] transition-all uppercase tracking-widest text-xs" 
+                            type="submit"
+                        >
+                            {loading ? 'Curating...' : 'Sign Up'}
+                        </button>
+                    </div>
+                </form>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      name="fullName"
-                      required
-                      placeholder="FULL NAME"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      className='w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300'
-                    />
-                    <input
-                      type="text"
-                      name="username"
-                      required
-                      placeholder="ALIAS"
-                      value={formData.username}
-                      onChange={handleChange}
-                      className='w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300'
-                    />
-                </div>
-                <input
-                    type="text"
-                    name="location"
-                    placeholder="STUDIO LOCATION"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className='w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300'
-                />
-              </div>
-            )}
-
-            <div className="flex flex-col gap-4">
-                <div className='relative'>
-                    <input
-                        type="text"
-                        name="email"
-                        required
-                        placeholder="IDENTIFIER (EMAIL/USER)"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className='w-full p-5 bg-stone-50 border border-stone-200/10 rounded-[1.5rem] text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300 pl-14'
-                    />
-                    <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-stone-300 text-[22px]">alternate_email</span>
-                </div>
-
-                <div className='relative'>
-                    <input
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        required
-                        placeholder="ACCESS KEY"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className='w-full p-5 bg-stone-50 border border-stone-200/10 rounded-[1.5rem] text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-stone-300 pl-14 pr-14'
-                    />
-                    <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-stone-300 text-[22px]">lock</span>
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-5 top-1/2 -translate-y-1/2 text-stone-300 hover:text-primary transition-colors h-full flex items-center"
-                    >
-                        <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
-                    </button>
-                </div>
+                {/* Footer Link */}
+                <p className="mt-10 text-center text-sm font-medium text-on-surface-variant/60">
+                    Already have an account? 
+                    <button onClick={() => setIsSignup(false)} className="text-primary font-black ml-2 hover:underline underline-offset-8 transition-all px-1">Log In</button>
+                </p>
+            </div>
+        </main>
+      ) : (
+        /* 🔑 LOGIN VIEW */
+        <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+            {/* Background Content (Simulated Gallery View) */}
+            <div className="fixed inset-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 p-6 opacity-10 grayscale pointer-events-none scale-110">
+                {[1,2,3,4,5,6,7,8,9,10,11,12].map(i => (
+                    <div key={i} className="aspect-[3/4] bg-surface-container-highest rounded-3xl overflow-hidden shadow-sm">
+                        <img 
+                            className="w-full h-full object-cover" 
+                            src={`https://images.unsplash.com/photo-${1500000000000 + i * 100000}?auto=format&fit=crop&w=400&q=20`} 
+                            alt="" 
+                        />
+                    </div>
+                ))}
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className='w-full p-5 bg-primary text-white text-[11px] font-black uppercase tracking-[0.3em] rounded-[1.5rem] shadow-2xl shadow-primary/30 active:scale-[0.97] transition-all flex items-center justify-center gap-3 mt-4 disabled:opacity-50 group overflow-hidden relative'
-            >
-              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-              <span className="relative z-10">{loading ? 'Processing Agent...' : isSignup ? 'Curate Account' : 'Request Access'}</span>
-              {!loading && <span className="material-symbols-outlined relative z-10 text-[18px]">arrow_forward</span>}
-            </button>
-          </form>
+            {/* Modal Container */}
+            <div className="relative w-full max-w-md bg-white p-10 md:p-14 rounded-[3.5rem] shadow-[0_64px_128px_-32px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col items-center border border-stone-100 animate-in fade-in zoom-in-95 duration-1000">
+                {/* Brand Identity */}
+                <div className="mb-12 text-center">
+                    <h1 className="text-4xl font-black italic tracking-tighter text-on-surface font-headline mb-4">Gallery</h1>
+                    <p className="text-on-surface font-headline text-2xl font-bold tracking-tight">Welcome Back</p>
+                    <div className="h-0.5 w-8 bg-primary/20 mx-auto mt-4" />
+                </div>
 
-          <div className='mt-12 text-center'>
-            <button
-                onClick={() => setIsSignup(!isSignup)}
-                className='text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-[0.3em] hover:text-primary transition-colors bg-transparent border-none cursor-pointer flex items-center justify-center gap-3 w-full group'
-            >
-                <div className='h-px flex-1 bg-stone-100 group-hover:bg-primary/10 transition-colors' />
-                <span>{isSignup ? 'Return To Registry' : 'Establish Studio'}</span>
-                <div className='h-px flex-1 bg-stone-100 group-hover:bg-primary/10 transition-colors' />
-            </button>
-          </div>
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="w-full space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 px-1" htmlFor="email">Email</label>
+                        <input 
+                            className="w-full h-14 px-6 bg-surface-container-low border-none focus:ring-2 focus:ring-primary/20 rounded-2xl text-on-surface placeholder:text-stone-300 transition-all outline-none font-medium" 
+                            id="email" 
+                            name="email"
+                            placeholder="name@example.com" 
+                            type="email" 
+                            required
+                            value={formData.email}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center px-1">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40" htmlFor="password">Password</label>
+                            <a className="text-[10px] font-black text-primary hover:opacity-70 transition-all uppercase tracking-widest" href="#">Forgot?</a>
+                        </div>
+                        <div className="relative">
+                            <input 
+                                className="w-full h-14 px-6 bg-surface-container-low border-none focus:ring-2 focus:ring-primary/20 rounded-2xl text-on-surface placeholder:text-stone-300 transition-all outline-none font-medium" 
+                                id="password" 
+                                name="password"
+                                placeholder="••••••••" 
+                                type={showPassword ? "text" : "password"} 
+                                required
+                                value={formData.password}
+                                onChange={handleChange}
+                            />
+                            <button 
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-primary transition-colors" 
+                                type="button"
+                            >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <button 
+                        disabled={loading}
+                        className="w-full h-14 mt-4 bg-gradient-to-r from-primary to-primary-dim text-white font-black rounded-full hover:opacity-90 active:scale-[0.97] transition-all duration-300 shadow-xl shadow-primary/20 uppercase tracking-widest text-xs" 
+                        type="submit"
+                    >
+                        {loading ? 'Verifying...' : 'Request Access'}
+                    </button>
+                </form>
+
+                {/* Divider */}
+                <div className="relative w-full flex items-center justify-center my-12">
+                    <div className="w-full h-[1.5px] bg-stone-100"></div>
+                    <span className="absolute bg-white px-4 text-[10px] font-black text-stone-300 uppercase tracking-[0.4em]">or</span>
+                </div>
+
+                {/* Footer */}
+                <div className="text-center">
+                    <p className="text-sm font-medium text-on-surface-variant/60">
+                        Don't have an account? 
+                        <button onClick={() => setIsSignup(true)} className="font-black text-primary ml-2 hover:underline underline-offset-8 decoration-2 transition-all px-1">Establish Studio</button>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
