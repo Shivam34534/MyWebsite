@@ -55,36 +55,37 @@ const StoriesBar = () => {
     })
 
     return (
-        <section className="flex gap-6 overflow-x-auto no-scrollbar py-2 px-1">
+        <section className="flex gap-6 overflow-x-auto no-scrollbar py-6 px-1">
             {/* ⚡ Your Identity Node */}
-            <div onClick={() => setShowModel(true)} className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group">
+            <div onClick={() => setShowModel(true)} className="flex flex-col items-center gap-3 flex-shrink-0 cursor-pointer group">
                 <div className="relative w-16 h-16 neo-box bg-white overflow-hidden rotate-2 group-hover:rotate-0 neo-transition">
                     <img 
-                        className="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-100" 
+                        className="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-100 neo-transition" 
                         src={user?.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} 
                         alt="Your Story" 
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="neo-box bg-main p-1 rotate-[-10deg] group-hover:rotate-0 neo-transition border-2">
-                            <Plus className="w-4 h-4 text-black" strokeWidth={4} />
+                        <div className="neo-box bg-main p-1.5 rotate-[-10deg] group-hover:rotate-0 neo-transition border-[3px]">
+                            <Plus className="w-5 h-5 text-black" strokeWidth={5} />
                         </div>
                     </div>
                 </div>
-                <span className="text-[10px] font-black text-black uppercase tracking-tighter italic">YOU</span>
+                <span className="font-mono text-[9px] font-black text-black/50 uppercase tracking-[0.2em] italic">YOU_ID</span>
             </div>
 
             {/* ⚡ Other Identity Nodes */}
             {
                 storiesByUser.map((group, index) => (
-                    <div onClick={() => setViewStory(group.stories)} key={index} className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group">
-                        <div className="w-16 h-16 neo-box bg-white overflow-hidden -rotate-2 group-hover:rotate-0 neo-transition p-1">
-                            <div className="w-full h-full bg-accent">
-                                <img 
-                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 neo-transition border-2 border-black" 
-                                    src={group.user.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${group.user.username}`} 
-                                    alt={group.user.full_name} 
-                                />
-                            </div>
+                    <div onClick={() => setViewStory(group.stories)} key={index} className="flex flex-col items-center gap-3 flex-shrink-0 cursor-pointer group">
+                        <div className="relative w-16 h-16 neo-box bg-white overflow-hidden -rotate-2 group-hover:rotate-0 neo-transition p-1">
+                           <div className="absolute top-1 right-1 z-10">
+                               <div className="w-2 h-2 bg-secondary rounded-full animate-pulse border border-black" />
+                           </div>
+                           <img 
+                               className="w-full h-full object-cover grayscale group-hover:grayscale-0 neo-transition border-2 border-black" 
+                               src={group.user.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${group.user.username}`} 
+                               alt={group.user.full_name} 
+                           />
                         </div>
                         <span className="text-[10px] font-black text-black uppercase tracking-tighter truncate w-16 text-center italic">@{group.user.username}</span>
                     </div>
