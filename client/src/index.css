@@ -1,89 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&family=Bebas+Neue&display=swap');
 @import "tailwindcss";
 
 @theme {
   /* Fonts */
-  --font-headline: "Plus Jakarta Sans", "Inter", sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Bebas Neue", "Public Sans", sans-serif;
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
   
-  /* Primary Gallery Palette */
-  --color-primary: #8037b1;
-  --color-primary-dim: #7329a4;
-  --color-primary-container: #cb80fe;
-  
-  --color-secondary: #b6004f;
-  --color-secondary-dim: #a00045;
-  --color-secondary-container: #ffc2cd;
-  
-  --color-tertiary: #815100;
-  --color-tertiary-dim: #714600;
-  --color-tertiary-container: #ffb147;
+  /* Neo-Brutalism Palette */
+  --color-bg: #FFFFFF;
+  --color-main: #A3E635; /* Neon Green */
+  --color-secondary: #FF3366; /* Neon Pink */
+  --color-accent: #FDE047; /* Yellow */
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-muted: #E5E7EB;
 
-  /* Surface & Background */
-  --color-surface: #f9f6f5;
-  --color-surface-bright: #f9f6f5;
-  --color-surface-dim: #d6d4d3;
-  --color-surface-variant: #dfdcdc;
+  /* Shadows - Hard Offset */
+  --shadow-neo: 6px 6px 0px 0px #000000;
+  --shadow-neo-sm: 4px 4px 0px 0px #000000;
+  --shadow-neo-lg: 10px 10px 0px 0px #000000;
   
-  --color-surface-container: #eae7e7;
-  --color-surface-container-low: #f3f0ef;
-  --color-surface-container-high: #e5e2e1;
-  --color-surface-container-highest: #dfdcdc;
-  --color-surface-container-lowest: #ffffff;
-
-  /* On Colors */
-  --color-on-surface: #2f2e2e;
-  --color-on-surface-variant: #5c5b5b;
-  --color-on-primary: #fdeeff;
-  --color-on-primary-container: #3a005c;
-  
-  /* Others */
-  --color-outline: #787676;
-  --color-outline-variant: #afacac;
+  /* Borders */
+  --border-width-neo: 4px;
 }
 
 @layer base {
   body {
-    @apply font-sans text-on-surface antialiased bg-surface selection:bg-primary-container selection:text-on-primary-container;
+    @apply font-sans bg-bg text-black antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading uppercase tracking-wider;
   }
 }
 
 @layer components {
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    @apply align-middle;
+  .neo-box {
+    @apply bg-white border-4 border-black shadow-neo transition-all duration-100;
   }
 
-  .story-ring {
-    background: linear-gradient(45deg, #8037b1, #E1306C, #FF8C00);
-    @apply p-[2px] rounded-full;
+  .neo-box-interactive {
+    @apply neo-box hover:-translate-x-1 hover:-translate-y-1 hover:shadow-neo-lg active:translate-x-0 active:translate-y-0 active:shadow-none;
   }
 
-  .glass-effect {
-    @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl;
+  .neo-button {
+    @apply neo-box-interactive px-6 py-2 font-bold uppercase tracking-tight flex items-center justify-center gap-2;
   }
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .neo-button-primary {
+    @apply neo-button bg-main;
   }
 
-  .editorial-shadow {
-    box-shadow: 0 32px 64px -12px rgba(92, 91, 91, 0.08);
+  .neo-button-secondary {
+    @apply neo-button bg-secondary text-white;
   }
 
-  @keyframes loading-bar {
-    0% { transform: translateX(-100%); }
-    50% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
+  .neo-button-accent {
+    @apply neo-button bg-accent;
   }
 
-  .animate-loading-bar {
-    animation: loading-bar 2s infinite ease-in-out;
+  .neo-input {
+    @apply bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-accent/10 transition-colors shadow-neo-sm;
+  }
+
+  .neo-card {
+    @apply neo-box p-6;
+  }
+
+  /* Layout Utilities */
+  .container-neo {
+    @apply max-w-7xl mx-auto px-4;
+  }
+
+  .grid-neo {
+    @apply grid gap-6;
+  }
+
+  /* Custom Transitions */
+  .neo-transition {
+    @apply transition-all duration-150 ease-in-out;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-main);
+    border: 3px solid #000;
   }
 }

@@ -39,19 +39,20 @@ const App = () => {
 
   }, [user, getToken, dispatch, signOut])
   
-  // A sleek loading spinner to display while chunks are downloading
+  // A bold Neo-Brutalist loading screen
   const LoadingScreen = () => (
-    <div className='fixed inset-0 flex items-center justify-center bg-surface/50 backdrop-blur-xl z-[200]'>
-        <div className='flex flex-col items-center gap-6 animate-in fade-in duration-1000'>
-            <div className='relative flex flex-col items-center'>
-                <h1 className='text-4xl font-black font-headline tracking-tighter bg-gradient-to-tr from-[#8037b1] via-[#E1306C] to-[#FF8C00] bg-clip-text text-transparent animate-pulse'>
-                    Gallery
+    <div className='fixed inset-0 flex items-center justify-center bg-white z-[200] border-[12px] border-black'>
+        <div className='flex flex-col items-center gap-4'>
+            <div className='neo-box bg-main p-8 -rotate-2 scale-110'>
+                <h1 className='text-6xl font-black italic tracking-tighter text-black'>
+                    GALLERY
                 </h1>
-                <div className='w-16 h-0.5 bg-stone-200/20 rounded-full mt-2 relative overflow-hidden'>
-                    <div className='absolute inset-0 bg-primary/40 w-1/2 animate-loading-bar'></div>
-                </div>
             </div>
-            <p className='text-[10px] font-bold uppercase tracking-[0.5em] text-on-surface-variant/30 animate-pulse'>Gathering your moments</p>
+            <div className='neo-box bg-black px-4 py-2 rotate-1'>
+              <p className='text-sm font-bold uppercase tracking-widest text-white animate-pulse'>
+                Loading...
+              </p>
+            </div>
         </div>
     </div>
   )

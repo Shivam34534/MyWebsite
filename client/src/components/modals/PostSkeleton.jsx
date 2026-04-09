@@ -2,32 +2,36 @@ import React from 'react'
 
 const PostSkeleton = () => {
     return (
-        <div className='bg-white sm:border border-gray-200 sm:rounded-lg sm:my-3 w-full max-w-[550px] mx-auto overflow-hidden animate-pulse'>
+        <div className='neo-box bg-white w-full max-w-[640px] mx-auto overflow-hidden animate-pulse'>
             {/* Header Skeleton */}
-            <div className='px-3 py-3 flex items-center gap-2.5'>
-                <div className='w-[42px] h-[42px] rounded-full bg-gray-200' />
-                <div className='flex flex-col gap-1.5'>
-                    <div className='w-24 h-3 bg-gray-200 rounded' />
-                    <div className='w-16 h-2 bg-gray-100 rounded' />
+            <div className='p-4 flex items-center justify-between border-b-4 border-black bg-main/20'>
+                <div className="flex items-center gap-3">
+                    <div className='w-12 h-12 neo-box bg-black/10' />
+                    <div className='flex flex-col gap-2'>
+                        <div className='w-24 h-4 bg-black/10' />
+                        <div className='w-16 h-3 bg-black/5' />
+                    </div>
                 </div>
             </div>
 
             {/* Media Skeleton */}
-            <div className='aspect-square w-full bg-gray-200' />
-
-            {/* Actions Skeleton */}
-            <div className='px-3 py-4 flex items-center gap-4'>
-                <div className='w-7 h-7 bg-gray-200 rounded-full' />
-                <div className='w-7 h-7 bg-gray-200 rounded-full' />
-                <div className='w-7 h-7 bg-gray-200 rounded-full' />
-            </div>
+            <div className='aspect-square w-full bg-black/5 border-b-4 border-black' />
 
             {/* Content Skeleton */}
-            <div className='px-3 pb-4 flex flex-col gap-2'>
-                <div className='w-20 h-3 bg-gray-200 rounded' />
-                <div className='w-full h-3 bg-gray-100 rounded' />
-                <div className='w-3/4 h-3 bg-gray-100 rounded' />
-                <div className='w-32 h-2 bg-gray-50 rounded mt-1' />
+            <div className='p-6 flex flex-col gap-6'>
+                <div className='flex gap-4'>
+                    <div className='w-10 h-10 neo-box bg-black/10' />
+                    <div className='w-10 h-10 neo-box bg-black/10' />
+                    <div className='w-10 h-10 neo-box bg-black/10' />
+                </div>
+                <div className='flex flex-col gap-3'>
+                    <div className='w-3/4 h-5 bg-black/10' />
+                    <div className='w-full h-4 bg-black/5' />
+                    <div className='w-1/2 h-4 bg-black/5' />
+                </div>
+                <div className='pt-4 border-t-2 border-dashed border-black/10'>
+                    <div className='w-20 h-3 bg-black/5' />
+                </div>
             </div>
         </div>
     )

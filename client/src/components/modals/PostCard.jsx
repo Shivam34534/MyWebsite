@@ -1,11 +1,10 @@
-import { BadgeCheck, Heart, MessageCircle, Share2, MoreHorizontal, Bookmark, Send } from 'lucide-react'
+import { BadgeCheck, Heart, MessageCircle, MoreHorizontal, Bookmark, Send } from 'lucide-react'
 import React, { useState, useMemo } from 'react'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import api from '../../api/axios'
 import { useAuth } from '../../mockClerk'
-import { assets } from '../../assets/assets'
 import toast from 'react-hot-toast'
 import PostLikesList from './PostLikesList'
 import PostCommentsList from './PostCommentsList'
@@ -22,17 +21,15 @@ const PostCard = ({ post }) => {
     const [showLikes, setShowLikes] = useState(false)
     const [showComments, setShowComments] = useState(false)
 
-    // Memoized content with highlights
     const postWithHashtags = useMemo(() => {
-        return post.content?.replace(/(#\w+)/g, '<span class="text-primary font-bold transition-all hover:opacity-70 cursor-pointer">$1</span>') || ''
+        return post.content?.replace(/(#\w+)/g, '<span class="text-secondary font-black cursor-pointer hover:underline">$1</span>') || ''
     }, [post.content])
 
-    // Optimize ImageKit URLs
     const optimizedImageUrl = useMemo(() => {
         if (!post.image_urls?.[0]) return ''
         const url = post.image_urls[0]
         if (url.includes('ik.imagekit.io')) {
-            return url.replace(/\/stories\//, '/stories/tr:h-800,q-80/')
+            return url.replace(/\/stories\//, '/stories/tr:h-1000,q-100/')
         }
         return url
     }, [post.image_urls])
@@ -57,7 +54,7 @@ const PostCard = ({ post }) => {
 
     const handleShare = async () => {
         const shareData = {
-            title: 'Curated Excellence - Gallery',
+            title: 'NEO_GALLERY_ENTRY',
             text: post.content,
             url: window.location.origin + '/post/' + post._id
         }
@@ -65,96 +62,90 @@ const PostCard = ({ post }) => {
         if (navigator.share) {
             try {
                 await navigator.share(shareData)
-                api.post('/api/post/share', { postId: post._id }, {
-                    headers: { Authorization: `Bearer ${await getToken()}` }
-                })
             } catch (err) {
                 console.log('Error sharing:', err)
             }
         } else {
             navigator.clipboard.writeText(shareData.url)
-            toast.success('Gallery link archived to clipboard')
+            toast.success('LINK_ARCHIVED_TO_CLIPBOARD')
         }
     }
 
     return (
-        <article className="bg-white rounded-[2.5rem] overflow-hidden border border-stone-200/40 shadow-sm transition-all duration-700 hover:editorial-shadow group/card animate-in fade-in duration-700">
-            {/* 🏷️ Editorial Header */}
-            <header className="flex items-center justify-between p-6 lg:p-7 pb-4">
-                <div onClick={() => navigate('/profile/' + post.user._id)} className="flex items-center gap-4 cursor-pointer group">
-                    <div className="w-11 h-11 rounded-full story-ring p-[2px] transition-all duration-500 group-hover:p-[1px]">
-                        <div className="w-full h-full rounded-full border-[2.5px] border-white overflow-hidden bg-stone-50">
-                            <img 
-                                className="w-full h-full object-cover" 
-                                src={post.user.profile_picture || assets.sample_profile} 
-                                loading="lazy"
-                                alt="" 
-                            />
-                        </div>
+        <article className="neo-box bg-white overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* ⚡ Header */}
+            <header className="flex items-center justify-between p-4 border-b-4 border-black bg-main">
+                <div onClick={() => navigate('/profile/' + post.user._id)} className="flex items-center gap-3 cursor-pointer group">
+                    <div className="w-12 h-12 neo-box bg-white overflow-hidden rotate-2 group-hover:rotate-0 neo-transition">
+                        <img 
+                            className="w-full h-full object-cover" 
+                            src={post.user.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user.username}`} 
+                            loading="lazy"
+                            alt="" 
+                        />
                     </div>
                     <div className='flex flex-col'>
                         <div className='flex items-center gap-1.5'>
-                            <h3 className="font-headline font-black text-[14px] leading-none text-on-surface group-hover:text-primary transition-colors tracking-tight uppercase">{post.user.username}</h3>
-                            <BadgeCheck className='w-3.5 h-3.5 text-primary-dim fill-primary/10' />
+                            <h3 className="font-black text-sm tracking-tighter uppercase italic">{post.user.username}</h3>
+                            <BadgeCheck className='w-4 h-4 text-black' />
                         </div>
-                        <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.2em] mt-1">{post.location || 'Editorial Studio'}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">{post.location || 'NEO_DISTRICT'}</p>
                     </div>
                 </div>
-                <button className="text-stone-300 hover:text-on-surface transition-all p-2 rounded-xl active:scale-90">
-                    <MoreHorizontal className="w-5 h-5 text-stone-400" />
+                <button className="neo-box bg-white p-2 hover:bg-accent neo-transition">
+                    <MoreHorizontal className="w-5 h-5" />
                 </button>
             </header>
 
-            {/* 📽️ Content Stage */}
+            {/* ⚡ Visual Content */}
             {post.image_urls && post.image_urls.length > 0 && (
-                <div className="w-full aspect-square bg-stone-50 overflow-hidden relative group/image">
+                <div className="w-full aspect-square border-b-4 border-black relative group/image overflow-hidden">
                     <img 
-                        className="w-full h-full object-cover group-hover/image:scale-[1.04] transition-transform duration-[3000ms] ease-out cursor-pointer" 
+                        className="w-full h-full object-cover grayscale hover:grayscale-0 neo-transition cursor-crosshair scale-100 hover:scale-105" 
                         src={optimizedImageUrl} 
                         loading="lazy"
                         alt="" 
                         onClick={() => navigate('/profile/' + post.user._id)}
                     />
                     {post.image_urls.length > 1 && (
-                        <div className="absolute top-6 right-6 bg-white/70 backdrop-blur-2xl px-4 py-2 rounded-full text-stone-900 text-[10px] font-black tracking-widest uppercase border border-white/40 shadow-xl">
-                            Curated Series 0{post.image_urls.length}
+                        <div className="absolute top-4 right-4 neo-box bg-accent px-3 py-1 text-[10px] font-black uppercase rotate-3">
+                            MULTIVERSE_ITEM_{post.image_urls.length}
                         </div>
                     )}
                 </div>
             )}
 
-            {/* ⚡ Interaction Stage */}
-            <div className="p-7 lg:p-9 pt-7 flex flex-col gap-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-8">
-                        <button onClick={handleLike} className="flex flex-col items-center gap-1.5 group/btn active:scale-75 transition-transform duration-300">
-                            <Heart className={`w-7 h-7 transition-all duration-300 ${likes.includes(currentUser?._id) ? 'fill-red-500 text-red-500 scale-110' : 'text-stone-300 hover:text-red-500'}`} />
-                            <span className="text-[10px] font-black text-stone-300 uppercase tracking-tighter">{likes.length}</span>
+            {/* ⚡ Interactions */}
+            <div className="p-6 bg-white">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                        <button onClick={handleLike} className={`neo-button flex items-center gap-2 ${likes.includes(currentUser?._id) ? 'bg-secondary text-white' : 'bg-white hover:bg-main'}`}>
+                            <Heart className={`w-5 h-5 ${likes.includes(currentUser?._id) ? 'fill-white' : ''}`} strokeWidth={3} />
+                            <span className="font-black text-xs">{likes.length}</span>
                         </button>
-                        <button onClick={() => setShowComments(!showComments)} className="flex flex-col items-center gap-1.5 group/btn active:scale-75 transition-transform duration-300 text-stone-300 hover:text-primary transition-all">
-                            <MessageCircle className="w-7 h-7" />
-                            <span className="text-[10px] font-black text-stone-300 uppercase tracking-tighter">{commentCount}</span>
+                        <button onClick={() => setShowComments(!showComments)} className="neo-button bg-white hover:bg-accent flex items-center gap-2">
+                            <MessageCircle className="w-5 h-5" strokeWidth={3} />
+                            <span className="font-black text-xs">{commentCount}</span>
                         </button>
-                        <button onClick={handleShare} className="flex flex-col items-center gap-1.5 group/btn active:scale-75 transition-transform duration-300 text-stone-300 hover:text-emerald-500 transition-all">
-                            <Send className="w-7 h-7" />
-                            <span className="text-[10px] font-black text-stone-300 uppercase tracking-tighter">Share</span>
+                        <button onClick={handleShare} className="neo-button bg-white hover:bg-main">
+                            <Send className="w-5 h-5" strokeWidth={3} />
                         </button>
                     </div>
-                    <button className="text-stone-300 hover:text-primary-dim transition-all active:scale-75">
-                        <Bookmark className="w-7 h-7" />
+                    <button className="neo-button bg-white hover:bg-black hover:text-white">
+                        <Bookmark className="w-5 h-5" strokeWidth={3} />
                     </button>
                 </div>
 
-                {/* 📜 Narrative Stage */}
-                <div className="flex flex-col gap-3">
-                    <div className="text-[15px] text-on-surface leading-loose">
-                        <span onClick={() => navigate('/profile/' + post.user._id)} className="font-headline font-black mr-2.5 cursor-pointer hover:text-primary transition-colors tracking-tight uppercase">{post.user.username}</span> 
-                        <span className="whitespace-pre-wrap break-words text-on-surface font-medium opacity-90 tracking-tight" dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
+                {/* ⚡ Caption */}
+                <div className="flex flex-col gap-4">
+                    <div className="text-sm leading-relaxed">
+                        <span onClick={() => navigate('/profile/' + post.user._id)} className="font-black uppercase italic mr-3 cursor-pointer hover:underline text-lg">@{post.user.username}</span> 
+                        <span className="font-bold text-black/80" dangerouslySetInnerHTML={{ __html: postWithHashtags }} />
                     </div>
                     
-                    <div className='flex items-center justify-between mt-2 pt-6 border-t border-stone-100/50'>
-                        <button onClick={() => setShowComments(true)} className="text-primary font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-70 transition-all">Begin Discussion</button>
-                        <span className="text-[9px] text-stone-400 uppercase tracking-[0.4em] font-black">
+                    <div className='flex items-center justify-between mt-4 pt-4 border-t-2 border-black border-dashed'>
+                        <button onClick={() => setShowComments(true)} className="font-black uppercase tracking-widest text-[10px] hover:text-secondary underline">READ_PROTOCOLS</button>
+                        <span className="text-[10px] font-black uppercase text-black/40">
                             {moment(post.createdAt).fromNow()}
                         </span>
                     </div>

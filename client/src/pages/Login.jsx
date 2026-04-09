@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import { assets } from '../assets/assets'
 import { useClerk } from '../mockClerk'
 import toast from 'react-hot-toast'
-import { X, Eye, EyeOff, Camera, MapPin, AtSign } from 'lucide-react'
+import { Eye, EyeOff, MapPin, AtSign, ArrowRight, Github, Twitter } from 'lucide-react'
 
 const Login = () => {
   const { openSignIn, openSignUp } = useClerk()
@@ -10,7 +9,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
-  // Form State
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -34,13 +32,13 @@ const Login = () => {
           email: formData.email,
           fullName: formData.fullName,
           username: formData.username || formData.email.split('@')[0], 
-          location: formData.location || "Gallery Resident",
+          location: formData.location || "Neo City",
           password: formData.password,
         })
         if (res.success) {
-          toast.success("Welcome to the Gallery!")
+          toast.success("WELCOME TO THE VOID")
         } else {
-          toast.error(res.message || "Failed to curate account")
+          toast.error(res.message || "ENTRY DENIED")
         }
       } else {
         const res = await openSignIn({ 
@@ -48,192 +46,152 @@ const Login = () => {
             password: formData.password 
         })
         if (res.success) {
-          toast.success("Access granted")
+          toast.success("ACCESS GRANTED")
         } else {
-          toast.error(res.message || "Invalid credentials")
+          toast.error(res.message || "INVALID KEY")
         }
       }
     } catch (error) {
-      console.error("Auth error:", error)
-      toast.error("An authentication error occurred")
+      toast.error("SYSTEM ERROR")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="bg-white font-body text-on-surface antialiased min-h-screen selection:bg-primary/20">
+    <div className="min-h-screen bg-bg flex flex-col lg:flex-row">
       
-      <style>{`
-        .signature-gradient {
-            background: linear-gradient(135deg, #8037b1 0%, #b6004f 50%, #ffb147 100%);
-        }
-        .editorial-input {
-            background-color: #f4f2f1;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .editorial-input:focus {
-            background-color: #ffffff;
-            box-shadow: 0 0 0 2px rgba(128, 55, 177, 0.1);
-        }
-      `}</style>
+      {/* ⚡ LEFT SECTION: LOUD BRANDING */}
+      <div className="lg:w-1/2 bg-main border-r-[10px] border-black flex flex-col justify-between p-8 lg:p-16 relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-secondary border-b-[8px] border-l-[8px] border-black -rotate-12 translate-x-20 -translate-y-20" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent border-t-[8px] border-r-[8px] border-black rotate-45 -translate-x-10 translate-y-10" />
+        
+        <div className="z-10">
+          <div className="neo-box bg-black inline-block px-4 py-2 rotate-2 mb-8">
+            <h2 className="text-white font-black italic tracking-widest text-xl">VERSION 2.0</h2>
+          </div>
+          <h1 className="text-8xl lg:text-[12rem] font-black leading-[0.8] tracking-tighter uppercase italic select-none">
+            GAL<br />LERY
+          </h1>
+          <p className="mt-8 text-2xl font-bold max-w-md uppercase tracking-tight">
+            THE MOST BRUTAL SOCIAL EXPERIENCE ON THE WEB. RAW. LOUD. UNFILTERED.
+          </p>
+        </div>
 
-      {/* 🖼️ FULL PAGE SPLIT LAYOUT */}
-      <main className="flex flex-col lg:flex-row min-h-screen w-full">
-            
-            {/* Left Section: Cinematic Visual Stage */}
-            <div className="hidden lg:block lg:w-[55%] relative overflow-hidden bg-[#b9bcad]">
-                <img 
-                    alt="Gallery Editorial" 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-[4000ms] hover:scale-105" 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV2gsvrP96A6-aIVLEWsfCroeE04950FbGkyUDwU2_ftI3I-FACdypCZ1AaMgT73zn4w99w41aTjmmeXvhFPH6Ubzc58duteYJlAwLjsiaj_EtzFUPblFtf-rpImyc2s6gBhW4FDGPJPJ-MK-4iLEHNxLgYLZOhwxszQ6a8av30jyCfpcjiSiFUingbpG_EVPJ1ZzkG7sS5FB8rF32URklP_XOH04EJpTsuOFzlW8Rzoqa-zv7USbXQgX5tcpViVvuRDwrvI-TvknO"
+        <div className="z-10 flex gap-4 mt-12 lg:mt-0">
+          <div className="neo-box bg-white p-4 -rotate-3 hover:rotate-0 neo-transition cursor-pointer">
+            <Github className="w-8 h-8" />
+          </div>
+          <div className="neo-box bg-accent p-4 rotate-6 hover:rotate-0 neo-transition cursor-pointer">
+            <Twitter className="w-8 h-8" />
+          </div>
+        </div>
+      </div>
+
+      {/* ⚡ RIGHT SECTION: BOLD FORM */}
+      <div className="lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
+        <div className="w-full max-w-xl">
+          
+          <div className="mb-12">
+            <div className="flex items-center gap-4 mb-4">
+               <div className="w-12 h-4 bg-secondary border-2 border-black" />
+               <span className="font-black uppercase tracking-widest text-sm">Authentication Protocol</span>
+            </div>
+            <h2 className="text-6xl font-black uppercase tracking-tighter">
+                {isSignup ? 'CREATE IDENTITY' : 'RESTORE ACCESS'}
+            </h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {isSignup && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="font-black uppercase text-sm">Full Name</label>
+                  <input 
+                    name="fullName" placeholder="JOHN DOE" type="text" required 
+                    className="neo-input" value={formData.fullName} onChange={handleChange} 
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="font-black uppercase text-sm">Alias</label>
+                  <div className="relative">
+                    <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
+                    <input 
+                      name="username" placeholder="NEO_USER" type="text" required 
+                      className="neo-input pl-12" value={formData.username} onChange={handleChange} 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2">
+              <label className="font-black uppercase text-sm">Digital Mail</label>
+              <input 
+                name="email" placeholder="YOU@EXAMPLE.COM" type="email" required 
+                className="neo-input" value={formData.email} onChange={handleChange} 
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between">
+                <label className="font-black uppercase text-sm">Security Key</label>
+                {!isSignup && <span className="font-bold text-xs underline cursor-pointer">LOST KEY?</span>}
+              </div>
+              <div className="relative">
+                <input 
+                  name="password" placeholder="••••••••" type={showPassword ? "text" : "password"} required 
+                  className="neo-input w-full" value={formData.password} onChange={handleChange} 
                 />
-                <div className="absolute inset-0 bg-black/10 mix-blend-multiply" />
-                
-                {/* Brand Overlay */}
-                <div className='absolute top-12 left-12 z-20'>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 signature-gradient rounded-2xl flex items-center justify-center text-white shadow-xl shadow-black/20">
-                            <Camera className="w-5 h-5" />
-                        </div>
-                        <span className="font-headline text-3xl font-black italic tracking-tighter text-white drop-shadow-sm">Gallery</span>
-                    </div>
-                </div>
-
-                {/* Editorial Quote Card (Full Page Style) */}
-                <div className="absolute bottom-16 left-16 p-10 bg-white/90 backdrop-blur-3xl rounded-[2.5rem] max-w-md shadow-[0_32px_128px_rgba(0,0,0,0.1)] border border-white/40 animate-in slide-in-from-bottom-12 duration-1000">
-                    <span className="font-headline font-black text-[11px] tracking-[0.5em] text-[#8037b1] uppercase mb-4 block">Editorial Volume 01</span>
-                    <p className="font-headline text-2xl font-bold leading-tight text-on-surface mb-6">"The essence of light is the frame of the moment."</p>
-                    <div className='flex items-center gap-4 opacity-40'>
-                        <div className='w-8 h-[1px] bg-on-surface' />
-                        <span className='text-[10px] font-black uppercase tracking-widest'>Museum of Digital Curacy</span>
-                    </div>
-                </div>
+                <button 
+                  type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
-            {/* Right Section: Focused Form Canvas */}
-            <div className="flex-1 bg-white flex flex-col items-center justify-center p-8 md:p-16 lg:p-24 overflow-y-auto no-scrollbar">
-                
-                {/* Mobile Identity */}
-                <div className="lg:hidden mb-12 flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 signature-gradient rounded-2xl flex items-center justify-center text-white shadow-xl">
-                        <Camera className="w-6 h-6" />
-                    </div>
-                    <span className="font-headline text-3xl font-black italic tracking-tighter text-on-surface">Gallery</span>
+            {isSignup && (
+                <div className="flex flex-col gap-2">
+                  <label className="font-black uppercase text-sm">Home Base</label>
+                  <div className="relative">
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
+                    <input 
+                      name="location" placeholder="TOKYO, NEO DISTRICT" type="text" required 
+                      className="neo-input pl-12 w-full" value={formData.location} onChange={handleChange} 
+                    />
+                  </div>
                 </div>
+            )}
 
-                <div className="w-full max-w-md animate-in fade-in slide-in-from-right-8 duration-700">
-                    <div className="mb-12">
-                        <h1 className="font-headline text-5xl font-black tracking-tighter mb-4 text-on-surface">
-                            {isSignup ? 'Begin Curation' : 'Resume Entry'}
-                        </h1>
-                        <p className="text-stone-400 font-medium text-base">
-                            {isSignup ? "Establish your presence in the world's most curated gallery." : "Return to your personal archive of visual storytelling."}
-                        </p>
-                    </div>
-
-                    {/* Social Logic */}
-                    <div className="grid grid-cols-2 gap-4 mb-10">
-                        <button className="flex items-center justify-center gap-3 py-4 border border-stone-100 rounded-2xl hover:bg-stone-50 transition-all font-bold text-xs uppercase tracking-widest text-stone-600">
-                            <img src="https://www.google.com/favicon.ico" className="w-4 h-4 grayscale opacity-60" alt="" />
-                            Google
-                        </button>
-                        <button className="flex items-center justify-center gap-3 py-4 border border-stone-100 rounded-2xl hover:bg-stone-50 transition-all font-bold text-xs uppercase tracking-widest text-stone-600">
-                            <span className="material-symbols-outlined text-[20px]">phone_iphone</span>
-                            Apple
-                        </button>
-                    </div>
-
-                    <div className="relative mb-10 flex items-center">
-                        <div className="flex-grow border-t border-stone-100"></div>
-                        <span className="px-5 text-[10px] font-black text-stone-200 uppercase tracking-[0.5em]">or registry email</span>
-                        <div className="flex-grow border-t border-stone-100"></div>
-                    </div>
-
-                    {/* Registration/Login Form */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {isSignup && (
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-5 animate-in fade-in slide-in-from-top-4 duration-500'>
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-stone-400 uppercase tracking-widest ml-1" htmlFor="fullName">Full Name</label>
-                                    <input 
-                                        className="w-full editorial-input border-none rounded-2xl px-6 py-4 outline-none font-medium text-sm text-stone-600" 
-                                        id="fullName" name="fullName" placeholder="Evelyn Thorne" type="text" required value={formData.fullName} onChange={handleChange} 
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-stone-400 uppercase tracking-widest ml-1" htmlFor="username">Alias</label>
-                                    <div className="relative">
-                                        <AtSign className='absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300' />
-                                        <input 
-                                            className="w-full editorial-input border-none rounded-2xl px-6 py-4 pl-12 outline-none font-medium text-sm text-stone-600" 
-                                            id="username" name="username" placeholder="curator01" type="text" required value={formData.username} onChange={handleChange} 
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-span-full space-y-2">
-                                    <label className="block text-[10px] font-black text-stone-400 uppercase tracking-widest ml-1" htmlFor="location">Studio Location</label>
-                                    <div className="relative">
-                                        <MapPin className='absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300' />
-                                        <input 
-                                            className="w-full editorial-input border-none rounded-2xl px-6 py-4 pl-12 outline-none font-medium text-sm text-stone-600" 
-                                            id="location" name="location" placeholder="Paris, Digital Art District" type="text" required value={formData.location} onChange={handleChange} 
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="space-y-2">
-                            <label className="block text-[10px] font-black text-stone-400 uppercase tracking-widest ml-1" htmlFor="email">Email Identifier</label>
-                            <input 
-                                className="w-full editorial-input border-none rounded-2xl px-6 py-4 outline-none font-medium text-sm text-stone-600" 
-                                id="email" name="email" placeholder="evelyn@gallery.art" type="email" required value={formData.email} onChange={handleChange} 
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center px-1">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-stone-400" htmlFor="password">Access Key</label>
-                                {!isSignup && <a className="text-[10px] font-black text-primary uppercase tracking-widest hover:opacity-60" href="#">Forgot?</a>}
-                            </div>
-                            <div className="relative">
-                                <input 
-                                    className="w-full editorial-input border-none rounded-2xl px-6 py-4 outline-none font-medium text-sm text-stone-600" 
-                                    id="password" name="password" placeholder="••••••••" type={showPassword ? "text" : "password"} required value={formData.password} onChange={handleChange} 
-                                />
-                                <button onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-stone-400" type="button">
-                                   <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div className="pt-6">
-                            <button 
-                                disabled={loading}
-                                className="w-full signature-gradient text-white font-headline font-black py-5 rounded-3xl shadow-[0_20px_40px_-10px_rgba(128,55,177,0.4)] hover:shadow-[0_24px_48px_-10px_rgba(128,55,177,0.5)] hover:scale-[1.01] active:scale-[0.98] transition-all text-xs uppercase tracking-[0.2em]" 
-                                type="submit"
-                            >
-                                {loading ? 'Processing Registry...' : isSignup ? 'Confirm Entry' : 'Request Registry Access'}
-                            </button>
-                        </div>
-                    </form>
-
-                    <p className="mt-12 text-center text-sm font-medium text-stone-400">
-                        {isSignup ? 'Previously established?' : "Haven't curated yet?"}
-                        <button onClick={() => setIsSignup(!isSignup)} className="text-primary font-black ml-2 hover:underline underline-offset-8 transition-all px-2 uppercase tracking-widest text-[11px]">
-                            {isSignup ? 'Login instead' : 'Join the Gallery'}
-                        </button>
-                    </p>
-
-                    <footer className="mt-16 flex items-center justify-center gap-10 text-[10px] font-black text-stone-200 tracking-[0.3em] uppercase">
-                        <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-                        <a href="#" className="hover:text-primary transition-colors">Terms</a>
-                        <a href="#" className="hover:text-primary transition-colors">Archives</a>
-                    </footer>
-                </div>
+            <div className="pt-4">
+              <button 
+                disabled={loading}
+                type="submit"
+                className="neo-button-primary w-full py-6 text-2xl group"
+              >
+                {loading ? 'PROCESSING...' : isSignup ? 'INITIALIZE IDENTITY' : 'EXECUTE LOGIN'}
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 neo-transition" />
+              </button>
             </div>
-      </main>
+          </form>
+
+          <button 
+            onClick={() => setIsSignup(!isSignup)}
+            className="mt-8 w-full neo-button-accent py-4 font-black"
+          >
+            {isSignup ? 'ALREADY HAVE AN IDENTITY? LOGIN' : 'NEW HERE? CREATE IDENTITY'}
+          </button>
+
+          <div className="mt-12 flex flex-wrap gap-8 justify-center opacity-50 font-black uppercase text-[10px] tracking-widest">
+            <span>© 2026 GALLERY_SYSTEM</span>
+            <span>PRIVACY_PROTOCOL</span>
+            <span>TERMS_OF_SERVICE</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

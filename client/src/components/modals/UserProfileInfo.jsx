@@ -1,7 +1,7 @@
 import React from 'react'
-import { assets } from '../../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { Settings, Share2, MessageCircle, UserPlus, CheckCircle } from 'lucide-react'
 
 const UserProfileInfo = ({ user, posts, profileId, setShowEdit }) => {
     const navigate = useNavigate()
@@ -9,78 +9,81 @@ const UserProfileInfo = ({ user, posts, profileId, setShowEdit }) => {
     const isOwnProfile = !profileId || profileId === currentUser?._id
 
     return (
-        <div className="relative px-6 pb-8 flex flex-col gap-6">
-            {/* Profile Meta Segment */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
-                    {/* Avatar Orbit */}
-                    <div className="relative -mt-16 md:-mt-20 group">
-                        <div className="w-28 h-28 md:w-36 md:h-36 rounded-full story-ring p-[4px]">
-                            <div className="w-full h-full rounded-full border-4 border-surface overflow-hidden bg-stone-100">
-                                <img 
-                                    src={user?.profile_picture || assets.sample_profile} 
-                                    onError={(e) => { e.target.src = assets.sample_profile }}
-                                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700" 
-                                    alt={user?.full_name} 
-                                />
-                            </div>
+        <div className="relative px-6 pb-8 flex flex-col gap-8">
+            {/* ⚡ Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div className="flex flex-col md:flex-row items-start md:items-end gap-8">
+                    {/* ⚡ Avatar Node */}
+                    <div className="relative -mt-20 group">
+                        <div className="w-32 h-32 md:w-44 md:h-44 neo-box bg-white overflow-hidden p-1 -rotate-2 group-hover:rotate-0 neo-transition">
+                            <img 
+                                src={user?.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} 
+                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 neo-transition scale-100 group-hover:scale-110" 
+                                alt={user?.full_name} 
+                            />
                         </div>
-                        <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 border-4 border-surface rounded-full shadow-lg"></div>
+                        <div className="absolute bottom-2 right-2 w-8 h-8 bg-main border-4 border-black rounded-full z-10"></div>
                     </div>
 
-                    {/* Profile Credentials */}
+                    {/* ⚡ User Credentials */}
                     <div className="flex flex-col">
                         <div className="flex items-center gap-3">
-                            <h2 className="text-[28px] md:text-4xl font-black font-headline tracking-tighter text-on-surface uppercase">{user?.full_name}</h2>
-                            <span className="material-symbols-outlined text-primary text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">{user?.full_name}</h2>
+                            <CheckCircle className="text-black w-8 h-8" strokeWidth={3} />
                         </div>
-                        <div className="flex items-center gap-4 mt-1">
-                            <span className="text-sm font-bold text-on-surface-variant">@{user?.username}</span>
-                            <span className="text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 bg-primary/10 text-primary rounded-full">Gallery Pro</span>
+                        <div className="flex items-center gap-4 mt-2">
+                            <span className="neo-box bg-black text-white px-3 py-1 font-bold text-sm tracking-tighter">@{user?.username}</span>
+                            <span className="font-black uppercase tracking-widest text-[10px] text-black/40">NEO_CURATOR_V2</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Dynamic Controls */}
-                <div className="flex items-center gap-3">
+                {/* ⚡ Interaction Controls */}
+                <div className="flex flex-wrap items-center gap-4">
                     {isOwnProfile ? (
                         <button 
                             onClick={() => setShowEdit(true)}
-                            className="px-6 py-3 bg-surface-container-high text-on-surface font-bold rounded-2xl hover:bg-stone-200 dark:hover:bg-stone-800 transition-all active:scale-95 text-xs uppercase tracking-widest shadow-sm border border-outline-variant/10"
+                            className="neo-button bg-accent flex items-center gap-2"
                         >
-                            Edit Studio
+                            <Settings className="w-5 h-5" />
+                            <span className="font-black uppercase text-sm">Update Studio</span>
                         </button>
                     ) : (
-                        <div className="flex items-center gap-3">
-                            <button className="px-8 py-3 bg-primary text-white font-bold rounded-2xl hover:scale-105 transition-all shadow-xl shadow-primary/20 text-xs uppercase tracking-widest active:scale-95">Follow Creator</button>
-                            <button className="p-3 bg-surface-container-high hover:bg-stone-200 dark:hover:bg-stone-800 rounded-2xl transition-all shadow-sm border border-outline-variant/10">
-                                <span className="material-symbols-outlined">chat</span>
+                        <>
+                            <button className="neo-button-primary flex items-center gap-2 px-8">
+                                <UserPlus className="w-5 h-5" />
+                                <span className="font-black uppercase text-sm">Follow</span>
                             </button>
-                        </div>
+                            <button className="neo-button bg-white">
+                                <MessageCircle className="w-5 h-5" />
+                            </button>
+                        </>
                     )}
-                    <button className="p-3 bg-surface-container-high hover:bg-stone-200 dark:hover:bg-stone-800 rounded-2xl transition-all shadow-sm border border-outline-variant/10">
-                        <span className="material-symbols-outlined">share</span>
+                    <button className="neo-button bg-white">
+                        <Share2 className="w-5 h-5" />
                     </button>
                 </div>
             </div>
 
-            {/* Narrative Metadata */}
-            <div className="flex flex-col gap-4">
-                <p className="text-sm md:text-base font-medium text-on-surface-variant leading-relaxed max-w-2xl">{user?.bio || "Exploring the intersection of storytelling and editorial photography."}</p>
+            {/* ⚡ Bio / Narrative */}
+            <div className="flex flex-col gap-6 max-w-3xl">
+                <div className="neo-box bg-white p-4 rotate-1">
+                    <p className="text-lg font-bold leading-relaxed">{user?.bio || "COMMUNICATING_VIA_VISUAL_STIMULI. DATA_ENTRY_PENDING."}</p>
+                </div>
                 
-                {/* Engagement Analytics */}
-                <div className="flex items-center gap-8 py-4 border-t border-stone-200/10 mt-2">
+                {/* ⚡ Stats Grid */}
+                <div className="grid grid-cols-3 gap-4 py-4 border-t-4 border-black border-dashed mt-2">
                     <div className="flex flex-col">
-                        <span className="text-lg font-black font-headline text-on-surface leading-none">{posts?.length || 0}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mt-1">Stories</span>
+                        <span className="text-3xl font-black italic text-black leading-none">{posts?.length || 0}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/50 mt-2">ENTRIES</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-lg font-black font-headline text-on-surface leading-none">{(user?.connections?.length || 0).toLocaleString()}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mt-1">Network</span>
+                        <span className="text-3xl font-black italic text-black leading-none">{(user?.connections?.length || 0).toLocaleString()}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/50 mt-2">NETWORK_NODES</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-lg font-black font-headline text-on-surface leading-none">{(posts?.reduce((acc, p) => acc + (p.likes_count || 0), 0) || 0).toLocaleString()}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mt-1">Impact</span>
+                        <span className="text-3xl font-black italic text-black leading-none">{(posts?.reduce((acc, p) => acc + (p.likes_count || 0), 0) || 0).toLocaleString()}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/50 mt-2">TOTAL_REACTIONS</span>
                     </div>
                 </div>
             </div>

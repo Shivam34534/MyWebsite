@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
-import moment from 'moment'
 import StoryModel from './StoryModel'
 import StoryViewer from './StoryViewer'
 import api from '../../api/axios'
-import { useUser, useAuth } from '../../mockClerk'
+import { useAuth } from '../../mockClerk'
 import toast from 'react-hot-toast'
-import { assets } from '../../assets/assets'
 import { useSelector } from 'react-redux'
 
 const StoriesBar = () => {
@@ -18,23 +16,15 @@ const StoriesBar = () => {
 
     const fetchStories = async () => {
         try {
-            let token
-            try {
-                token = await getToken()
-            } catch (e) {
-                // Handle token fetch error if needed
-            }
-
-            const headers = token ? { Authorization: `Bearer ${token}` } : {}
-            const { data } = await api.get('/api/story/all', { headers })
+            const token = await getToken()
+            const { data } = await api.get('/api/story/all', { 
+                headers: { Authorization: `Bearer ${token}` } 
+            })
             if (data.success) {
                 setStories(data.stories)
-            } else {
-                toast.error(data.message || 'Failed to fetch stories')
             }
         } catch (error) {
             console.error('Error fetching stories:', error)
-            toast.error(error.response?.data?.message || 'Failed to fetch stories')
         }
     }
 
@@ -65,48 +55,43 @@ const StoriesBar = () => {
     })
 
     return (
-        <section className="flex gap-4 overflow-x-auto no-scrollbar py-2 px-1">
-            {/* Your Story */}
+        <section className="flex gap-6 overflow-x-auto no-scrollbar py-2 px-1">
+            {/* ⚡ Your Identity Node */}
             <div onClick={() => setShowModel(true)} className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group">
-                <div className="relative w-16 h-16 rounded-full story-ring transition-transform group-hover:scale-105 duration-300">
-                    <div className="w-full h-full rounded-full border-2 border-white overflow-hidden bg-stone-100">
-                        <img 
-                            className="w-full h-full object-cover opacity-60" 
-                            src={user?.profile_picture || assets.sample_profile} 
-                            onError={(e) => { e.target.src = assets.sample_profile }}
-                            alt="Your Story" 
-                        />
-                    </div>
-                    <div className="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
-                        <span className="material-symbols-outlined text-[12px] font-bold">add</span>
+                <div className="relative w-16 h-16 neo-box bg-white overflow-hidden rotate-2 group-hover:rotate-0 neo-transition">
+                    <img 
+                        className="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-100" 
+                        src={user?.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} 
+                        alt="Your Story" 
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="neo-box bg-main p-1 rotate-[-10deg] group-hover:rotate-0 neo-transition border-2">
+                            <Plus className="w-4 h-4 text-black" strokeWidth={4} />
+                        </div>
                     </div>
                 </div>
-                <span className="text-[11px] font-bold text-on-surface truncate w-16 text-center tracking-tight">Your Story</span>
+                <span className="text-[10px] font-black text-black uppercase tracking-tighter italic">YOU</span>
             </div>
 
-            {/* Other Stories */}
+            {/* ⚡ Other Identity Nodes */}
             {
                 storiesByUser.map((group, index) => (
                     <div onClick={() => setViewStory(group.stories)} key={index} className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group">
-                        <div className="w-16 h-16 rounded-full story-ring transition-all group-hover:scale-105 duration-300 p-[2px]">
-                            <div className="w-full h-full rounded-full border-2 border-white overflow-hidden bg-white">
+                        <div className="w-16 h-16 neo-box bg-white overflow-hidden -rotate-2 group-hover:rotate-0 neo-transition p-1">
+                            <div className="w-full h-full bg-accent">
                                 <img 
-                                    className="w-full h-full object-cover" 
-                                    src={group.user.profile_picture || assets.sample_profile} 
-                                    onError={(e) => { e.target.src = assets.sample_profile }}
+                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 neo-transition border-2 border-black" 
+                                    src={group.user.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${group.user.username}`} 
                                     alt={group.user.full_name} 
                                 />
                             </div>
                         </div>
-                        <span className="text-[11px] font-medium text-on-surface-variant truncate w-16 text-center">{group.user.username}</span>
+                        <span className="text-[10px] font-black text-black uppercase tracking-tighter truncate w-16 text-center italic">@{group.user.username}</span>
                     </div>
                 ))
             }
 
-            {/* Add Story Model */}
             {showModel && <StoryModel setShowModel={setShowModel} fetchStories={fetchStories} />}
-            
-            {/* View Story Modal */}
             {viewStory && <StoryViewer stories={viewStory} setViewStory={setViewStory} />}
         </section>
     )
