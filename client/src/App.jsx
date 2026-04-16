@@ -39,20 +39,18 @@ const App = () => {
 
   }, [user, getToken, dispatch, signOut])
   
-  // A bold Neo-Brutalist loading screen
+  // A sleek loading spinner to display while chunks are downloading
   const LoadingScreen = () => (
-    <div className='fixed inset-0 flex items-center justify-center bg-white z-[200] border-[12px] border-black'>
-        <div className='flex flex-col items-center gap-4'>
-            <div className='neo-box bg-main p-8 -rotate-2 scale-110'>
-                <h1 className='text-6xl font-black italic tracking-tighter text-black'>
-                    GALLERY
+    <div className='fixed inset-0 flex items-center justify-center bg-yellow-300 z-[200] border-[10px] border-black'>
+        <div className='flex flex-col items-center gap-6'>
+            <div className='neo-card bg-white rotate-2'>
+                <h1 className='text-6xl font-black font-headline tracking-tighter text-black'>
+                    AURA
                 </h1>
             </div>
-            <div className='neo-box bg-black px-4 py-2 rotate-1'>
-              <p className='text-sm font-bold uppercase tracking-widest text-white animate-pulse'>
-                Loading...
-              </p>
-            </div>
+            <p className='text-sm font-black uppercase tracking-widest text-black bg-lime-400 px-4 py-1 neo-border neo-shadow -rotate-2'>
+                Loading the vibe...
+            </p>
         </div>
     </div>
   )

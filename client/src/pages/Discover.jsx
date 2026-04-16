@@ -67,20 +67,20 @@ const Discover = () => {
   }, [input, getToken]);
 
   return (
-    <div className='w-full min-h-screen bg-surface px-4 sm:px-8 py-10 flex flex-col gap-12 overflow-y-auto no-scrollbar'>
+    <div className='w-full min-h-screen bg-[#F2F2F2] px-4 sm:px-8 py-10 flex flex-col gap-12 overflow-y-auto no-scrollbar'>
       {/* Title Section */}
-      <div className='flex flex-col gap-2'>
-          <h1 className='text-4xl font-black font-headline tracking-tighter text-on-surface uppercase'>Discover</h1>
-          <p className='text-[10px] font-bold uppercase tracking-[0.4em] text-on-surface-variant/40'>Explore the global gallery community</p>
+      <div className='flex flex-col gap-2 -rotate-1'>
+          <h1 className='text-6xl font-black italic tracking-tighter text-black uppercase leading-none'>DISCOVER.NET</h1>
+          <div className='bg-primary text-black px-3 py-1 neo-border text-[10px] font-black uppercase tracking-widest w-fit shadow-[4px_4px_0px_0px_#000]'>GLOBAL_ACCESS_ENABLED</div>
       </div>
 
       {/* Global Search Canvas */}
-      <div className='relative w-full max-w-2xl group transition-all'>
-          <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-[24px]">search</span>
+      <div className='relative w-full max-w-2xl group transition-all translate-y-2'>
+          <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-black text-[28px] font-black">search</span>
           <input 
               type="text" 
-              placeholder='Search creators or gallery stories...'
-              className='w-full pl-14 pr-6 py-4 bg-surface-container rounded-3xl border-none text-base placeholder:text-on-surface-variant/20 focus:ring-1 focus:ring-primary/30 transition-all font-medium text-on-surface shadow-sm' 
+              placeholder='SEARCH_THE_VOID...'
+              className='w-full pl-16 pr-6 py-6 bg-white neo-border text-lg font-black placeholder:text-black/20 focus:bg-stone-50 outline-none transition-all uppercase tracking-widest shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]' 
               onChange={(e) => setInput(e.target.value)} 
               value={input} 
           />
@@ -91,15 +91,15 @@ const Discover = () => {
             <Loading />
         </div>
       ) : (
-        <div className='flex flex-col gap-16 pb-20'>
+        <div className='flex flex-col gap-16 pb-24'>
             {/* Suggested Creators Stage */}
             {suggestedUsers.length > 0 && !input.trim() && (
                 <div className='flex flex-col gap-8'>
-                    <div className="flex items-center justify-between border-b border-stone-200/20 pb-4">
-                        <h2 className='text-sm font-bold uppercase tracking-widest text-on-surface-variant'>Suggested Creators</h2>
-                        <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
+                    <div className="flex items-center justify-between border-b-[4px] border-black pb-4">
+                        <h2 className='text-2xl font-black uppercase tracking-tighter italic'>HOT_CREATORS</h2>
+                        <span className="bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest neo-border">VERIFIED</span>
                     </div>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-start'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
                         {suggestedUsers.map((user) => (
                             <UserCard user={user} key={user._id} />
                         ))}
@@ -109,12 +109,12 @@ const Discover = () => {
 
             {/* Search Result Creators */}
             {users.length > 0 && (
-                <div className='flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
-                    <div className="flex items-center gap-2 border-b border-stone-200/20 pb-4">
-                        <h2 className='text-sm font-bold uppercase tracking-widest text-on-surface-variant'>People</h2>
-                        <span className="text-xs font-medium text-primary-dim bg-primary/5 px-2 py-0.5 rounded-full">{users.length} results</span>
+                <div className='flex flex-col gap-8 animate-in slide-in-from-bottom-4 duration-500'>
+                    <div className="flex items-center gap-4 border-b-[4px] border-black pb-4">
+                        <h2 className='text-2xl font-black uppercase tracking-tighter italic'>IDENTITIES_FOUND</h2>
+                        <span className="text-[10px] font-black text-black px-3 py-1 bg-accent neo-border shadow-[3px_3px_0px_0px_#000] uppercase">{users.length} HITS</span>
                     </div>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 items-start'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
                         {users.map((user) => (
                             <UserCard user={user} key={user._id} />
                         ))}
@@ -124,11 +124,11 @@ const Discover = () => {
             
             {/* Search Result Gallery Items */}
             {posts.length > 0 && (
-                <div className='flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
-                    <div className="flex items-center gap-2 border-b border-stone-200/20 pb-4">
-                        <h2 className='text-sm font-bold uppercase tracking-widest text-on-surface-variant'>Editorial Stories</h2>
+                <div className='flex flex-col gap-8 animate-in slide-in-from-bottom-4 duration-500'>
+                    <div className="flex items-center gap-4 border-b-[4px] border-black pb-4">
+                        <h2 className='text-2xl font-black uppercase tracking-tighter italic'>STORY_FRAGMENTS</h2>
                     </div>
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8'>
                         {posts.map((post) => (
                             <PostCard post={post} key={post._id} />
                         ))}
@@ -138,17 +138,20 @@ const Discover = () => {
 
             {/* Empty Context */}
             {input.trim() && users.length === 0 && posts.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-center gap-6 opacity-30">
-                    <span className="material-symbols-outlined text-8xl">sentiment_dissatisfied</span>
+                <div className="flex flex-col items-center justify-center py-24 text-center gap-6 bg-white neo-border neo-shadow-lg max-w-xl mx-auto italic">
+                    <div className="w-20 h-20 neo-border bg-stone-100 flex items-center justify-center -rotate-6">
+                        <span className="material-symbols-outlined text-6xl font-black">error</span>
+                    </div>
                     <div className="flex flex-col gap-2">
-                        <h3 className="font-headline font-black text-2xl text-on-surface">No results found</h3>
-                        <p className="text-sm font-medium">Try searching for different creators or gallery moments.</p>
+                        <h3 className="text-4xl font-black uppercase tracking-tight">NULL_RESULTS</h3>
+                        <p className="text-[10px] font-black uppercase tracking-widest opacity-40">The void returned nothing for your request.</p>
                     </div>
                 </div>
             )}
         </div>
       )}
     </div>
+
   )
 }
 

@@ -81,76 +81,78 @@ const ChatBox = () => {
     if (loading || !user) return <Loading />
 
     return (
-        <section className="flex flex-1 flex-col h-full bg-surface-container-lowest overflow-hidden">
+        <section className="flex flex-1 flex-col h-full bg-white overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 md:py-6 border-b border-stone-200/15 flex items-center justify-between bg-surface/50 backdrop-blur-xl z-10">
+            <div className="px-6 py-4 md:py-6 border-b-[4px] border-black flex items-center justify-between bg-stone-50 z-10 shadow-[0_4px_0_0_rgba(0,0,0,1)]">
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={() => navigate('/messages')} 
-                        className="md:hidden p-2 hover:bg-surface-container rounded-xl transition-all"
+                        className="md:hidden w-10 h-10 neo-border bg-white flex items-center justify-center hover:bg-black hover:text-white transition-all"
                     >
-                         <span className="material-symbols-outlined">arrow_back</span>
+                         <span className="material-symbols-outlined font-black">arrow_back</span>
                     </button>
                     <div 
                         onClick={() => navigate(`/profile/${user.username}`)}
                         className="flex items-center gap-4 cursor-pointer group"
                     >
                         <div className="relative flex-shrink-0">
-                            <img 
-                                className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2 border-surface shadow-sm transition-transform group-hover:scale-105" 
-                                src={user.profile_picture || assets.sample_profile} 
-                                onError={(e) => { e.target.src = assets.sample_profile }}
-                                alt={user.full_name} 
-                            />
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface rounded-full"></div>
+                            <div className="w-12 h-12 neo-border bg-black p-0.5 group-hover:rotate-3 transition-transform">
+                                <div className="w-full h-full bg-white overflow-hidden">
+                                    <img 
+                                        className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0" 
+                                        src={user.profile_picture || assets.sample_profile} 
+                                        onError={(e) => { e.target.src = assets.sample_profile }}
+                                        alt={user.full_name} 
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-headline font-extrabold text-sm md:text-base text-on-surface group-hover:text-primary transition-colors leading-tight">{user.full_name}</span>
-                            <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest flex items-center gap-1.5 leading-none mt-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Online
+                            <span className="font-black text-lg text-black group-hover:text-primary transition-colors leading-none uppercase italic">{user.full_name}</span>
+                            <span className="text-[10px] text-black/40 font-black uppercase tracking-widest flex items-center gap-1.5 leading-none mt-1">
+                                <div className="w-2 h-2 bg-lime-400 neo-border"></div> LINK_ESTABLISHED
                             </span>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button className="p-2.5 hover:bg-surface-container text-on-surface-variant hover:text-primary rounded-xl transition-all">
-                        <span className="material-symbols-outlined text-[20px]">call</span>
+                <div className="flex items-center gap-3">
+                    <button className="w-10 h-10 neo-border bg-white flex items-center justify-center hover:bg-black hover:text-white transition-all">
+                        <span className="material-symbols-outlined text-[20px] font-black">call</span>
                     </button>
-                    <button className="p-2.5 hover:bg-surface-container text-on-surface-variant hover:text-primary rounded-xl transition-all">
-                        <span className="material-symbols-outlined text-[20px]">videocam</span>
-                    </button>
-                    <button className="p-2.5 hover:bg-surface-container text-on-surface-variant hover:text-on-surface rounded-xl transition-all">
-                        <span className="material-symbols-outlined text-[20px]">info</span>
+                    <button className="w-10 h-10 neo-border bg-white flex items-center justify-center hover:bg-black hover:text-white transition-all">
+                        <span className="material-symbols-outlined text-[20px] font-black">videocam</span>
                     </button>
                 </div>
             </div>
 
             {/* Message Thread */}
-            <div className="flex-1 overflow-y-auto no-scrollbar p-6 flex flex-col gap-6 bg-surface-container-lowest">
+            <div className="flex-1 overflow-y-auto no-scrollbar p-6 flex flex-col gap-8 bg-[#EEE] bg-grid-pattern">
                 {messages.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center opacity-30 gap-3 py-20">
-                         <span className="material-symbols-outlined text-5xl">chat</span>
-                         <p className="text-sm font-bold uppercase tracking-widest">Beginning of conversation</p>
+                    <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 py-20 italic">
+                         <div className="w-16 h-16 neo-border bg-tertiary flex items-center justify-center">
+                            <span className="material-symbols-outlined text-4xl font-black">chat</span>
+                         </div>
+                         <p className="text-[10px] font-black uppercase tracking-widest opacity-40">ENCRYPTED_LOGS_NULL</p>
                     </div>
                 ) : (
                     [...messages].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map((msg, index) => {
                         const isSent = msg.from_user_id === currentUser?._id
                         return (
-                            <div key={msg._id || index} className={`flex flex-col gap-1.5 max-w-[85%] md:max-w-[70%] ${isSent ? 'self-end items-end' : 'self-start items-start'}`}>
-                                <div className={`relative px-4 py-3 shadow-sm transition-all animate-in fade-in slide-in-from-bottom-1 duration-300 ${
+                            <div key={msg._id || index} className={`flex flex-col gap-2 max-w-[85%] md:max-w-[70%] ${isSent ? 'self-end items-end' : 'self-start items-start'}`}>
+                                <div className={`relative px-4 py-3 neo-border transition-all animate-in slide-in-from-bottom-2 duration-300 ${
                                     isSent 
-                                    ? 'bg-primary text-white rounded-2xl rounded-tr-none' 
-                                    : 'bg-surface-container text-on-surface rounded-2xl rounded-tl-none border border-outline-variant/10'
+                                    ? 'bg-primary text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' 
+                                    : 'bg-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
                                 }`}>
                                     {msg.message_type === 'image' && (
-                                        <div className="mb-2 rounded-xl overflow-hidden border border-black/10">
-                                            <img src={msg.media_url} alt="Gallery item" className="w-full h-auto max-h-[300px] object-cover" />
+                                        <div className="mb-2 neo-border border-black bg-black p-0.5">
+                                            <img src={msg.media_url} alt="Gallery item" className="w-full h-auto max-h-[300px] object-cover grayscale-[0.2]" />
                                         </div>
                                     )}
-                                    <p className="text-[14px] leading-relaxed font-medium">{msg.text}</p>
+                                    <p className="text-[15px] font-bold leading-tight">{msg.text}</p>
                                 </div>
-                                <span className="text-[9px] text-on-surface-variant font-bold uppercase tracking-tighter opacity-70">
-                                    {moment(msg.createdAt).format('hh:mm A')}
+                                <span className={`text-[9px] font-black uppercase tracking-widest opacity-40 ${isSent ? 'pr-1' : 'pl-1'}`}>
+                                    {moment(msg.createdAt).format('HH:MM:SS')}
                                 </span>
                             </div>
                         )
@@ -160,44 +162,40 @@ const ChatBox = () => {
             </div>
 
             {/* Control Bar */}
-            <div className="p-6 bg-surface/50 backdrop-blur-xl border-t border-stone-200/15 pb-24 md:pb-6">
-                <div className="max-w-4xl mx-auto flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 pr-2">
-                        <label className="p-2.5 md:p-3 hover:bg-surface-container rounded-full text-on-surface-variant hover:text-primary cursor-pointer transition-all">
-                            <span className="material-symbols-outlined text-[24px]">image</span>
+            <div className="p-6 bg-stone-50 border-t-[4px] border-black pb-32 md:pb-6">
+                <div className="max-w-5xl mx-auto flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <label className="w-12 h-12 neo-border bg-white flex items-center justify-center hover:bg-black hover:text-white cursor-pointer transition-all active:translate-y-1 active:shadow-none shadow-[3px_3px_0px_0px_#000]">
+                            <span className="material-symbols-outlined font-black">image</span>
                             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                                 const file = e.target.files[0]
                                 if (file) setImage(file)
                             }} />
                         </label>
-                        <button className="hidden sm:flex p-2.5 md:p-3 hover:bg-surface-container rounded-full text-on-surface-variant hover:text-primary transition-all">
-                             <span className="material-symbols-outlined text-[24px]">sticky_note_2</span>
-                        </button>
                     </div>
                     {image && (
                         <div className="relative group">
-                            <img src={URL.createObjectURL(image)} alt="Preview" className="w-12 h-12 rounded-xl object-cover border-2 border-primary" />
-                            <button onClick={() => setImage(null)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-lg">×</button>
+                            <div className="w-14 h-14 neo-border bg-black p-0.5 shadow-[4px_4px_0_0_#A3E635]">
+                                <img src={URL.createObjectURL(image)} alt="Preview" className="w-full h-full object-cover" />
+                            </div>
+                            <button onClick={() => setImage(null)} className="absolute -top-3 -right-3 bg-red-500 text-white neo-border w-7 h-7 flex items-center justify-center text-xs font-black shadow-[2px_2px_0_0_#000]">×</button>
                         </div>
                     )}
                     <div className="flex-1 relative flex items-center">
                         <input 
                             type="text" 
-                            placeholder="Message gallery friend..." 
+                            placeholder="TYPE_MESSAGE..." 
                             value={text}
                             onChange={(e) => setText(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && sendMessage()}
-                            className="w-full bg-surface-container-high rounded-2xl px-5 py-3.5 pr-12 text-sm placeholder:text-on-surface-variant/40 focus:ring-1 focus:ring-primary/30 border-none transition-all font-medium text-on-surface" 
+                            className="w-full bg-white neo-border px-6 py-4 text-sm font-black placeholder:text-black/20 focus:bg-stone-50 outline-none transition-all shadow-[4px_4px_0px_0px_#000]" 
                         />
-                        <button className="absolute right-3 p-1.5 text-on-surface-variant hover:text-primary">
-                             <span className="material-symbols-outlined text-[20px]">sentiment_satisfied</span>
-                        </button>
                     </div>
                     <button 
                         onClick={sendMessage}
-                        className={`p-3.5 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-primary/10 ${text.trim() || image ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant cursor-not-allowed opacity-50'}`}
+                        className={`w-14 h-14 neo-border flex items-center justify-center transition-all active:translate-y-1 active:shadow-none ${text.trim() || image ? 'bg-primary shadow-[4px_4px_0px_0px_#000]' : 'bg-stone-200 text-black/20 cursor-not-allowed shadow-none'}`}
                     >
-                         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
+                         <span className="material-symbols-outlined font-black" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
                     </button>
                 </div>
             </div>

@@ -1,117 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Fonts */
-  --font-heading: "Bebas Neue", "Public Sans", sans-serif;
-  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  /* Neo-Brutalism Design Tokens */
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-sans: "Public Sans", sans-serif;
   
-  /* Neo-Brutalism Palette */
-  --color-bg: #FFFFFF;
-  --color-main: #A3E635; /* Neon Green */
-  --color-secondary: #FF3366; /* Neon Pink */
-  --color-accent: #FDE047; /* Yellow */
-  --color-black: #000000;
-  --color-white: #FFFFFF;
-  --color-gray-soft: #F3F4F6;
-
-  /* Shadows - Hard Offset */
-  --shadow-neo: 5px 5px 0px 0px #000000;
-  --shadow-neo-sm: 2px 2px 0px 0px #000000;
+  --color-primary: #A3E635; /* Lime */
+  --color-secondary: #FF90E8; /* Pink */
+  --color-tertiary: #FFD600; /* Yellow */
+  --color-accent: #00E1EF; /* Cyan */
+  
+  --color-surface: #ffffff;
+  --color-on-surface: #000000;
+  
+  --shadow-neo: 4px 4px 0px 0px #000000;
   --shadow-neo-lg: 8px 8px 0px 0px #000000;
-  
-  /* Layout */
-  --radius-none: 0px;
+  --shadow-neo-xl: 12px 12px 0px 0px #000000;
 }
 
 @layer base {
   body {
-    @apply font-sans bg-white text-black antialiased selection:bg-main selection:text-black;
+    @apply font-sans text-on-surface bg-[#F2F2F2] selection:bg-black selection:text-white antialiased;
   }
-
-  h1 { @apply text-6xl md:text-8xl font-black italic tracking-tighter leading-[0.9]; }
-  h2 { @apply text-4xl md:text-6xl font-black italic tracking-tighter leading-none; }
-  h3 { @apply text-2xl md:text-4xl font-black tracking-tight leading-none; }
-  h4 { @apply text-xl md:text-2xl font-black uppercase tracking-widest; }
-
-  /* Smooth scroll for all */
-  html {
-    scroll-behavior: smooth;
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline font-black uppercase tracking-tighter;
   }
 }
 
-/* ⚡ Neo-Brutalist Utilities (composable with @apply) */
-@utility neo-box {
-  background-color: var(--color-white);
-  border: 4px solid var(--color-black);
-  box-shadow: var(--shadow-neo);
-  transition: all 150ms ease-in-out;
-}
-
-@utility neo-box-interactive {
-  @apply neo-box;
-  &:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: var(--shadow-neo-lg);
-  }
-  &:active {
-    transform: translate(0, 0);
-    box-shadow: none;
-  }
-}
-
-@utility neo-button {
-  @apply neo-box-interactive px-6 py-2 font-bold uppercase tracking-tight flex items-center justify-center gap-2;
-}
-
-@utility neo-transition {
-  transition: all 150ms ease-in-out;
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 @layer components {
-  /* These are now just aliases or refinements if needed, but we can also use the utilities directly in JSX */
+  .neo-border {
+    @apply border-[3px] border-black;
+  }
   
-  .neo-button-primary {
-    @apply neo-button bg-main;
+  .neo-shadow {
+    @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
   }
-
-  .neo-button-secondary {
-    @apply neo-button bg-secondary text-white;
+  
+  .neo-shadow-lg {
+    @apply shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
   }
-
-  .neo-button-accent {
-    @apply neo-button bg-accent;
+  
+  .neo-shadow-hover {
+    @apply hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer;
   }
-
-  .neo-input {
-    @apply bg-white border-4 border-black p-3 font-bold focus:outline-none focus:bg-accent/10 transition-colors shadow-neo-sm;
+  
+  .neo-button {
+    @apply neo-border neo-shadow neo-shadow-hover px-6 py-2 bg-primary font-black uppercase tracking-tight active:translate-x-[2px] active:translate-y-[2px] active:shadow-none inline-flex items-center justify-center gap-2;
   }
 
   .neo-card {
-    @apply neo-box p-6;
+    @apply neo-border neo-shadow bg-white p-5 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all;
   }
 
-  /* Layout Utilities */
-  .container-neo {
-    @apply max-w-7xl mx-auto px-4;
+  .material-symbols-outlined {
+    @apply align-middle;
   }
 
-  .grid-neo {
-    @apply grid gap-6;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #000;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-main);
-    border: 3px solid #000;
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

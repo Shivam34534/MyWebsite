@@ -83,26 +83,22 @@ const StoryModel = ({ setShowModel, fetchStories }) => {
     }
 
     return (
-        <div className='fixed inset-0 z-110 min-h-screen bg-black/80 backdrop-blur
-        text-white flex items-center justify-center p-4'>
-            <div className='w-full max-w-md'>
-                <div className='text-center mb-4 flex items-center justify-between'>
-                    <button onClick={() => setShowModel(false)} className='text-white 
-                    p-2 cursor-pointer'>
-                        <ArrowLeft />
+        <div className='fixed inset-0 z-[120] min-h-screen bg-black/80 flex items-center justify-center p-4 animate-in zoom-in-95 duration-300'>
+            <div className='w-full max-w-md bg-white neo-border neo-shadow-lg p-8 flex flex-col gap-6'>
+                <div className='flex items-center justify-between border-b-[4px] border-black pb-4 -rotate-1'>
+                    <button onClick={() => setShowModel(false)} className='w-10 h-10 neo-border bg-white text-black hover:bg-black hover:text-white transition-all flex items-center justify-center font-black'>
+                        <ArrowLeft size={18} strokeWidth={4} />
                     </button>
-                    <h2 className='text-lg font-semibold'>Create Story</h2>
-                    <span className='w-10'></span>
+                    <h2 className='text-2xl font-black uppercase tracking-tighter italic'>NEW_STORY.ISO</h2>
+                    <div className='w-10'></div>
                 </div>
 
-                <div className='rounded-lg h-96 flex items-center justify-center
-                relative' style={{ backgroundColor: background }}>
-
+                <div className='neo-border h-[400px] flex items-center justify-center relative shadow-[8px_8px_0_0_#000]' style={{ backgroundColor: background }}>
                     {
                         (mode === 'text' || mode === 'media') && (
                             <textarea
-                                className={`bg-transparent text-white w-full h-full p-6 text-lg resize-none focus:outline-none z-10 ${mode === 'media' && previewUrl ? 'absolute inset-0 bg-black/20 placeholder-gray-200' : ''}`}
-                                placeholder="What's on your mind?"
+                                className={`bg-transparent text-white w-full h-full p-8 text-xl font-black uppercase tracking-tight resize-none focus:outline-none z-10 placeholder:text-white/40 leading-tight ${mode === 'media' && previewUrl ? 'absolute inset-0 bg-black/40' : ''}`}
+                                placeholder="INITIALIZE_NARRATIVE_STREAM..."
                                 onChange={(e) => setText(e.target.value)}
                                 value={text}
                             />
@@ -111,55 +107,46 @@ const StoryModel = ({ setShowModel, fetchStories }) => {
                     {
                         mode === 'media' && previewUrl && (
                             media?.type.startsWith('image') ? (
-                                <img src={previewUrl} alt="" className='object-cover 
-                                     max-h-full w-full h-full absolute inset-0' />
+                                <img src={previewUrl} alt="" className='object-cover max-h-full w-full h-full absolute inset-0 grayscale-[0.2]' />
                             ) : (
-                                <video src={previewUrl} className='object-cover
-                                    max-h-full w-full h-full absolute inset-0' controls />
+                                <video src={previewUrl} className='object-cover max-h-full w-full h-full absolute inset-0' controls />
                             )
                         )
                     }
-
                 </div>
-                <div className='flex mt-4 gap-2'>
+
+                <div className='flex flex-wrap mt-2 gap-2 p-3 bg-[#EEE] neo-border shadow-inner'>
                     {bgColors.map((color) => (
-                        <button key={color} className='w-6 h-6 rounded-full ring
-                        cursor-pointer' style={{ backgroundColor: color }} onClick={() =>
+                        <button key={color} className='w-6 h-6 neo-border cursor-pointer transition-transform hover:scale-110' style={{ backgroundColor: color }} onClick={() =>
                                 setBackground(color)} />
                     ))}
                 </div>
-                <div className='flex gap-2 mt-4'>
+
+                <div className='flex gap-4 mt-2'>
                     <button onClick={() => {
                         setMode('text');
                         setMedia(null);
                         setPreviewUrl(null);
-                        // Do not clear text
-                    }} className={`flex-1 flex items-center
-                        justify-center gap-2 p-2 rounded cursor-pointer ${mode === 'text' ? "bg-white text-black"
-                            : "bg-zinc-800"}`}>
-                        <TextIcon size={18} /> Text
+                    }} className={`flex-1 flex items-center justify-center gap-3 p-4 neo-border font-black uppercase text-[10px] transition-all ${mode === 'text' ? "bg-[#A3E635] text-black shadow-[4px_4px_0_0_#000]" : "bg-white text-black/40 hover:bg-stone-50"}`}>
+                        <TextIcon size={18} strokeWidth={3} /> TEXT_MODE
                     </button>
-                    <label className={`flex-1 flex items-center
-                        justify-center gap-2 p-2 rounded cursor-pointer ${mode === 'media' ? "bg-white text-black"
-                            : "bg-zinc-800"}`}>
+                    <label className={`flex-1 flex items-center justify-center gap-3 p-4 neo-border font-black uppercase text-[10px] cursor-pointer transition-all ${mode === 'media' ? "bg-[#A3E635] text-black shadow-[4px_4px_0_0_#000]" : "bg-white text-black/40 hover:bg-stone-50"}`}>
                         <input onChange={(e) => { handleMediaUpload(e); setMode('media') }} type="file" accept='image/*,video/*'
                             className='hidden' />
-                        <Upload size={18} /> Photo/Video
+                        <Upload size={18} strokeWidth={3} /> MEDIA_UPLOAD
                     </label>
                 </div>
+
                 <button onClick={() => toast.promise(handleCreateStory(), {
-                    loading: 'Saving...',
-                    success: <p>Story Added </p>,
-                    error: e => <p>{e.message}</p>,
-                })} className='flex items-center justify-center gap-2 text-white
-                py-3 mt-4 w-full rounded bg-gradient-to-r from-indigo-500 to-purple-600
-                hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition cursor-pointer'>
-                    <Sparkle size={18} /> Create Story
+                    loading: 'UPLOADING...',
+                    success: <b>STORY_INITIALIZED</b>,
+                    error: e => <b>{e.message}</b>,
+                })} className='neo-button bg-black text-[#A3E635] py-5 mt-2 flex items-center justify-center gap-3 shadow-[6px_6px_0_0_#A3E635] hover:shadow-[10px_10px_0_0_#A3E635]'>
+                    <Sparkle size={20} strokeWidth={3} /> BROADCAST_STORY
                 </button>
-
             </div>
-
         </div>
+
     )
 }
 

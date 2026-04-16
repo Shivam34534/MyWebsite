@@ -61,50 +61,53 @@ const ProfileModal = ({ setShowEdit }) => {
     }
 
     return (
-        <div className='fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/40 backdrop-blur-sm p-4 overflow-hidden'>
-            <div className='w-full max-w-2xl bg-surface-container-lowest rounded-[2.5rem] shadow-2xl border border-outline-variant/10 overflow-hidden animate-in fade-in zoom-in-95 duration-500 flex flex-col'>
+        <div className='fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-none p-4 overflow-hidden'>
+            <div className='w-full max-w-2xl bg-white neo-border neo-shadow-lg overflow-hidden animate-in slide-in-from-bottom-8 duration-500 flex flex-col'>
                 {/* Header Section */}
-                <div className="p-8 border-b border-stone-200/10 flex items-center justify-between bg-stone-50/50">
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-black font-headline text-on-surface tracking-tighter uppercase">Edit Studio</h2>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-on-surface-variant/40">Personalize your creator space</p>
+                <div className="p-8 border-b-[4px] border-black flex items-center justify-between bg-stone-50">
+                    <div className="flex flex-col gap-1 -rotate-1">
+                        <h2 className="text-4xl font-black text-black tracking-tighter uppercase leading-none">STUDIO_CONFIG.EXE</h2>
+                        <div className="bg-primary text-black px-2 py-0.5 neo-border text-[8px] font-black uppercase tracking-widest w-fit">VERSION_4.0.1</div>
                     </div>
                     <button 
                         onClick={() => setShowEdit(false)}
-                        className="p-2.5 hover:bg-stone-200 dark:hover:bg-stone-800 rounded-full text-on-surface-variant transition-all active:scale-90"
+                        className="w-12 h-12 neo-border bg-white text-black hover:bg-black hover:text-white transition-all flex items-center justify-center font-black"
                     >
-                        <span className="material-symbols-outlined text-[24px]">close</span>
+                        <span className="material-symbols-outlined font-black">close</span>
                     </button>
                 </div>
 
-                <form className='p-8 flex flex-col gap-8 overflow-y-auto no-scrollbar bg-surface-container-lowest' onSubmit={handleSaveProfile}>
+                <form className='p-8 flex flex-col gap-10 overflow-y-auto no-scrollbar bg-white' onSubmit={handleSaveProfile}>
                     {/* Visual Media Section */}
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-8">
                         <div className="relative">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 mb-3 block">Gallery Banner</span>
-                            <label className="relative group block h-40 md:h-48 rounded-3xl overflow-hidden cursor-pointer border border-stone-200/5 bg-stone-50 shadow-inner">
+                            <span className="text-xs font-black uppercase tracking-widest text-black mb-3 block">BANNER_STREAM</span>
+                            <label className="relative group block h-40 md:h-48 neo-border overflow-hidden cursor-pointer bg-black p-0.5">
                                 <img 
                                     src={editForm.cover_photo ? URL.createObjectURL(editForm.cover_photo) : (user.cover_picture || assets.sample_cover)} 
-                                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700" 
+                                    className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" 
                                     alt="Cover Preview"
                                 />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-300">
-                                     <span className="material-symbols-outlined text-white text-3xl mb-1">add_a_photo</span>
-                                     <span className="text-[10px] text-white/80 font-bold uppercase tracking-widest">Update Banner</span>
+                                <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all">
+                                     <div className="bg-black text-white px-4 py-2 neo-border rotate-3">
+                                        <span className="text-xs font-black uppercase tracking-widest">REPLACE_BANNER</span>
+                                     </div>
                                 </div>
                                 <input type="file" hidden accept="image/*" onChange={(e) => setEditForm({...editForm, cover_photo: e.target.files[0]})} />
                             </label>
 
                             {/* Avatar Float */}
-                            <label className="absolute -bottom-6 left-8 group cursor-pointer">
-                                <div className="w-24 h-24 rounded-full border-4 border-surface shadow-2xl overflow-hidden bg-white relative">
-                                    <img 
-                                        src={editForm.profile_picture ? URL.createObjectURL(editForm.profile_picture) : (user.profile_picture || assets.sample_profile)} 
-                                        className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" 
-                                        alt="Profile Preview"
-                                    />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                                         <span className="material-symbols-outlined text-white text-[20px]">edit</span>
+                            <label className="absolute -bottom-10 left-8 group cursor-pointer z-20">
+                                <div className="w-28 h-28 neo-border bg-black p-0.5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[10px_10px_0px_0px_#A3E635] transition-all">
+                                    <div className="w-full h-full neo-border border-white overflow-hidden bg-white">
+                                        <img 
+                                            src={editForm.profile_picture ? URL.createObjectURL(editForm.profile_picture) : (user.profile_picture || assets.sample_profile)} 
+                                            className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0" 
+                                            alt="Profile Preview"
+                                        />
+                                    </div>
+                                    <div className="absolute -bottom-2 -right-2 bg-black text-white w-8 h-8 neo-border flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-colors shadow-[2px_2px_0_0_#A3E635]">
+                                         <span className="material-symbols-outlined text-sm font-black">edit</span>
                                     </div>
                                 </div>
                                 <input type="file" hidden accept="image/*" onChange={(e) => setEditForm({...editForm, profile_picture: e.target.files[0]})} />
@@ -113,45 +116,45 @@ const ProfileModal = ({ setShowEdit }) => {
                     </div>
 
                     {/* Information Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
                         <div className="flex flex-col gap-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 ml-1">Creator Name</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1 italic">CREATOR_TAG</label>
                             <input 
                                 type="text" 
-                                placeholder="Enter full name"
-                                className="w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-sm font-medium focus:ring-1 focus:ring-primary/20 transition-all text-on-surface"
+                                placeholder="FULL NAME"
+                                className="w-full p-4 bg-stone-50 neo-border text-sm font-black placeholder:text-black/20 focus:bg-white focus:shadow-[4px_4px_0_0_#000] outline-none transition-all uppercase"
                                 onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })} 
                                 value={editForm.full_name} 
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 ml-1">Unique Alias</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1 italic">STATION_ALIAS</label>
                             <input 
                                 type="text" 
-                                placeholder="Edit username"
-                                className="w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-sm font-medium focus:ring-1 focus:ring-primary/20 transition-all text-on-surface"
+                                placeholder="USERNAME"
+                                className="w-full p-4 bg-stone-50 neo-border text-sm font-black placeholder:text-black/20 focus:bg-white focus:shadow-[4px_4px_0_0_#000] outline-none transition-all uppercase"
                                 onChange={(e) => setEditForm({ ...editForm, username: e.target.value })} 
                                 value={editForm.username} 
                             />
                         </div>
                         <div className="flex flex-col gap-2 md:col-span-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 ml-1">Editorial Bio</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1 italic">MISSION_STATEMENT</label>
                             <textarea 
-                                rows={3}
-                                placeholder="Tell your gallery story..."
-                                className="w-full p-4 bg-stone-50 border border-stone-200/10 rounded-2xl text-sm font-medium focus:ring-1 focus:ring-primary/20 transition-all text-on-surface resize-none leading-relaxed"
+                                rows={2}
+                                placeholder="BIOGRAPHY DATA..."
+                                className="w-full p-4 bg-stone-50 neo-border text-sm font-black placeholder:text-black/20 focus:bg-white focus:shadow-[4px_4px_0_0_#000] outline-none transition-all uppercase resize-none leading-tight"
                                 onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })} 
                                 value={editForm.bio} 
                             />
                         </div>
                         <div className="flex flex-col gap-2 md:col-span-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 ml-1">Studio Location</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1 italic">GEOGRAPHIC_COORDINATES</label>
                             <div className="relative">
-                                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-[20px]">location_on</span>
+                                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-black text-[20px] font-black">location_on</span>
                                 <input 
                                     type="text" 
-                                    placeholder="City, Country"
-                                    className="w-full p-4 pl-12 bg-stone-50 border border-stone-200/10 rounded-2xl text-sm font-medium focus:ring-1 focus:ring-primary/20 transition-all text-on-surface"
+                                    placeholder="CITY, REGION"
+                                    className="w-full p-4 pl-12 bg-stone-50 neo-border text-sm font-black placeholder:text-black/20 focus:bg-white focus:shadow-[4px_4px_0_0_#000] outline-none transition-all uppercase"
                                     onChange={(e) => setEditForm({ ...editForm, location: e.target.value })} 
                                     value={editForm.location} 
                                 />
@@ -160,30 +163,31 @@ const ProfileModal = ({ setShowEdit }) => {
                     </div>
 
                     {/* Form Controls */}
-                    <div className='flex items-center justify-end gap-4 pt-4 pb-2'>
+                    <div className='flex flex-col md:flex-row items-center justify-end gap-6 pt-4 pb-4'>
                         <button 
                             onClick={() => setShowEdit(false)} 
                             type='button'
-                            className='px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors active:scale-95'
+                            className='w-full md:w-auto px-10 py-4 text-xs font-black uppercase tracking-widest text-black hover:italic transition-all'
                         > 
-                            Discard
+                            DISCARD_CHANGES
                         </button>
 
                         <button 
                             type='submit' 
                             disabled={loading} 
-                            className={`px-10 py-3.5 font-bold rounded-2xl text-xs uppercase tracking-widest transition-all active:scale-95 shadow-xl ${
+                            className={`neo-button w-full md:w-auto px-12 py-5 text-sm font-black italic shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${
                                 loading 
-                                ? 'bg-surface-container text-on-surface-variant cursor-not-allowed shadow-none' 
-                                : 'bg-primary text-white shadow-primary/20 hover:scale-[1.02]'
+                                ? 'bg-stone-200 text-black/30 cursor-not-allowed shadow-none' 
+                                : 'bg-primary text-black'
                             }`}
                         > 
-                            {loading ? 'Finalizing...' : 'Update Studio'}
+                            {loading ? 'UPLOADING_DATA...' : 'COMMIT_CHANGES'}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+
     )
 }
 

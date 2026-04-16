@@ -86,13 +86,13 @@ const StoryViewer = ({ stories, setViewStory }) => {
     }
 
     return (
-        <div className='fixed inset-0 z-[150] bg-stone-950 flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-700'>
+        <div className='fixed inset-0 z-[150] bg-black flex flex-col items-center justify-center overflow-hidden animate-in slide-in-from-right-8 duration-500'>
             {/* Cinematic Progress Segment */}
-            <div className='absolute top-0 left-0 w-full flex gap-1.5 p-4 z-20'>
+            <div className='absolute top-0 left-0 w-full flex gap-1 p-2 z-20'>
                 {stories.map((_, index) => (
-                    <div key={index} className='h-[4px] flex-1 bg-white/20 rounded-full overflow-hidden'>
+                    <div key={index} className='h-[6px] flex-1 bg-white/20 neo-border border-white/10 overflow-hidden'>
                         <div 
-                            className={`h-full bg-white transition-all duration-100 linear ${index < currentStoryIndex ? 'w-full' : index === currentStoryIndex ? '' : 'w-0'}`}
+                            className={`h-full bg-primary transition-all duration-100 linear ${index < currentStoryIndex ? 'w-full' : index === currentStoryIndex ? '' : 'w-0'}`}
                             style={{ width: index === currentStoryIndex ? `${progress}%` : undefined }}
                         />
                     </div>
@@ -100,39 +100,39 @@ const StoryViewer = ({ stories, setViewStory }) => {
             </div>
 
             {/* Identity Bar */}
-            <div className='absolute top-10 left-6 z-20 flex items-center gap-4 py-2 px-4 bg-black/20 backdrop-blur-xl rounded-[2rem] border border-white/10 shadow-2xl transition-all hover:bg-black/30'>
-                <div className='w-10 h-10 rounded-full story-ring p-[1.5px]'>
-                    <div className='w-full h-full rounded-full border border-white/20 overflow-hidden bg-stone-800'>
+            <div className='absolute top-12 left-8 z-20 flex items-center gap-5 p-4 bg-white neo-border shadow-[4px_4px_0_0_#000] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_0_#000]'>
+                <div className='w-12 h-12 neo-border bg-black p-0.5'>
+                    <div className='w-full h-full neo-border border-white overflow-hidden bg-stone-100'>
                         <img 
                             src={currentStory.user?.profile_picture || assets.sample_profile} 
                             onError={(e) => { e.target.src = assets.sample_profile }}
-                            className='w-full h-full object-cover' 
+                            className='w-full h-full object-cover grayscale-[0.2]' 
                             alt={currentStory.user?.full_name} 
                         />
                     </div>
                 </div>
                 <div className='flex flex-col'>
-                    <span className='text-[13px] font-headline font-black text-white tracking-widest uppercase leading-none'>{currentStory.user?.full_name}</span>
-                    <span className='text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] mt-1'>Editorial Story</span>
+                    <span className='text-sm font-black text-black tracking-tight uppercase leading-none italic'>{currentStory.user?.full_name}</span>
+                    <span className='text-[8px] font-black text-black/40 uppercase tracking-widest mt-1'>STORY_PROTOCOL_04</span>
                 </div>
             </div>
 
             {/* Close Trigger */}
             <button 
                 onClick={handleClose} 
-                className='absolute top-10 right-6 z-20 p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all active:scale-90 border border-white/5 shadow-lg'
+                className='absolute top-12 right-8 z-20 w-12 h-12 neo-border bg-white text-black hover:bg-black hover:text-white transition-all active:translate-y-1 active:shadow-none shadow-[4px_4px_0_0_#000]'
             >
-                <span className="material-symbols-outlined text-[24px]">close</span>
+                <span className="material-symbols-outlined font-black">close</span>
             </button>
 
             {/* Media Canvas */}
-            <div className='w-full h-full flex flex-col items-center justify-center relative bg-stone-900/50 shadow-2xl overflow-hidden'>
+            <div className='w-full h-full flex flex-col items-center justify-center relative bg-black shadow-2xl overflow-hidden'>
                 {renderContent()}
                 
                 {/* Story Narration Overlay */}
                 {currentStory.media_type !== 'text' && currentStory.content && (
-                    <div className='absolute bottom-0 left-0 right-0 px-8 py-20 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-center justify-center text-center'>
-                        <p className='text-white text-lg md:text-2xl font-medium max-w-2xl leading-relaxed tracking-tight drop-shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-1000'>
+                    <div className='absolute bottom-0 left-0 right-0 p-10 bg-black/80 flex items-center justify-center text-center border-t-[6px] border-primary z-10'>
+                        <p className='text-white text-xl md:text-3xl font-black uppercase tracking-tight italic max-w-2xl leading-tight'>
                             {currentStory.content}
                         </p>
                     </div>
@@ -156,6 +156,7 @@ const StoryViewer = ({ stories, setViewStory }) => {
                 />
             </div>
         </div>
+
     )
 }
 

@@ -76,51 +76,54 @@ const UserCard = ({ user }) => {
     }
 
     return (
-        <div key={user._id} className="relative bg-surface-container-lowest p-8 rounded-[2.5rem] border border-stone-200/5 shadow-xl flex flex-col gap-6 items-center text-center transition-all hover:shadow-stone-200/40 hover:-translate-y-1 group/card">
+        <div key={user._id} className="relative bg-white p-6 neo-border neo-shadow group/card flex flex-col gap-6 items-center text-center transition-all hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[12px_12px_0px_0px_#A3E635]">
             {/* Identity Orbit */}
             <div 
                 onClick={() => navigate(`/profile/${user._id}`)}
-                className="relative group cursor-pointer"
+                className="relative group cursor-pointer -rotate-1 group-hover/card:rotate-0 transition-transform"
             >
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full story-ring p-[2px]">
-                    <div className="w-full h-full rounded-full border-2 border-surface overflow-hidden bg-stone-50">
+                <div className="w-24 h-24 neo-border bg-black p-0.5">
+                    <div className="w-full h-full bg-stone-100 overflow-hidden">
                         <img 
                             src={user.profile_picture || assets.sample_profile} 
                             onError={(e) => { e.target.src = assets.sample_profile }}
                             alt={user.full_name} 
-                            className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" 
+                            className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500" 
                         />
                     </div>
                 </div>
-                <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-4 border-surface rounded-full shadow-sm"></div>
+                <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-lime-400 neo-border flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+                    <span className="material-symbols-outlined text-xs font-black">check</span>
+                </div>
             </div>
 
             {/* Credentials */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-full">
                 <h3 
                     onClick={() => navigate(`/profile/${user._id}`)}
-                    className="font-headline font-black text-on-surface text-lg cursor-pointer hover:text-primary transition-colors leading-tight"
+                    className="font-black text-black text-xl cursor-pointer hover:italic transition-all leading-tight uppercase truncate"
                 >
                     {user.full_name}
                 </h3>
-                <p className="text-[10px] font-bold text-on-surface-variant/50 uppercase tracking-widest">@{user.username || 'creator'}</p>
+                <p className="text-[10px] font-black text-black/40 uppercase tracking-widest italic">@{user.username || 'unknown_entity'}</p>
             </div>
 
             {/* Narrative Fragment */}
-            <p className="text-xs font-medium text-on-surface-variant line-clamp-2 leading-relaxed px-2">
-                {user.bio || "Exploring modern storytelling through an editorial gallery lens."}
-            </p>
+            <div className="bg-[#EEE] p-3 neo-border w-full shadow-inner rotate-1">
+                <p className="text-[10px] font-black uppercase tracking-tight text-black line-clamp-2 leading-tight">
+                    {user.bio || "INITIALIZING_USER_PROTOCOL..."}
+                </p>
+            </div>
 
             {/* Metric Bar */}
-            <div className="flex items-center gap-6 py-2 border-y border-stone-200/10 w-full justify-center">
-                <div className="flex flex-col items-center">
-                    <span className="text-xs font-black text-on-surface">{(user.followers?.length || 0).toLocaleString()}</span>
-                    <span className="text-[8px] font-bold uppercase tracking-widest text-on-surface-variant/40">Network</span>
+            <div className="flex items-center gap-0 neo-border w-full overflow-hidden bg-black text-white shadow-[4px_4px_0px_0px_#000]">
+                <div className="flex-1 flex flex-col items-center py-2 bg-white text-black border-r-[3px] border-black">
+                    <span className="text-sm font-black italic">{(user.followers?.length || 0)}</span>
+                    <span className="text-[8px] font-black uppercase tracking-tighter">NET_RANK</span>
                 </div>
-                <div className="w-px h-4 bg-stone-200/20"></div>
-                <div className="flex flex-col items-center">
-                    <span className="text-xs font-black text-on-surface truncate max-w-[60px]">{user.location || "Earth"}</span>
-                    <span className="text-[8px] font-bold uppercase tracking-widest text-on-surface-variant/40">Studio</span>
+                <div className="flex-1 flex flex-col items-center py-2 bg-black text-white hover:bg-primary hover:text-black transition-colors">
+                    <span className="text-sm font-black truncate max-w-[60px] uppercase">{(user.location || "EARTH").split(',')[0]}</span>
+                    <span className="text-[8px] font-black uppercase tracking-tighter">ZONE</span>
                 </div>
             </div>
 
@@ -128,30 +131,31 @@ const UserCard = ({ user }) => {
             <div className="w-full flex items-center gap-2 mt-auto">
                 <button 
                     onClick={handleFollow}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 neo-border font-black text-[10px] uppercase transition-all active:translate-y-1 active:shadow-none ${
                         isFollowing 
-                        ? 'bg-stone-100 text-on-surface shadow-none' 
-                        : 'bg-primary text-white shadow-primary/20 hover:shadow-primary/40'
+                        ? 'bg-stone-100 text-black shadow-none' 
+                        : 'bg-primary text-black shadow-[4px_4px_0px_0px_#000]'
                     }`}
                 >
-                    <span className="material-symbols-outlined text-[16px]">{isFollowing ? 'check' : 'person_add'}</span>
-                    {isFollowing ? 'Following' : 'Follow'}
+                    <span className="material-symbols-outlined text-[16px] font-black">{isFollowing ? 'check' : 'person_add'}</span>
+                    {isFollowing ? 'FOLLOWER' : 'SYNC_FOLLOW'}
                 </button>
                 <button 
                     onClick={handleConnectionRequest}
                     disabled={isPending}
-                    className={`p-3.5 rounded-2xl transition-all active:scale-90 border border-stone-200/5 shadow-sm flex items-center justify-center ${
+                    className={`w-12 h-12 neo-border transition-all active:translate-y-1 active:shadow-none flex items-center justify-center ${
                         isConnected 
-                        ? 'bg-stone-100 text-primary' 
-                        : 'bg-surface-container-high text-on-surface-variant hover:text-primary hover:bg-stone-200'
+                        ? 'bg-accent text-black shadow-none' 
+                        : 'bg-white text-black shadow-[4px_4px_0px_0px_#000] hover:bg-lime-400'
                     } disabled:opacity-50`}
                 >
-                    <span className="material-symbols-outlined text-[20px]">
+                    <span className="material-symbols-outlined text-[20px] font-black">
                         {isConnected ? 'chat' : isPending ? 'pending' : isPendingFromThem ? 'how_to_reg' : 'add'}
                     </span>
                 </button>
             </div>
         </div>
+
     )
 }
 

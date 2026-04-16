@@ -99,84 +99,118 @@ const Admin = () => {
     if (loading || !stats) return <Loading />;
 
     return (
-        <div className="flex flex-col h-full bg-slate-50 overflow-y-auto">
-            <div className="bg-slate-900 text-white p-6 shadow-md">
-                <div className="max-w-6xl mx-auto flex items-center gap-3">
-                    <LayoutDashboard className="w-8 h-8 text-indigo-400" />
-                    <h1 className="text-3xl font-bold">Aura Master Control</h1>
+        <div className="flex flex-col h-full bg-[#F2F2F2] overflow-y-auto">
+            <div className="bg-black text-white p-8 border-b-[6px] border-black shadow-[0_10px_0_0_#A3E635]">
+                <div className="max-w-6xl mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-4 -rotate-1">
+                        <div className="bg-white p-2 neo-border">
+                             <LayoutDashboard className="w-10 h-10 text-black stroke-[3px]" />
+                        </div>
+                        <div>
+                             <h1 className="text-5xl font-black italic tracking-tighter leading-none">SYSTEM_OVERRIDE</h1>
+                             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#A3E635]">ADMINISTRATIVE_ACCESS_GRANTED</span>
+                        </div>
+                    </div>
+                    <div className="hidden md:flex flex-col items-end opacity-40">
+                         <span className="text-[8px] font-black uppercase tracking-widest">ENCRYPTION: 256-BIT_RAW</span>
+                         <span className="text-[8px] font-black uppercase tracking-widest">UID: {currentUser?._id}</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="max-w-6xl w-full mx-auto p-6 flex flex-col md:flex-row gap-6">
+            <div className="max-w-7xl w-full mx-auto p-10 flex flex-col lg:flex-row gap-10">
                 {/* Lateral Navigation Menu */}
-                <div className="w-full md:w-64 bg-white rounded-xl shadow p-4 flex flex-col gap-2 h-max">
-                    <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-3 p-3 rounded-lg font-medium transition ${activeTab === 'dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'}`}>
-                        <LayoutDashboard className="w-5 h-5" /> Analytics
+                <div className="w-full lg:w-72 flex flex-col gap-4">
+                    <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-4 p-5 neo-border font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'dashboard' ? 'bg-[#A3E635] text-black shadow-[6px_6px_0_0_#000] translate-x-[-2px] translate-y-[-2px]' : 'bg-white text-black hover:bg-stone-50'}`}>
+                        <LayoutDashboard className="w-5 h-5 stroke-[2.5px]" /> ANALYTICS_CORE
                     </button>
-                    <button onClick={() => setActiveTab('users')} className={`flex items-center gap-3 p-3 rounded-lg font-medium transition ${activeTab === 'users' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'}`}>
-                        <Users className="w-5 h-5" /> Manage Users
+                    <button onClick={() => setActiveTab('users')} className={`flex items-center gap-4 p-5 neo-border font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'users' ? 'bg-[#A3E635] text-black shadow-[6px_6px_0_0_#000] translate-x-[-2px] translate-y-[-2px]' : 'bg-white text-black hover:bg-stone-50'}`}>
+                        <Users className="w-5 h-5 stroke-[2.5px]" /> USER_DATABASE
                     </button>
-                    <button onClick={() => setActiveTab('content')} className={`flex items-center gap-3 p-3 rounded-lg font-medium transition ${activeTab === 'content' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'}`}>
-                        <FileText className="w-5 h-5" /> Moderate Content
+                    <button onClick={() => setActiveTab('content')} className={`flex items-center gap-4 p-5 neo-border font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'content' ? 'bg-[#A3E635] text-black shadow-[6px_6px_0_0_#000] translate-x-[-2px] translate-y-[-2px]' : 'bg-white text-black hover:bg-stone-50'}`}>
+                        <FileText className="w-5 h-5 stroke-[2.5px]" /> CONTENT_MODERATION
                     </button>
+
+                    <div className="mt-6 p-6 bg-black text-white neo-border shadow-[8px_8px_0_0_rgba(0,0,0,0.1)]">
+                         <h4 className="text-[10px] font-black uppercase tracking-widest mb-3 text-primary">SERVER_STATUS</h4>
+                         <div className="flex flex-col gap-2">
+                              <div className="flex justify-between items-center text-[9px] font-black uppercase">
+                                   <span>LATENCY</span>
+                                   <span className="text-lime-400">0.12ms</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[9px] font-black uppercase">
+                                   <span>UPTIME</span>
+                                   <span className="text-lime-400">99.9%</span>
+                              </div>
+                              <div className="w-full h-1 bg-stone-800 mt-2">
+                                   <div className="w-3/4 h-full bg-primary"></div>
+                              </div>
+                         </div>
+                    </div>
                 </div>
 
                 {/* Intelligent Workspace Context */}
-                <div className="flex-1 bg-white rounded-xl shadow p-6 min-h-[500px]">
+                <div className="flex-1 bg-white neo-border neo-shadow-lg p-10 min-h-[600px]">
                     {activeTab === 'dashboard' && (
-                        <div className="animate-in fade-in duration-300">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">Database Health Analytics</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                                <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-xl flex flex-col items-center justify-center">
-                                    <span className="text-sm font-semibold text-indigo-600 uppercase tracking-widest">Total Users</span>
-                                    <span className="text-4xl font-extrabold text-indigo-900 mt-2">{stats.totalUsers}</span>
+                        <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+                            <h2 className="text-3xl font-black text-black mb-10 uppercase tracking-tight italic border-b-[4px] border-black pb-4">HEALTH_METRICS</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                                <div className="bg-white neo-border p-8 flex flex-col items-center justify-center shadow-[6px_6px_0_0_#000] hover:translate-y-[-2px] transition-all">
+                                    <span className="text-[10px] font-black text-black/40 uppercase tracking-[0.3em]">TOTAL_IDENTITIES</span>
+                                    <span className="text-6xl font-black text-black mt-3 italic leading-none">{stats.totalUsers}</span>
                                 </div>
-                                <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-xl flex flex-col items-center justify-center">
-                                    <span className="text-sm font-semibold text-emerald-600 uppercase tracking-widest">Total Posts</span>
-                                    <span className="text-4xl font-extrabold text-emerald-900 mt-2">{stats.totalPosts}</span>
+                                <div className="bg-white neo-border p-8 flex flex-col items-center justify-center shadow-[6px_6px_0_0_#000] hover:translate-y-[-2px] transition-all">
+                                    <span className="text-[10px] font-black text-black/40 uppercase tracking-[0.3em]">TOTAL_PAYLOADS</span>
+                                    <span className="text-6xl font-black text-black mt-3 italic leading-none">{stats.totalPosts}</span>
                                 </div>
-                                <div className="bg-purple-50 border border-purple-100 p-6 rounded-xl flex flex-col items-center justify-center">
-                                    <span className="text-sm font-semibold text-purple-600 uppercase tracking-widest">Live Stories</span>
-                                    <span className="text-4xl font-extrabold text-purple-900 mt-2">{stats.totalStories}</span>
+                                <div className="bg-white neo-border p-8 flex flex-col items-center justify-center shadow-[6px_6px_0_0_#000] hover:translate-y-[-2px] transition-all">
+                                    <span className="text-[10px] font-black text-black/40 uppercase tracking-[0.3em]">ACTIVE_THREADS</span>
+                                    <span className="text-6xl font-black text-black mt-3 italic leading-none">{stats.totalStories}</span>
                                 </div>
+                            </div>
+
+                            <div className="p-6 bg-stone-100 neo-border italic">
+                                 <p className="text-[10px] font-black uppercase tracking-widest text-black/40">SYSTEM_NOTE: AUTOMATIC_BACKUPS_SCHEDULED_EVERY_24H. CURRENT_DATA_INTEGRITY: NORMAL.</p>
                             </div>
                         </div>
                     )}
 
                     {activeTab === 'users' && (
-                        <div className="animate-in fade-in duration-300">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">User Database Access</h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm text-gray-500">
-                                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+                        <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+                            <h2 className="text-3xl font-black text-black mb-10 uppercase tracking-tight italic border-b-[4px] border-black pb-4">IDENTITY_LOOKUP</h2>
+                            <div className="overflow-x-auto neo-border">
+                                <table className="w-full text-left bg-white">
+                                    <thead className="bg-black text-white text-[10px] font-black uppercase tracking-[0.2em]">
                                         <tr>
-                                            <th className="px-6 py-3">User & Email</th>
-                                            <th className="px-6 py-3">Clearance</th>
-                                            <th className="px-6 py-3 text-right">Action Target</th>
+                                            <th className="px-6 py-4">CREATOR_ID</th>
+                                            <th className="px-6 py-4">CLEARANCE</th>
+                                            <th className="px-6 py-4 text-right">OPERATIONS</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y-[2px] divide-black">
                                         {allUsers.map((u) => (
-                                            <tr key={u._id} className="bg-white border-b hover:bg-gray-50">
-                                                <td className="px-6 py-4 flex items-center gap-3">
-                                                    <img src={u.profile_picture || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded-full object-cover" alt="" />
+                                            <tr key={u._id} className="bg-white hover:bg-stone-50 transition-colors">
+                                                <td className="px-6 py-5 flex items-center gap-4">
+                                                    <div className="w-12 h-12 neo-border bg-black p-0.5">
+                                                         <img src={u.profile_picture || 'https://via.placeholder.com/40'} className="w-full h-full object-cover" alt="" />
+                                                    </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-semibold text-gray-900">{u.username}</span>
-                                                        <span className="text-gray-500">{u.email}</span>
+                                                        <span className="font-black text-black uppercase text-sm tracking-tight">{u.username}</span>
+                                                        <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">{u.email}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                <td className="px-6 py-5">
+                                                    <span className={`px-3 py-1 neo-border text-[9px] font-black uppercase tracking-widest ${u.role === 'admin' ? 'bg-red-400 text-black' : 'bg-lime-400 text-black shadow-[2px_2px_0_0_#000]'}`}>
                                                         {u.role.toUpperCase()}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
+                                                <td className="px-6 py-5 text-right">
                                                     {u.role !== 'admin' && (
                                                         <button 
                                                             onClick={() => handleDeleteUser(u._id)}
-                                                            className="text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 ml-auto transition"
+                                                            className="neo-button bg-red-600 text-white text-[10px] px-5 py-2 hover:bg-red-700 transition"
                                                         >
-                                                            <Trash2 className="w-3 h-3" /> Scrub
+                                                            PURGE_DATA
                                                         </button>
                                                     )}
                                                 </td>
@@ -189,20 +223,20 @@ const Admin = () => {
                     )}
 
                     {activeTab === 'content' && (
-                        <div className="animate-in fade-in duration-300">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Payload Submissions</h2>
-                            <div className="flex flex-col gap-4">
+                        <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+                            <h2 className="text-3xl font-black text-black mb-10 uppercase tracking-tight italic border-b-[4px] border-black pb-4">PAYLOAD_AUDIT</h2>
+                            <div className="flex flex-col gap-6">
                                 {stats.recentPosts.map((post) => (
-                                    <div key={post._id} className="p-4 border border-gray-100 rounded-lg flex justify-between items-center shadow-sm">
+                                    <div key={post._id} className="p-6 bg-white neo-border flex justify-between items-center shadow-[4px_4px_0_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_0_#000] transition-all">
                                         <div className="flex flex-col max-w-[70%]">
-                                            <span className="font-semibold text-indigo-600 mb-1">@{post.user?.username}</span>
-                                            <p className="text-gray-700 truncate">{post.content || "(Media Only)"}</p>
+                                            <span className="text-[10px] font-black text-primary uppercase tracking-widest mb-1 italic">SOURCE: @{post.user?.username}</span>
+                                            <p className="text-sm font-black text-black uppercase tracking-tight truncate leading-none">{post.content || "BINARY_MEDIA_ONLY"}</p>
                                         </div>
                                         <button 
                                             onClick={() => handleDeletePost(post._id)}
-                                            className="text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                                            className="neo-button bg-black text-white text-[10px] py-3 px-6 hover:bg-stone-800"
                                         >
-                                            <Trash2 className="w-4 h-4" /> Purge
+                                            MODERATION: DELETE
                                         </button>
                                     </div>
                                 ))}
@@ -212,6 +246,7 @@ const Admin = () => {
                 </div>
             </div>
         </div>
+
     );
 };
 

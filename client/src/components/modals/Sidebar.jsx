@@ -1,9 +1,9 @@
 import React from 'react'
+import { assets } from '../../assets/assets'
 import { Link, useNavigate } from 'react-router-dom'
 import MenuItems from './MenuItems'
 import { useClerk } from '../../mockClerk'
 import { useSelector } from 'react-redux'
-import { LogOut, PlusSquare, Smartphone, Zap, Activity, Cpu, ShieldCheck } from 'lucide-react'
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate()
@@ -11,97 +11,60 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const { signOut } = useClerk()
 
   return (
-    <aside className={`fixed lg:sticky top-0 left-0 h-screen w-full lg:w-[300px] xl:w-[340px] bg-white border-r-[6px] border-black flex flex-col p-6 z-[100] transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} selection:bg-main selection:text-black`}>
-      
-      {/* ⚡ BRANDING SECTION */}
-      <div className="mb-14 cursor-pointer group" onClick={() => navigate('/')}>
-        <div className="neo-box bg-main px-5 py-3 -rotate-1 group-hover:rotate-0 neo-transition mb-4 border-b-8">
-           <h1 className="text-5xl font-black italic tracking-tighter leading-none uppercase">GALLERY_OS</h1>
-        </div>
-        <div className="flex items-center justify-between px-1">
-           <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-black rounded-full animate-pulse" />
-              <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black">STRIKE_MODE_ACTIVE</span>
-           </div>
-           <span className="font-mono text-[9px] font-black bg-black text-white px-2 py-0.5">V7.1.5</span>
-        </div>
+    <aside className={`fixed left-0 top-0 h-screen w-64 lg:w-[280px] xl:w-[320px] bg-[#F2F2F2] border-r-[6px] border-black flex flex-col p-8 gap-10 z-50 transition-transform duration-300 ease-in-out max-lg:${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative`}>
+      {/* Branding */}
+      <div className="flex flex-col gap-1 -rotate-2">
+        <h1 
+          onClick={() => navigate('/')}
+          className="text-6xl font-black text-black italic tracking-tighter cursor-pointer leading-none hover:rotate-0 transition-transform"
+        >
+          AURA.NET
+        </h1>
+        <div className="bg-black text-[10px] font-black tracking-widest uppercase text-white px-2 py-0.5 w-fit">CORE_SOCIAL_X</div>
       </div>
 
-      {/* ⚡ PRIMARY INTERFACE NODES */}
-      <div className="flex flex-col gap-4 flex-1">
-        <div className="px-2 flex items-center justify-between">
-          <span className="font-mono text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">INTERFACE_STATIONS</span>
-          <Activity className="w-3 h-3 text-black/20" />
-        </div>
+      {/* Primary Navigation */}
+      <nav className="flex flex-col gap-6 flex-1 pt-4">
+        <MenuItems setSidebarOpen={setSidebarOpen} />
         
-        <nav className="flex flex-col gap-3">
-          <MenuItems setSidebarOpen={setSidebarOpen} />
-          
-          <Link to='/create-post' 
-            onClick={() => setSidebarOpen(false)}
-            className='neo-button bg-accent w-full mt-6 group py-4 relative group'
-          >
-            <PlusSquare className="w-6 h-6 group-hover:rotate-90 neo-transition" strokeWidth={3} />
-            <span className="font-black text-lg uppercase italic">TRANSMIT_DATA</span>
-            <div className="absolute right-3 top-3 w-2 h-2 bg-black rounded-full opacity-0 group-hover:opacity-100 neo-transition" />
-          </Link>
-        </nav>
+        {/* Create Action */}
+        <Link to='/create-post' 
+          onClick={() => setSidebarOpen(false)}
+          className='neo-button bg-accent mt-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none'
+        >
+          <span className="material-symbols-outlined text-[24px] font-black">add_box</span>
+          <span className="text-sm font-black uppercase tracking-widest">INITIALIZE_POST</span>
+        </Link>
+      </nav>
 
-        {/* ⚡ SYSTEM TELEMETRY */}
-        <div className="mt-12 space-y-4">
-           <div className="px-2">
-             <span className="font-mono text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">HARDWARE_STATUS</span>
-           </div>
-           <div className="grid grid-cols-2 gap-4">
-              <div className="neo-box bg-gray-soft p-3 flex flex-col gap-1">
-                 <div className="flex items-center gap-2">
-                    <Cpu className="w-3 h-3" />
-                    <span className="font-mono text-[8px] font-black">LOAD</span>
-                 </div>
-                 <span className="font-mono text-xs font-black">24.2%</span>
-              </div>
-              <div className="neo-box bg-gray-soft p-3 flex flex-col gap-1">
-                 <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-3 h-3" />
-                    <span className="font-mono text-[8px] font-black">SECURE</span>
-                 </div>
-                 <span className="font-mono text-xs font-black">TRUE</span>
-              </div>
-           </div>
-        </div>
-      </div>
-
-      {/* ⚡ IDENTITY GATEWAY */}
-      <div className='mt-auto pt-8'>
-        <div className="neo-box bg-white overflow-hidden flex flex-col group/user border-t-8">
-          <div 
-            className="p-5 flex items-center gap-4 cursor-pointer hover:bg-main/10 neo-transition"
-            onClick={() => navigate(`/profile/${user?._id}`)}
-          >
-            <div className="w-14 h-14 neo-box overflow-hidden bg-accent -rotate-3 group-hover/user:rotate-0 neo-transition">
-              <img 
-                className="w-full h-full object-cover grayscale group-hover/user:grayscale-0" 
-                src={user?.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} 
-                alt={user?.full_name}
-              />
-            </div>
-            <div className="flex flex-col flex-1 overflow-hidden">
-              <span className="text-lg font-black uppercase italic truncate leading-none mb-1">@{user?.username || 'GUEST'}</span>
-              <span className="font-mono text-[9px] font-black text-black/40 truncate">UID_{user?._id?.slice(-8).toUpperCase()}</span>
-            </div>
+      {/* Profile Section */}
+      <div className='mt-auto p-4 neo-border bg-white flex items-center justify-between group cursor-pointer hover:translate-y-[-2px] transition-all shadow-[6px_6px_0px_0px_#000]' onClick={() => navigate('/profile')}>
+        <div className="flex items-center gap-4">
+          <div className="neo-border p-0.5 bg-black rotate-3 group-hover:rotate-0 transition-transform">
+            <img 
+              className="w-12 h-12 object-cover" 
+              src={user?.profile_picture || assets.sample_profile} 
+              onError={(e) => { e.target.src = assets.sample_profile }}
+              alt=""
+            />
           </div>
-
-          <button 
-            onClick={(e) => { e.stopPropagation(); signOut(); }}
-            className="bg-black text-white py-3 text-xs font-black uppercase tracking-[0.2em] hover:bg-secondary neo-transition flex items-center justify-center gap-3"
-          >
-            <LogOut className="w-4 h-4" strokeWidth={3} />
-            DISCONNECT_SESSION
-          </button>
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-[11px] font-black text-black truncate leading-none uppercase tracking-tighter">{user?.full_name}</span>
+            <span className="text-[9px] text-black/40 font-black uppercase tracking-widest truncate mt-1">@{user?.username}</span>
+          </div>
         </div>
+        <button 
+          onClick={(e) => { e.stopPropagation(); signOut(); }}
+          className="w-10 h-10 neo-border bg-stone-100 flex items-center justify-center hover:bg-black hover:text-white transition-all active:scale-90"
+        >
+          <span className="material-symbols-outlined text-[20px] font-black">logout</span>
+        </button>
       </div>
     </aside>
+
   )
 }
 
 export default Sidebar
+
+

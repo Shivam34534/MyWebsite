@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
+import moment from 'moment'
 import StoryModel from './StoryModel'
 import StoryViewer from './StoryViewer'
 import api from '../../api/axios'
-import { useAuth } from '../../mockClerk'
+import { useUser, useAuth } from '../../mockClerk'
 import toast from 'react-hot-toast'
+import { assets } from '../../assets/assets'
 import { useSelector } from 'react-redux'
 
 const StoriesBar = () => {
@@ -16,15 +18,23 @@ const StoriesBar = () => {
 
     const fetchStories = async () => {
         try {
-            const token = await getToken()
-            const { data } = await api.get('/api/story/all', { 
-                headers: { Authorization: `Bearer ${token}` } 
-            })
+            let token
+            try {
+                token = await getToken()
+            } catch (e) {
+                // Handle token fetch error if needed
+            }
+
+            const headers = token ? { Authorization: `Bearer ${token}` } : {}
+            const { data } = await api.get('/api/story/all', { headers })
             if (data.success) {
                 setStories(data.stories)
+            } else {
+                toast.error(data.message || 'Failed to fetch stories')
             }
         } catch (error) {
             console.error('Error fetching stories:', error)
+            toast.error(error.response?.data?.message || 'Failed to fetch stories')
         }
     }
 
@@ -55,44 +65,48 @@ const StoriesBar = () => {
     })
 
     return (
-        <section className="flex gap-6 overflow-x-auto no-scrollbar py-6 px-1">
-            {/* ⚡ Your Identity Node */}
+        <section className="flex gap-6 overflow-x-auto no-scrollbar py-2 px-1">
+            {/* Your Story */}
             <div onClick={() => setShowModel(true)} className="flex flex-col items-center gap-3 flex-shrink-0 cursor-pointer group">
-                <div className="relative w-16 h-16 neo-box bg-white overflow-hidden rotate-2 group-hover:rotate-0 neo-transition">
-                    <img 
-                        className="w-full h-full object-cover grayscale opacity-40 group-hover:opacity-100 neo-transition" 
-                        src={user?.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} 
-                        alt="Your Story" 
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="neo-box bg-main p-1.5 rotate-[-10deg] group-hover:rotate-0 neo-transition border-[3px]">
-                            <Plus className="w-5 h-5 text-black" strokeWidth={5} />
-                        </div>
+                <div className="relative w-16 h-16 neo-border bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] group-hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    <div className="w-full h-full overflow-hidden flex items-center justify-center">
+                        <img 
+                            className="w-full h-full object-cover opacity-60" 
+                            src={user?.profile_picture || assets.sample_profile} 
+                            onError={(e) => { e.target.src = assets.sample_profile }}
+                            alt="Your Story" 
+                        />
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 bg-primary neo-border w-7 h-7 flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+                        <Plus size={16} strokeWidth={4} />
                     </div>
                 </div>
-                <span className="font-mono text-[9px] font-black text-black/50 uppercase tracking-[0.2em] italic">YOU_ID</span>
+                <span className="text-[10px] font-black text-black truncate w-16 text-center tracking-widest uppercase italic">YOU</span>
             </div>
 
-            {/* ⚡ Other Identity Nodes */}
+            {/* Other Stories */}
             {
                 storiesByUser.map((group, index) => (
                     <div onClick={() => setViewStory(group.stories)} key={index} className="flex flex-col items-center gap-3 flex-shrink-0 cursor-pointer group">
-                        <div className="relative w-16 h-16 neo-box bg-white overflow-hidden -rotate-2 group-hover:rotate-0 neo-transition p-1">
-                           <div className="absolute top-1 right-1 z-10">
-                               <div className="w-2 h-2 bg-secondary rounded-full animate-pulse border border-black" />
-                           </div>
-                           <img 
-                               className="w-full h-full object-cover grayscale group-hover:grayscale-0 neo-transition border-2 border-black" 
-                               src={group.user.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${group.user.username}`} 
-                               alt={group.user.full_name} 
-                           />
+                        <div className="w-16 h-16 neo-border bg-black p-0.5 shadow-[4px_4px_0px_0px_#A3E635] group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] group-hover:shadow-[6px_6px_0px_0px_#A3E635] transition-all">
+                            <div className="w-full h-full overflow-hidden bg-white">
+                                <img 
+                                    className="w-full h-full object-cover" 
+                                    src={group.user.profile_picture || assets.sample_profile} 
+                                    onError={(e) => { e.target.src = assets.sample_profile }}
+                                    alt={group.user.full_name} 
+                                />
+                            </div>
                         </div>
-                        <span className="text-[10px] font-black text-black uppercase tracking-tighter truncate w-16 text-center italic">@{group.user.username}</span>
+                        <span className="text-[10px] font-black text-black truncate w-16 text-center uppercase tracking-tighter italic">@{group.user.username}</span>
                     </div>
                 ))
             }
 
+            {/* Add Story Model */}
             {showModel && <StoryModel setShowModel={setShowModel} fetchStories={fetchStories} />}
+            
+            {/* View Story Modal */}
             {viewStory && <StoryViewer stories={viewStory} setViewStory={setViewStory} />}
         </section>
     )

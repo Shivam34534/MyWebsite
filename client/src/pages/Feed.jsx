@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { assets } from '../assets/assets'
 import StoriesBar from '../components/modals/StoriesBar'
 import PostCard from '../components/modals/PostCard'
 import PostSkeleton from '../components/modals/PostSkeleton'
@@ -8,15 +9,17 @@ import { useAuth } from '../mockClerk'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { TrendingUp, Users, Archive, Compass, Search } from 'lucide-react'
 
 const Feed = () => {
     const navigate = useNavigate()
     const user = useSelector((state) => state.user.value)
     const { getToken } = useAuth()
 
+    // Feed State
     const [feeds, setfeeds] = useState([])
     const [loading, setLoading] = useState(true)
+    
+    // Pagination State
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -38,10 +41,11 @@ const Feed = () => {
                 }
                 setHasMore(data.hasMore);
             } else {
-                toast.error('FEED_FETCH_ERROR')
+                toast.error(data.message || 'Failed to fetch posts')
             }
         } catch (error) {
-            toast.error('NETWORK_PROTOCOL_ERROR')
+            console.error('Error fetching feeds:', error)
+            toast.error(error.response?.data?.message || 'Failed to fetch posts')
         } finally {
             setLoading(false)
             setLoadingMore(false)
@@ -53,38 +57,32 @@ const Feed = () => {
     }, [])
 
     return (
-        <div className='flex flex-col xl:flex-row gap-8 min-h-screen'>
-            {/* 📸 MAIN VIEWPORT */}
-            <div className="flex-1 flex flex-col gap-8 max-w-4xl">
-                
-                {/* ⚡ Stories Sector */}
-                <div className='neo-box bg-white p-6 rotate-1'>
-                    <div className="flex items-center gap-2 mb-4 border-b-2 border-black pb-2">
-                        <Users className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Active_Identities</span>
-                    </div>
+        <div className='flex justify-center max-w-[1400px] mx-auto min-h-screen'>
+            {/* 📸 Main Feed Stage */}
+            <div className="w-full max-w-[640px] px-4 md:px-8 py-8 lg:py-12 flex flex-col gap-8">
+                {/* Stories Section with Neo Border */}
+                <div className='bg-white neo-border neo-shadow p-4 lg:p-6'>
                     <StoriesBar />
                 </div>
 
-                {/* ⚡ Content Stream */}
-                <div className="flex flex-col gap-12">
+                {/* Post Stream */}
+                <section className="flex flex-col gap-8 md:gap-12 pb-12">
                     {loading ? (
                         [1, 2, 3].map((i) => <PostSkeleton key={i} />)
                     ) : feeds.length === 0 ? (
-                        <div className="neo-box bg-white p-12 text-center flex flex-col items-center gap-6 border-dashed">
-                            <div className='neo-box bg-accent p-6 -rotate-6'>
-                                <Archive className="w-12 h-12" />
+                        <div className="flex flex-col items-center justify-center py-20 text-center gap-6 bg-white neo-border neo-shadow-lg">
+                            <div className='w-20 h-20 neo-border bg-accent flex items-center justify-center -rotate-3'>
+                                <span className="material-symbols-outlined text-5xl text-black">image_search</span>
                             </div>
-                            <div>
-                                <h3 className="text-4xl font-black uppercase tracking-tighter italic">EMPTY_ARCHIVE</h3>
-                                <p className='font-bold text-black/60 uppercase text-xs mt-2'>Your gallery hasn't been populated with any data yet.</p>
+                            <div className='space-y-2'>
+                                <h3 className="text-3xl font-black">FEED IS EMPTY!</h3>
+                                <p className='text-sm font-bold uppercase tracking-tight max-w-[280px]'>Join the community and start following the vibes.</p>
                             </div>
                             <button 
                                 onClick={() => navigate('/discover')}
-                                className="neo-button bg-main px-8 py-3"
+                                className="neo-button bg-primary"
                             >
-                                <Search className="w-5 h-5 mr-2" />
-                                SCAN_DISCOVER
+                                EXPLORE NOW
                             </button>
                         </div>
                     ) : (
@@ -93,9 +91,9 @@ const Feed = () => {
                         ))
                     )}
 
-                    {/* Infinite Exploration */}
+                    {/* Infinite Exploration Handler */}
                     {hasMore && feeds.length > 0 && !loading && (
-                        <div className='flex justify-center pb-12'>
+                        <div className='flex justify-center pt-4 pb-12'>
                             <button 
                                 onClick={() => {
                                     const next = page + 1;
@@ -103,86 +101,88 @@ const Feed = () => {
                                     fetchFeeds(next);
                                 }} 
                                 disabled={loadingMore}
-                                className='neo-button-secondary py-4 px-12 text-lg'
+                                className='neo-button bg-black text-white hover:bg-stone-800'
                             >
-                                {loadingMore ? "RETRIEVING_DATA..." : "ACCESS_ARCHIVE_LEVEL_0" + (page + 1)}
+                                {loadingMore ? "LOADING..." : "LOAD MORE"}
                             </button>
                         </div>
                     )}
-                </div>
+                </section>
             </div>
 
-            {/* 💎 DATA SIDEBAR */}
-            <aside className="w-full xl:w-[380px] flex flex-col gap-8 sticky top-8 h-fit">
-                
-                {/* ⚡ Personal Node */}
-                <div className="neo-box bg-white p-6 flex items-center justify-between group cursor-pointer hover:-translate-y-1 neo-transition" onClick={() => navigate('/profile')}>
-                    <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 neo-box bg-main overflow-hidden -rotate-3 group-hover:rotate-0 neo-transition">
+            {/* ⚡ Neo Sidebar (Desktop Only) */}
+            <aside className="hidden xl:flex w-[400px] flex-col gap-8 p-10 h-screen sticky top-0 overflow-y-auto no-scrollbar">
+                {/* User Identity Card */}
+                <div className="neo-card bg-secondary rotate-1 flex items-center justify-between gap-4 p-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <div 
+                        onClick={() => navigate('/profile')}
+                        className="flex items-center gap-4 cursor-pointer group"
+                    >
+                        <div className="neo-border bg-white p-0.5">
                             <img 
-                                className="w-full h-full object-cover" 
-                                src={user?.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} 
+                                className="w-12 h-12 object-cover" 
+                                src={user?.profile_picture || assets.sample_profile} 
+                                onError={(e) => { e.target.src = assets.sample_profile }}
                                 alt={user?.full_name} 
                             />
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-black uppercase text-base italic tracking-tighter">@{user?.username}</span>
-                            <span className="text-[10px] font-bold text-black/50 uppercase">{user?.full_name}</span>
+                            <span className="font-black text-sm uppercase tracking-tighter leading-none">@{user?.username}</span>
+                            <span className="text-[10px] font-bold text-black/60 uppercase tracking-widest">{user?.full_name}</span>
                         </div>
                     </div>
-                    <div className="neo-box bg-black px-2 py-1 rotate-6">
-                        <span className="text-white text-[10px] font-black uppercase">CURATOR</span>
-                    </div>
+                    <div className="bg-black text-white text-[10px] font-black px-2 py-1 neo-border">VIP</div>
                 </div>
 
-                {/* ⚡ Recent Transmissions */}
-                <div className="neo-box bg-white p-6">
-                    <div className="flex items-center justify-between mb-6 border-b-2 border-black pb-2">
-                        <h4 className="font-black text-xs uppercase tracking-widest">RECENT_MESSAGES</h4>
-                        <Compass className="w-4 h-4" />
+                {/* Suggestions Section */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                        <h4 className="text-xl font-black uppercase tracking-tighter italic">HOT MESSAGES</h4>
+                        <button onClick={() => navigate('/messages')} className="text-xs font-black underline hover:text-primary transition-colors">GO TO INBOX</button>
                     </div>
-                    <div className="p-2 border-2 border-black bg-[#f0f0f0] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div className='bg-white neo-border p-4 shadow-[4px_4px_0px_0px_#000]'>
                         <RecentMessages />
                     </div>
                 </div>
 
-                {/* ⚡ Trending Protocols */}
-                <div className="neo-box bg-white p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                        <TrendingUp className="w-5 h-5" />
-                        <h4 className="font-black text-xs uppercase tracking-widest">TRENDING_PROTOCOLS</h4>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4">
-                        <div className="neo-box bg-secondary p-4 hover:rotate-1 neo-transition cursor-pointer group">
-                            <span className="text-[10px] uppercase font-black text-white/60 mb-1 block">RANK_01</span>
-                            <h5 className="font-black text-xl text-white italic tracking-tighter">#NEO_BRUTALISM</h5>
-                            <p className="text-[10px] text-white/80 font-bold mt-2 uppercase">12.4K ACTIVE_NODES</p>
+                {/* Trending (Neo-Brutalism Style) */}
+                <div className="space-y-4">
+                    <h4 className="text-xl font-black uppercase tracking-tighter italic">TOP TRENDS</h4>
+                    <div className="grid grid-cols-1 gap-3">
+                        <div className="neo-border bg-accent p-5 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer">
+                            <h5 className="text-2xl font-black italic">#NEO_REVOLUTION</h5>
+                            <p className="text-xs font-bold mt-2 uppercase">12.4K BRUTALISTS ACTIVE</p>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="neo-box bg-accent p-4 cursor-pointer hover:scale-105 neo-transition">
-                                <h5 className="font-black text-sm uppercase">#MINIMAL</h5>
-                                <p className="text-[9px] font-bold text-black/50">8.2K ENTRIES</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="neo-border bg-tertiary p-4 cursor-pointer hover:bg-yellow-400 transition-colors">
+                                <h5 className="text-sm font-black">#RAW_ART</h5>
+                                <p className="text-[10px] font-bold opacity-60">5.2K POSTS</p>
                             </div>
-                            <div className="neo-box bg-white p-4 cursor-pointer hover:scale-105 neo-transition">
-                                <h5 className="font-black text-sm uppercase">#RAW_DATA</h5>
-                                <p className="text-[9px] font-bold text-black/50">3.1K ENTRIES</p>
+                            <div className="neo-border bg-lime-400 p-4 cursor-pointer hover:bg-lime-500 transition-colors">
+                                <h5 className="text-sm font-black">#AURA_VIBE</h5>
+                                <p className="text-[10px] font-bold opacity-60">8.9K POSTS</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* ⚡ Legal Protocols */}
-                <footer className="opacity-40 hover:opacity-100 transition-opacity p-4">
-                    <div className="flex flex-wrap gap-4 mb-4">
-                        {['PRIVACY', 'TERMS', 'API', 'ARCHIVE'].map(link => (
-                            <a key={link} className="text-[10px] font-black underline hover:text-secondary" href="#">{link}</a>
+                {/* Minimal Footer */}
+                <footer className="mt-auto py-8">
+                    <nav className="flex flex-wrap gap-x-4 gap-y-2 mb-6">
+                        {['PRIVACY', 'TERMS', 'ARCHIVE', 'ABOUT'].map(link => (
+                            <a key={link} className="text-[10px] font-black tracking-widest hover:text-primary transition-colors hover:underline" href="#">{link}</a>
                         ))}
+                    </nav>
+                    <div className='space-y-1 p-2 bg-black text-white neo-border shadow-[4px_4px_0px_0px_#A3E635]'>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em]">AURA PROTOCOL V3.0</p>
+                        <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">© 2026 UNTAMED DIGITAL LABS</p>
                     </div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.3em]">VERSION_2.0.4_ULTRA</p>
                 </footer>
             </aside>
         </div>
+
     )
 }
 
 export default Feed
+
