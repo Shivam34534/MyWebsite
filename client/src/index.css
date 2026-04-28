@@ -52,11 +52,11 @@
   }
   
   .neo-button {
-    @apply neo-border neo-shadow neo-shadow-hover px-6 py-2 bg-primary font-black uppercase tracking-tight active:translate-x-[2px] active:translate-y-[2px] active:shadow-none inline-flex items-center justify-center gap-2;
+    @apply border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer px-6 py-2 bg-primary font-black uppercase tracking-tight active:translate-x-[2px] active:translate-y-[2px] active:shadow-none inline-flex items-center justify-center gap-2;
   }
 
   .neo-card {
-    @apply neo-border neo-shadow bg-white p-5 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all;
+    @apply border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white p-5 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all;
   }
 
   .material-symbols-outlined {

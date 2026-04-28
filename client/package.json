@@ -24,6 +24,9 @@
     "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.1.13"
   },
+  "overrides": {
+    "math-intrinsics": "1.0.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@types/react": "^19.1.10",
