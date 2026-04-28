@@ -2,17 +2,15 @@ import React from 'react'
 
 const Loading = () => {
   return (
-    <div className='fixed inset-0 flex items-center justify-center bg-[#F2F2F2] z-[200]'>
-        <div className='flex flex-col items-center gap-8'>
-            <div className='bg-primary p-6 neo-border shadow-[8px_8px_0_0_#000] rotate-3 animate-bounce'>
-                <h1 className='text-6xl font-black italic tracking-tighter text-black uppercase leading-none'>
-                    LOADING...
-                </h1>
+    <div className='fixed inset-0 flex items-center justify-center bg-[#F8FAFC] z-[200]'>
+        <div className='flex flex-col items-center gap-6 animate-fade-in'>
+            <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-2xl shadow-primary/40 animate-bounce">
+                <span className="text-white font-black text-4xl italic">A</span>
             </div>
-            <div className='w-64 h-8 neo-border bg-white relative overflow-hidden shadow-[4px_4px_0_0_#000]'>
-                <div className='absolute inset-0 bg-accent w-full animate-[loading-bar_1.5s_infinite_linear] border-r-[4px] border-black'></div>
+            <div className="flex flex-col items-center gap-2">
+              <h2 className="text-xl font-black text-gray-900 tracking-tighter uppercase">Aura</h2>
+              <p className='text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 animate-pulse'>Synchronizing Vibe...</p>
             </div>
-            <p className='text-[10px] font-black uppercase tracking-[0.6em] text-black italic animate-pulse'>SYNCHRONIZING_AURA_PROTOCOLS</p>
         </div>
     </div>
   )

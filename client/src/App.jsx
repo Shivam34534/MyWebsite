@@ -41,14 +41,12 @@ const App = () => {
   
   // A sleek loading spinner to display while chunks are downloading
   const LoadingScreen = () => (
-    <div className='fixed inset-0 flex items-center justify-center bg-yellow-300 z-[200] border-[10px] border-black'>
-        <div className='flex flex-col items-center gap-6'>
-            <div className='neo-card bg-white rotate-2'>
-                <h1 className='text-6xl font-black font-headline tracking-tighter text-black'>
-                    AURA
-                </h1>
+    <div className='fixed inset-0 flex items-center justify-center bg-[#F8FAFC] z-[200]'>
+        <div className='flex flex-col items-center gap-6 animate-fade-in'>
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-2xl shadow-primary/40 animate-bounce">
+                <span className="text-white font-black text-3xl italic">A</span>
             </div>
-            <p className='text-sm font-black uppercase tracking-widest text-black bg-lime-400 px-4 py-1 neo-border neo-shadow -rotate-2'>
+            <p className='text-sm font-bold uppercase tracking-[0.2em] text-gray-400'>
                 Loading the vibe...
             </p>
         </div>
