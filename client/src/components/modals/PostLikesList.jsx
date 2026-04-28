@@ -1,78 +1,66 @@
-import React, { useEffect, useState } from 'react'
-import { X } from 'lucide-react'
-import UserCard from './UserCard'
-import { useSelector } from 'react-redux'
-import { assets } from '../../assets/assets'
-import api from '../../api/axios'
-import { useAuth } from '../../mockClerk'
-import Loading from './Loading'
+import React from 'react'
+import { X, Heart, UserPlus, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
-const PostLikesList = ({ likes, setShowLikes }) => {
-    const currentUser = useSelector((state) => state.user.value)
-    const [likeUsers, setLikeUsers] = useState([])
-    const [loading, setLoading] = useState(true)
-    const { getToken } = useAuth()
+const PostLikesList = ({ likes, onClose }) => {
+  const navigate = useNavigate()
 
-    useEffect(() => {
-        const fetchLikeUsers = async () => {
-            try {
-                const token = await getToken()
-                const headers = token ? { Authorization: `Bearer ${token}` } : {}
-
-                const userPromises = likes.map(async (userId) => {
-                    // Optimized: Check if it's the current user first to avoid API call
-                    if (userId === currentUser?._id) {
-                        return currentUser
-                    }
-                    try {
-                        const { data } = await api.get(`/api/user/profile/${userId}`, { headers })
-                        return data.success ? data.profile : null
-                    } catch (error) {
-                        return null
-                    }
-                })
-
-                const users = await Promise.all(userPromises)
-                setLikeUsers(users.filter(u => u !== null))
-            } catch (error) {
-                console.error("Error fetching like users", error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        if (likes.length > 0) {
-            fetchLikeUsers()
-        } else {
-            setLoading(false)
-        }
-    }, [likes, currentUser, getToken])
-
-
-    return (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-            <div className='bg-white rounded-xl shadow-lg w-full max-w-sm max-h-[80vh] flex flex-col'>
-                <div className='flex items-center justify-between p-4 border-b border-gray-100'>
-                    <h3 className='font-semibold text-lg'>Likes</h3>
-                    <button onClick={() => setShowLikes(false)} className='p-1 hover:bg-gray-100 rounded-full transition'>
-                        <X className='w-5 h-5 text-gray-500' />
-                    </button>
-                </div>
-
-                <div className='overflow-y-auto p-4 flex flex-col gap-3 min-h-40'>
-                    {loading ? (
-                        <Loading height='h-40' />
-                    ) : likeUsers.length > 0 ? (
-                        likeUsers.map((user, index) => (
-                            <UserCard key={user._id || index} user={user} />
-                        ))
-                    ) : (
-                        <p className='text-gray-500 text-center py-4'>No likes yet.</p>
-                    )}
-                </div>
-            </div>
+  return (
+    <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+      <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[70vh]">
+        
+        {/* Header */}
+        <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-white">
+           <div className="flex items-center gap-2">
+              <Heart className="text-secondary fill-current w-5 h-5" />
+              <h3 className="font-black text-gray-900 uppercase tracking-wider text-xs">Likes</h3>
+           </div>
+           <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-50 text-gray-400 transition-all">
+              <X size={20} />
+           </button>
         </div>
-    )
+
+        {/* Likes List */}
+        <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-2">
+           {likes && likes.length > 0 ? (
+             likes.map((likeUser, i) => (
+               <div 
+                  key={i} 
+                  className="flex items-center justify-between p-3 rounded-2xl hover:bg-gray-50 transition-all group cursor-pointer"
+                  onClick={() => { navigate(`/profile/${likeUser._id}`); onClose(); }}
+               >
+                  <div className="flex items-center gap-3">
+                     <img 
+                        src={likeUser.profile_picture || '/default-avatar.png'} 
+                        className="w-11 h-11 rounded-xl object-cover border-2 border-white shadow-sm transition-transform group-hover:scale-105" 
+                        alt="" 
+                     />
+                     <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors truncate">{likeUser.full_name}</span>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">@{likeUser.username}</span>
+                     </div>
+                  </div>
+                  <button className="p-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all">
+                     <UserPlus size={16} />
+                  </button>
+               </div>
+             ))
+           ) : (
+             <div className="text-center py-16 flex flex-col items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center">
+                   <Heart className="text-gray-100 w-7 h-7" />
+                </div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">No likes yet</p>
+             </div>
+           )}
+        </div>
+
+        <div className="p-6 bg-gray-50/50 border-t border-gray-50 text-center">
+            <button onClick={onClose} className="text-[10px] font-black text-gray-400 hover:text-primary uppercase tracking-widest transition-colors">Close</button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default PostLikesList

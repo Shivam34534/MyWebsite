@@ -53,6 +53,40 @@ const Feed = () => {
 
         {/* Sidebar Column (Desktop) */}
         <aside className="hidden xl:block w-80 space-y-6">
+          {/* Profile Summary Card */}
+          <div className="glass-card bg-white p-6 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-secondary to-accent" />
+            <div className="flex items-center gap-4 mb-6">
+              <div className="relative">
+                <img 
+                  src={user?.profile_picture || '/default-avatar.png'} 
+                  className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm transition-transform group-hover:scale-105"
+                  alt=""
+                />
+                <div className="absolute -top-1 -right-1 bg-yellow-400 text-[8px] font-black px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm uppercase tracking-tighter">VIP</div>
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-black text-gray-900 truncate">@{user?.username}</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase truncate">{user?.full_name}</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between py-4 border-t border-gray-50">
+               <div className="text-center flex-1 border-r border-gray-50">
+                  <p className="text-xs font-black text-gray-900">{user?.followers?.length || 0}</p>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Followers</p>
+               </div>
+               <div className="text-center flex-1">
+                  <p className="text-xs font-black text-gray-900">{user?.following?.length || 0}</p>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Following</p>
+               </div>
+            </div>
+            <button className="w-full mt-4 py-2.5 rounded-xl bg-gray-50 text-[10px] font-black text-gray-400 hover:bg-primary/5 hover:text-primary transition-all uppercase tracking-widest">
+               View My Profile
+            </button>
+          </div>
+
+          <RecentMessages />
+
           {/* Trending Card */}
           <div className="glass-card bg-white/50">
             <div className="flex items-center gap-2 mb-6">
@@ -64,28 +98,6 @@ const Feed = () => {
                 <div key={i} className="flex flex-col group cursor-pointer">
                   <span className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors">{tag}</span>
                   <span className="text-[11px] text-gray-400 font-medium">2.4k interactions this hour</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Suggested Users */}
-          <div className="glass-card bg-white/50">
-             <div className="flex items-center gap-2 mb-6">
-              <Users className="w-5 h-5 text-secondary" />
-              <h3 className="font-bold text-gray-900 uppercase tracking-wider text-xs">Who to follow</h3>
-            </div>
-            <div className="space-y-4">
-              {[1, 2, 3].map((_, i) => (
-                <div key={i} className="flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-gray-200" />
-                      <div className="flex flex-col">
-                         <span className="text-xs font-bold text-gray-900 leading-none mb-1">User Name</span>
-                         <span className="text-[10px] text-gray-400">@username</span>
-                      </div>
-                   </div>
-                   <button className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">Follow</button>
                 </div>
               ))}
             </div>

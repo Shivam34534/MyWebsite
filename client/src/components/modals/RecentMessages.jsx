@@ -1,71 +1,74 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import api from '../api/axios'
+import { MessageCircle, ArrowRight } from 'lucide-react'
 import moment from 'moment'
-import api from '../../api/axios.js'
-import { useAuth } from '../../mockClerk.jsx'
-import { assets } from '../../assets/assets.js'
 
 const RecentMessages = () => {
-    const [messages, setMessages] = useState([])
-    const { getToken } = useAuth()
+  const [conversations, setConversations] = useState([])
+  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
-    const fetchRecentMessages = async () => {
-        try {
-            const token = await getToken()
-            const { data } = await api.get('/api/user/recent-messages', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            if (data.success) {
-                setMessages(data.messages)
-            }
-        } catch (error) {
-            console.error('Error fetching recent messages:', error)
+  useEffect(() => {
+    const fetchRecent = async () => {
+      try {
+        const { data } = await api.get('/api/message/conversations')
+        if (data.success) {
+          setConversations(data.data.slice(0, 5)) // Top 5
         }
+      } catch (error) {
+        console.error("Failed to fetch recent messages", error)
+      } finally {
+        setLoading(false)
+      }
     }
+    fetchRecent()
+  }, [])
 
-    useEffect(() => {
-        fetchRecentMessages()
-    }, [])
+  return (
+    <div className="glass-card bg-white/50">
+      <div className="flex items-center justify-between mb-6">
+         <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-primary" />
+            <h3 className="font-bold text-gray-900 uppercase tracking-wider text-xs">Hot Messages</h3>
+         </div>
+         <button onClick={() => navigate('/messages')} className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest flex items-center gap-1">
+            Inbox <ArrowRight size={10} />
+         </button>
+      </div>
 
-    return (
-        <div className="flex flex-col gap-3">
-            {messages.length === 0 ? (
-                <div className="py-8 text-center bg-surface-container-low rounded-2xl border border-outline-variant/10">
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/40">No recent activity</p>
+      <div className="space-y-4">
+        {loading ? (
+          [1,2,3].map(i => <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />)
+        ) : conversations.length > 0 ? (
+          conversations.map((conv) => (
+            <div 
+              key={conv._id}
+              onClick={() => navigate(`/messages/${conv.participant._id}`)}
+              className="flex items-center gap-3 group cursor-pointer"
+            >
+              <img 
+                src={conv.participant.profile_picture || '/default-avatar.png'} 
+                className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm transition-transform group-hover:scale-105" 
+                alt="" 
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                   <span className="text-xs font-bold text-gray-900 truncate group-hover:text-primary transition-colors">{conv.participant.full_name}</span>
+                   <span className="text-[9px] text-gray-400 font-bold uppercase">{moment(conv.lastMessage.createdAt).fromNow(true)}</span>
                 </div>
-            ) : (
-                messages.map((message, index) => {
-                    const fromUser = typeof message.from_user_id === 'object' ? message.from_user_id : {}
-                    return (
-                        <Link 
-                            to={`/messages/${fromUser._id}`} 
-                            key={index} 
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container-low transition-all group"
-                        >
-                            <div className="relative flex-shrink-0">
-                                <img 
-                                    src={fromUser.profile_picture || assets.sample_profile} 
-                                    alt=""
-                                    onError={(e) => { e.target.src = assets.sample_profile }}
-                                    className="w-10 h-10 rounded-full object-cover border-2 border-surface shadow-sm group-hover:scale-105 transition-transform" 
-                                />
-                                {!message.seen && <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-primary border-2 border-surface rounded-full shadow-sm"></div>}
-                            </div>
-                            <div className="flex-1 overflow-hidden">
-                                <div className="flex items-center justify-between">
-                                    <p className="font-headline font-bold text-[13px] text-on-surface truncate group-hover:text-primary transition-colors">{fromUser.full_name}</p>
-                                    <p className="text-[9px] text-on-surface-variant/60 font-bold uppercase whitespace-nowrap ml-2">{moment(message.createdAt).fromNow(true)}</p>
-                                </div>
-                                <p className="text-[11px] text-on-surface-variant/70 truncate font-medium">
-                                    {message.text || 'Shared a media gallery'}
-                                </p>
-                            </div>
-                        </Link>
-                    )
-                })
-            )}
-        </div>
-    )
+                <p className="text-[11px] text-gray-500 truncate">{conv.lastMessage.content}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-6">
+             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No messages yet</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default RecentMessages

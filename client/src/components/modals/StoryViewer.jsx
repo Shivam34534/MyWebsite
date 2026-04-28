@@ -1,163 +1,109 @@
-import React, { useEffect, useState } from 'react'
-import { assets } from '../../assets/assets'
+import React, { useState, useEffect } from 'react'
+import { X, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
+import moment from 'moment'
 
-const StoryViewer = ({ stories, setViewStory }) => {
-    const [currentStoryIndex, setCurrentStoryIndex] = useState(0)
-    const [progress, setProgress] = useState(0)
+const StoryViewer = ({ stories, initialIndex, onClose }) => {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [progress, setProgress] = useState(0)
 
-    const currentStory = stories?.[currentStoryIndex]
+  const currentStory = stories[currentIndex]
 
-    useEffect(() => {
-        let timer = null;
-        let progressInterval = null;
-
-        if (currentStory) {
-            setProgress(0);
-            const duration = currentStory.media_type === 'video' ? 15000 : 8000;
-            const setTime = 100;
-            let elapsed = 0;
-
-            progressInterval = setInterval(() => {
-                elapsed += setTime;
-                setProgress((elapsed / duration) * 100);
-                if (elapsed >= duration) {
-                    clearInterval(progressInterval);
-                }
-            }, setTime);
-
-            timer = setTimeout(() => {
-                handleNext()
-            }, duration);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          handleNext()
+          return 0
         }
+        return prev + 1
+      })
+    }, 50) // 5 seconds total (50ms * 100)
+    return () => clearInterval(timer)
+  }, [currentIndex])
 
-        return () => {
-            if (timer) clearTimeout(timer);
-            if (progressInterval) clearInterval(progressInterval);
-        };
-    }, [currentStory]);
-
-    const handleNext = () => {
-        if (currentStoryIndex < stories.length - 1) {
-            setCurrentStoryIndex(prev => prev + 1)
-            setProgress(0)
-        } else {
-            setViewStory(null)
-        }
+  const handleNext = () => {
+    if (currentIndex < stories.length - 1) {
+      setCurrentIndex(currentIndex + 1)
+      setProgress(0)
+    } else {
+      onClose()
     }
+  }
 
-    const handleClose = () => {
-        setViewStory(null)
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1)
+      setProgress(0)
     }
+  }
 
-    if (!currentStory) return null
-
-    const renderContent = () => {
-        switch (currentStory.media_type) {
-            case 'image':
-                return (
-                    <img 
-                        src={currentStory.media_url} 
-                        alt='' 
-                        className='w-full h-full object-contain md:max-w-[450px] shadow-2xl' 
-                    />
-                );
-            case 'video':
-                return (
-                    <video 
-                        onEnded={handleNext} 
-                        src={currentStory.media_url}
-                        className='w-full h-full object-contain md:max-w-[450px] shadow-2xl' 
-                        controls 
-                        autoPlay 
-                    />
-                );
-            case 'text':
-                return (
-                    <div 
-                        className='w-full h-full flex items-center justify-center p-12 text-white text-3xl font-headline font-bold text-center leading-relaxed'
-                        style={{ backgroundColor: currentStory.background_color || '#8037b1' }}
-                    >
-                        {currentStory.content}
-                    </div>
-                );
-            default:
-                return null;
-        }
-    }
-
-    return (
-        <div className='fixed inset-0 z-[150] bg-black flex flex-col items-center justify-center overflow-hidden animate-in slide-in-from-right-8 duration-500'>
-            {/* Cinematic Progress Segment */}
-            <div className='absolute top-0 left-0 w-full flex gap-1 p-2 z-20'>
-                {stories.map((_, index) => (
-                    <div key={index} className='h-[6px] flex-1 bg-white/20 neo-border border-white/10 overflow-hidden'>
-                        <div 
-                            className={`h-full bg-primary transition-all duration-100 linear ${index < currentStoryIndex ? 'w-full' : index === currentStoryIndex ? '' : 'w-0'}`}
-                            style={{ width: index === currentStoryIndex ? `${progress}%` : undefined }}
-                        />
-                    </div>
-                ))}
+  return (
+    <div className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-xl flex items-center justify-center animate-fade-in">
+      <div className="relative w-full max-w-lg aspect-[9/16] bg-black rounded-[3rem] overflow-hidden shadow-2xl">
+        
+        {/* Progress Bars */}
+        <div className="absolute top-6 left-6 right-6 z-20 flex gap-1.5">
+          {stories.map((_, i) => (
+            <div key={i} className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-white transition-all duration-100 ease-linear"
+                style={{ width: i < currentIndex ? '100%' : i === currentIndex ? `${progress}%` : '0%' }}
+              />
             </div>
-
-            {/* Identity Bar */}
-            <div className='absolute top-12 left-8 z-20 flex items-center gap-5 p-4 bg-white neo-border shadow-[4px_4px_0_0_#000] transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_0_#000]'>
-                <div className='w-12 h-12 neo-border bg-black p-0.5'>
-                    <div className='w-full h-full neo-border border-white overflow-hidden bg-stone-100'>
-                        <img 
-                            src={currentStory.user?.profile_picture || assets.sample_profile} 
-                            onError={(e) => { e.target.src = assets.sample_profile }}
-                            className='w-full h-full object-cover grayscale-[0.2]' 
-                            alt={currentStory.user?.full_name} 
-                        />
-                    </div>
-                </div>
-                <div className='flex flex-col'>
-                    <span className='text-sm font-black text-black tracking-tight uppercase leading-none italic'>{currentStory.user?.full_name}</span>
-                    <span className='text-[8px] font-black text-black/40 uppercase tracking-widest mt-1'>STORY_PROTOCOL_04</span>
-                </div>
-            </div>
-
-            {/* Close Trigger */}
-            <button 
-                onClick={handleClose} 
-                className='absolute top-12 right-8 z-20 w-12 h-12 neo-border bg-white text-black hover:bg-black hover:text-white transition-all active:translate-y-1 active:shadow-none shadow-[4px_4px_0_0_#000]'
-            >
-                <span className="material-symbols-outlined font-black">close</span>
-            </button>
-
-            {/* Media Canvas */}
-            <div className='w-full h-full flex flex-col items-center justify-center relative bg-black shadow-2xl overflow-hidden'>
-                {renderContent()}
-                
-                {/* Story Narration Overlay */}
-                {currentStory.media_type !== 'text' && currentStory.content && (
-                    <div className='absolute bottom-0 left-0 right-0 p-10 bg-black/80 flex items-center justify-center text-center border-t-[6px] border-primary z-10'>
-                        <p className='text-white text-xl md:text-3xl font-black uppercase tracking-tight italic max-w-2xl leading-tight'>
-                            {currentStory.content}
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            {/* Navigation Triggers (Left/Right) */}
-            <div className="absolute inset-0 flex z-10">
-                <div 
-                    onClick={() => {
-                        if (currentStoryIndex > 0) {
-                            setCurrentStoryIndex(prev => prev - 1)
-                            setProgress(0)
-                        }
-                    }}
-                    className="flex-1 cursor-pointer"
-                />
-                <div 
-                    onClick={handleNext}
-                    className="flex-1 cursor-pointer"
-                />
-            </div>
+          ))}
         </div>
 
-    )
+        {/* Header */}
+        <div className="absolute top-10 left-6 right-6 z-20 flex items-center justify-between">
+           <div className="flex items-center gap-3">
+              <img src={currentStory?.user?.profile_picture || '/default-avatar.png'} className="w-10 h-10 rounded-full border-2 border-white object-cover" alt="" />
+              <div className="flex flex-col">
+                 <span className="text-white text-sm font-bold">{currentStory?.user?.full_name}</span>
+                 <span className="text-white/60 text-[10px] font-bold uppercase tracking-tight">{moment(currentStory?.createdAt).fromNow()}</span>
+              </div>
+           </div>
+           <div className="flex items-center gap-2">
+              <button className="p-2 text-white/80 hover:text-white transition-colors"><MoreHorizontal size={20} /></button>
+              <button onClick={onClose} className="p-2 text-white/80 hover:text-white transition-colors"><X size={20} /></button>
+           </div>
+        </div>
+
+        {/* Content */}
+        <div className="w-full h-full flex items-center justify-center p-8 text-center" style={{ background: currentStory?.background_color || '#111' }}>
+           {currentStory?.media_type === 'image' && (
+              <img src={currentStory.media_url} className="absolute inset-0 w-full h-full object-cover" alt="" />
+           )}
+           {currentStory?.media_type === 'video' && (
+              <video src={currentStory.media_url} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop />
+           )}
+           {currentStory?.content && (
+              <p className={`relative z-10 text-white text-2xl md:text-3xl font-black leading-tight drop-shadow-lg ${currentStory?.media_type !== 'text' ? 'bg-black/20 p-6 backdrop-blur-sm rounded-3xl' : ''}`}>
+                 {currentStory.content}
+              </p>
+           )}
+        </div>
+
+        {/* Navigation Overlays */}
+        <div className="absolute inset-y-0 left-0 w-1/3 z-30 cursor-pointer" onClick={handlePrev} />
+        <div className="absolute inset-y-0 right-0 w-1/3 z-30 cursor-pointer" onClick={handleNext} />
+        
+        {/* Desktop Buttons */}
+        <button 
+          onClick={handlePrev}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md hidden md:flex transition-all"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <button 
+          onClick={handleNext}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md hidden md:flex transition-all"
+        >
+          <ChevronRight size={24} />
+        </button>
+
+      </div>
+    </div>
+  )
 }
 
 export default StoryViewer
