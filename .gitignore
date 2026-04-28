@@ -3,3 +3,11 @@ node_modules/
 dist/
 build/
 .DS_Store
+Thumbs.db
+*.log
+test_output.txt
+test_result.txt
+.vscode/
+.idea/
+*.tmp
+*.crdownload
