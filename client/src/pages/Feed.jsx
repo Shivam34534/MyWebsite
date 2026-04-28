@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import StoriesBar from '../components/modals/StoriesBar'
 import PostCard from '../components/modals/PostCard'
-import { useSelector } from 'react-redux'
+import RecentMessages from '../components/modals/RecentMessages'
 import api from '../api/axios'
-import { Sparkles, TrendingUp, Users } from 'lucide-react'
+import { Sparkles, TrendingUp, Users, Plus } from 'lucide-react'
 
 const Feed = () => {
   const user = useSelector((state) => state.user.value)
+  const navigate = useNavigate()
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -33,6 +36,20 @@ const Feed = () => {
         {/* Main Feed Column */}
         <div className="flex-1 max-w-2xl mx-auto lg:mx-0">
           <StoriesBar user={user} />
+          
+          {/* Create Post Box (Quick Action) */}
+          <div className="bg-white rounded-[2rem] border border-gray-100 p-6 mb-8 shadow-sm flex gap-4 items-center">
+             <img src={user?.profile_picture || '/default-avatar.png'} className="w-11 h-11 rounded-full object-cover" alt="" />
+             <div 
+               onClick={() => navigate('/create-post')}
+               className="flex-1 bg-gray-50 hover:bg-gray-100 rounded-2xl px-6 py-3 text-gray-400 font-medium cursor-pointer transition-all"
+             >
+                What's on your mind, {user?.full_name?.split(' ')[0]}?
+             </div>
+             <button className="p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all">
+                <Plus size={20} />
+             </button>
+          </div>
           
           <div className="space-y-6">
             {loading ? (
