@@ -38,7 +38,7 @@
   }
   
   .glass-card {
-    @apply glass-effect rounded-2xl p-6 transition-all duration-300;
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass rounded-2xl p-6 transition-all duration-300;
   }
 
   .premium-button {
@@ -46,11 +46,11 @@
   }
 
   .button-primary {
-    @apply premium-button bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30;
   }
 
   .button-secondary {
-    @apply premium-button bg-white text-on-surface border border-gray-200 hover:bg-gray-50 hover:border-gray-300;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none bg-white text-on-surface border border-gray-200 hover:bg-gray-50 hover:border-gray-300;
   }
 
   .input-field {
