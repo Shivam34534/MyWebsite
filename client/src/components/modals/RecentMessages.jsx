@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../api/axios'
+import api from '../../api/axios'
 import { MessageCircle, ArrowRight } from 'lucide-react'
 import moment from 'moment'
 
