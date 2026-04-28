@@ -1,66 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Neo-Brutalism Design Tokens */
-  --font-headline: "Space Grotesk", sans-serif;
-  --font-sans: "Public Sans", sans-serif;
+  --font-headline: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Inter", sans-serif;
   
-  --color-primary: #A3E635; /* Lime */
-  --color-secondary: #FF90E8; /* Pink */
-  --color-tertiary: #FFD600; /* Yellow */
-  --color-accent: #00E1EF; /* Cyan */
+  --color-primary: #6366f1; /* Indigo */
+  --color-primary-dark: #4f46e5;
+  --color-secondary: #ec4899; /* Pink */
+  --color-accent: #10b981; /* Emerald */
   
   --color-surface: #ffffff;
-  --color-on-surface: #000000;
+  --color-surface-container: #f9fafb;
+  --color-on-surface: #111827;
+  --color-on-surface-variant: #6b7280;
   
-  --shadow-neo: 4px 4px 0px 0px #000000;
-  --shadow-neo-lg: 8px 8px 0px 0px #000000;
-  --shadow-neo-xl: 12px 12px 0px 0px #000000;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  
+  --shadow-premium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 @layer base {
   body {
-    @apply font-sans text-on-surface bg-[#F2F2F2] selection:bg-black selection:text-white antialiased;
+    @apply font-sans text-on-surface bg-[#F8FAFC] selection:bg-primary selection:text-white antialiased;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-headline font-black uppercase tracking-tighter;
+    @apply font-headline font-bold tracking-tight;
   }
-}
-
-@keyframes loading-bar {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
 }
 
 @layer components {
-  .neo-border {
-    @apply border-[3px] border-black;
+  .glass-effect {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass;
   }
   
-  .neo-shadow {
-    @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
-  }
-  
-  .neo-shadow-lg {
-    @apply shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
-  }
-  
-  .neo-shadow-hover {
-    @apply hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer;
-  }
-  
-  .neo-button {
-    @apply border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer px-6 py-2 bg-primary font-black uppercase tracking-tight active:translate-x-[2px] active:translate-y-[2px] active:shadow-none inline-flex items-center justify-center gap-2;
+  .glass-card {
+    @apply glass-effect rounded-2xl p-6 transition-all duration-300;
   }
 
-  .neo-card {
-    @apply border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white p-5 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all;
+  .premium-button {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
   }
 
-  .material-symbols-outlined {
-    @apply align-middle;
+  .button-primary {
+    @apply premium-button bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30;
+  }
+
+  .button-secondary {
+    @apply premium-button bg-white text-on-surface border border-gray-200 hover:bg-gray-50 hover:border-gray-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all;
+  }
+
+  .nav-link-active {
+    @apply text-primary bg-primary/10 font-semibold;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -70,5 +68,15 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Custom Animations */
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
   }
 }

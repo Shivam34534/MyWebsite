@@ -1,204 +1,158 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useParams, useNavigate } from 'react-router-dom'
-import UserProfileInfo from '../components/modals/UserProfileInfo'
-import PostCard from '../components/modals/PostCard'
-import Loading from '../components/modals/Loading'
-import ProfileModal from '../components/modals/ProfileModal'
-import toast from 'react-hot-toast'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useUser, useAuth } from '../mockClerk'
+import { useParams } from 'react-router-dom'
 import api from '../api/axios'
-import { assets } from '../assets/assets'
+import PostCard from '../components/modals/PostCard'
+import { MapPin, Link as LinkIcon, Calendar, Edit3, Grid, Heart, Bookmark, Settings } from 'lucide-react'
+import moment from 'moment'
 
 const Profile = () => {
-  const currentUser = useSelector((state) => state.user.value)
-  const navigate = useNavigate()
-  const { getToken } = useAuth()
   const { profileId } = useParams()
-  
-  const [user, setUser] = useState(null)
+  const loggedInUser = useSelector((state) => state.user.value)
+  const [profile, setProfile] = useState(null)
   const [posts, setPosts] = useState([])
-  const [likedPosts, setLikedPosts] = useState([])
   const [activeTab, setActiveTab] = useState('posts')
-  const [showEdit, setShowEdit] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  const fetchUser = async (targetId) => {
-    setLoading(true)
-    try {
-      const token = await getToken()
-      const { data } = await api.post('api/user/profiles', { profileId: targetId }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (data.success) {
-        setUser(data.profile)
-        setPosts(data.posts)
-        setLikedPosts(data.likedPosts || [])
-      } else {
-        toast.error(data.message)
-      }
-    } catch (error) {
-      console.error('Profile fetch error:', error)
-      toast.error("Failed to load profile data")
-    } finally {
-      setLoading(false)
-    }
-  }
+  const isOwnProfile = !profileId || profileId === loggedInUser?._id
 
   useEffect(() => {
-    const target = profileId || currentUser?._id
-    if (target) fetchUser(target)
-  }, [profileId, currentUser])
+    const fetchProfile = async () => {
+      try {
+        const id = profileId || loggedInUser?._id
+        if (!id) return
+        const { data } = await api.get(`/api/user/profile/${id}`)
+        if (data.success) {
+          setProfile(data.profile)
+          setPosts(data.posts)
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [profileId, loggedInUser])
 
-  if (loading && !user) return <Loading />
+  if (loading) return (
+    <div className="w-full max-w-4xl mx-auto mt-10 animate-pulse">
+        <div className="h-64 bg-gray-200 rounded-[2.5rem] mb-20" />
+        <div className="space-y-4">
+            <div className="h-8 w-1/3 bg-gray-200 rounded-lg" />
+            <div className="h-4 w-1/2 bg-gray-200 rounded-lg" />
+        </div>
+    </div>
+  )
 
-  return user ? (
-    <div className='w-full relative min-h-screen bg-[#F2F2F2] p-4 md:p-8 flex flex-col gap-10 overflow-y-auto no-scrollbar pb-24'>
-      <div className='max-w-5xl mx-auto w-full flex flex-col gap-10'>
+  if (!profile) return <div>User not found</div>
 
-        {/* Profile Shell */}
-        <div className='bg-white neo-border neo-shadow-lg flex flex-col overflow-hidden'>
-          {/* Cover Section */}
-          <div className='h-48 md:h-72 relative border-b-[4px] border-black bg-stone-200'>
-            {user.cover_picture ? (
-              <img 
-                src={user.cover_picture} 
-                alt="Banner" 
-                className='w-full h-full object-cover grayscale-[0.3]' 
-              />
-            ) : (
-              <div className='w-full h-full bg-accent' />
-            )}
-            <div className='absolute top-4 left-4 bg-black text-white px-4 py-1 neo-border text-xs font-black uppercase tracking-widest -rotate-2'>
-              SECURED_PROFILE.SYS
-            </div>
-          </div>
-
-          {/* User Details & Controls */}
-          <div className="relative pt-0 px-6 pb-8 md:px-12">
-             <UserProfileInfo 
-                user={user} 
-                posts={posts} 
-                profileId={profileId}
-                setShowEdit={setShowEdit} 
-              />
-          </div>
+  return (
+    <div className="max-w-4xl mx-auto animate-fade-in">
+      {/* Header Card */}
+      <div className="relative mb-8">
+        {/* Cover Image */}
+        <div className="h-48 md:h-64 w-full rounded-[2.5rem] overflow-hidden bg-gray-100 border border-gray-100 shadow-sm">
+          <img 
+            src={profile.cover_picture || 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=400&fit=crop'} 
+            className="w-full h-full object-cover"
+            alt="Cover"
+          />
         </div>
 
-        {/* Content Navigation Area */}
-        <div className='flex flex-col gap-8'>
-          <div className='flex items-center justify-center gap-4 border-b-[4px] border-black pb-0'>
-            {["posts", "media", "likes"].map((tab) => (
-              <button 
-                onClick={() => setActiveTab(tab)} 
-                key={tab} 
-                className={`pb-4 px-6 text-sm font-black uppercase tracking-widest transition-all relative ${
-                  activeTab === tab 
-                  ? "text-black" 
-                  : "text-black/30 hover:text-black hover:translate-y-[-2px]"
-                }`}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 w-full h-[6px] bg-primary border-t-[3px] border-black" />
-                )}
-              </button>
-            ))}
+        {/* Profile Info Overlay */}
+        <div className="px-6 md:px-10 -mt-16 relative z-10 flex flex-col md:flex-row items-end justify-between gap-6">
+          <div className="flex flex-col md:flex-row items-end gap-6 text-center md:text-left">
+            <div className="p-1.5 rounded-[2.2rem] bg-white shadow-xl shadow-gray-200/50 border border-gray-50">
+              <img 
+                src={profile.profile_picture || '/default-avatar.png'} 
+                className="w-32 h-32 md:w-40 md:h-40 rounded-[1.8rem] object-cover"
+                alt={profile.full_name}
+              />
+            </div>
+            <div className="pb-2">
+              <h1 className="text-3xl font-black text-gray-900">{profile.full_name}</h1>
+              <p className="text-gray-500 font-semibold mb-2">@{profile.username}</p>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {profile.location || 'Everywhere'}</span>
+                <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Joined {moment(profile.createdAt).format('MMM YYYY')}</span>
+              </div>
+            </div>
           </div>
-
-          {/* Render Active View */}
-          <section className='animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20'>
-            {activeTab === 'posts' && (
-              <div className='flex flex-col items-center gap-12'>
-                {posts.length > 0 ? (
-                  posts.map((post) => (
-                    <div key={post._id} className="w-full max-w-[640px]">
-                         <PostCard post={post} />
-                    </div>
-                  ))
-                ) : (
-                  <div className='py-20 text-center flex flex-col items-center gap-6 bg-white neo-border neo-shadow w-full max-w-xl mx-auto'>
-                    <div className="w-20 h-20 neo-border bg-stone-100 flex items-center justify-center -rotate-6">
-                        <span className="material-symbols-outlined text-5xl">folder_off</span>
-                    </div>
-                    <div className='flex flex-col gap-2'>
-                        <h3 className='text-3xl font-black'>EMPTY ARCHIVE</h3>
-                        <p className='text-xs font-bold uppercase tracking-widest opacity-60'>No stories have been curated by this user.</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+          
+          <div className="pb-2 flex gap-3">
+            {isOwnProfile ? (
+              <>
+                <button className="button-secondary px-5 py-2.5 flex items-center gap-2">
+                  <Edit3 className="w-4 h-4" /> Edit Profile
+                </button>
+                <button className="button-secondary p-2.5">
+                  <Settings className="w-5 h-5" />
+                </button>
+              </>
+            ) : (
+              <button className="button-primary px-8 py-2.5">Follow</button>
             )}
-
-            {activeTab === 'media' && (
-              <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
-                {posts.filter((post) => post.image_urls?.length > 0).map((post) => (
-                  <React.Fragment key={post._id}>
-                    {post.image_urls.map((image, index) => (
-                      <div 
-                        onClick={() => window.open(image, '_blank')}
-                        key={index} 
-                        className='relative group overflow-hidden aspect-square cursor-pointer neo-border bg-white shadow-[4px_4px_0px_0px_#000] hover:shadow-[8px_8px_0px_0px_#A3E635] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all'
-                      >
-                        <img src={image} className='w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0' alt="Media" />
-                        <div className='absolute bottom-2 right-2 bg-black text-white p-2 neo-border opacity-0 group-hover:opacity-100 transition-opacity'>
-                           <span className="material-symbols-outlined text-sm">fullscreen</span>
-                        </div>
-                      </div>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'likes' && (
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                {likedPosts.length > 0 ? (
-                  likedPosts.map((post) => (
-                    <div key={post._id} className="bg-white p-6 neo-border neo-shadow flex items-center justify-between group hover:bg-stone-50 transition-all cursor-pointer" onClick={() => navigate(`/profile/${post.user._id}`)}>
-                        <div className='flex items-center gap-5'>
-                            <div className='w-16 h-16 neo-border bg-black p-0.5 group-hover:rotate-3 transition-transform'>
-                                <div className='w-full h-full bg-stone-100 overflow-hidden'>
-                                    <img
-                                      src={post.user.profile_picture || assets.sample_profile}
-                                      onError={(e) => { e.target.src = assets.sample_profile }}
-                                      alt={post.user.full_name}
-                                      className='w-full h-full object-cover'
-                                    />
-                                </div>
-                            </div>
-                            <div className='flex flex-col'>
-                              <span className='text-lg font-black uppercase text-black leading-none italic'>
-                                @{post.user.username}
-                              </span>
-                              <span className='text-[10px] uppercase font-bold text-black/40 tracking-widest mt-1'>{post.user.full_name}</span>
-                            </div>
-                        </div>
-                        <div className="w-10 h-10 neo-border flex items-center justify-center bg-primary group-hover:bg-accent transition-colors">
-                            <span className="material-symbols-outlined">north_east</span>
-                        </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className='col-span-full py-20 text-center flex flex-col items-center gap-6 bg-white neo-border neo-shadow w-full max-w-xl mx-auto italic'>
-                    <div className="w-16 h-16 neo-border bg-pink-400 rotate-12 flex items-center justify-center">
-                        <Heart className="w-8 h-8 fill-black" />
-                    </div>
-                    <div className='flex flex-col gap-2'>
-                        <h3 className='text-3xl font-black'>NO LIKES DETECTED</h3>
-                        <p className='text-xs font-bold uppercase tracking-widest opacity-60'>Discovery is waiting. Heart something.</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
+          </div>
         </div>
       </div>
 
-      {showEdit && <ProfileModal setShowEdit={setShowEdit} onUpdate={() => fetchUser(profileId || currentUser?._id)} />}
+      {/* Stats Bar */}
+      <div className="glass-card bg-white/60 mb-8 flex items-center justify-around py-6 text-center">
+        {[
+          { label: 'Posts', value: posts.length },
+          { label: 'Followers', value: profile.followers?.length || 0 },
+          { label: 'Following', value: profile.following?.length || 0 },
+        ].map((stat, i) => (
+          <div key={i} className="flex flex-col">
+            <span className="text-xl font-black text-gray-900">{stat.value}</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Bio */}
+      <div className="px-6 mb-10">
+        <p className="text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
+          {profile.bio || "Crafting digital experiences and chasing high-fidelity vibes."}
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-100 mb-8 flex items-center gap-8 px-6 overflow-x-auto no-scrollbar">
+        {[
+          { id: 'posts', label: 'Posts', icon: Grid },
+          { id: 'liked', label: 'Liked', icon: Heart },
+          { id: 'saved', label: 'Saved', icon: Bookmark },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 pb-4 border-b-2 transition-all font-bold text-sm uppercase tracking-widest ${activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="px-2">
+        {activeTab === 'posts' && (
+          <div className="space-y-6">
+            {posts.length > 0 ? (
+              posts.map(post => <PostCard key={post._id} post={post} />)
+            ) : (
+              <div className="text-center py-20 text-gray-400 font-medium">No posts yet.</div>
+            )}
+          </div>
+        )}
+        {activeTab !== 'posts' && (
+          <div className="text-center py-20 text-gray-400 font-medium uppercase tracking-widest text-xs">This section is being curated...</div>
+        )}
+      </div>
     </div>
-  ) : (<Loading />)
+  )
 }
 
 export default Profile

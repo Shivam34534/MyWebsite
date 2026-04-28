@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import { assets } from '../assets/assets'
 import { useClerk } from '../mockClerk'
 import toast from 'react-hot-toast'
-import { X, Eye, EyeOff, Camera, MapPin, AtSign } from 'lucide-react'
+import { Eye, EyeOff, AtSign, User, Mail, Lock, MapPin, Sparkles } from 'lucide-react'
 
 const Login = () => {
   const { openSignIn, openSignUp } = useClerk()
@@ -10,7 +9,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
-  // Form State
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -27,157 +25,163 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-
     try {
       if (isSignup) {
-        const res = await openSignUp({
-          email: formData.email,
-          fullName: formData.fullName,
-          username: formData.username || formData.email.split('@')[0], 
-          location: formData.location || "Gallery Resident",
-          password: formData.password,
-        })
-        if (res.success) {
-          toast.success("Welcome to the Gallery!")
-        } else {
-          toast.error(res.message || "Failed to curate account")
-        }
+        const res = await openSignUp(formData)
+        if (res.success) toast.success("Welcome to Aura!")
+        else toast.error(res.message || "Signup failed")
       } else {
-        const res = await openSignIn({ 
-            email: formData.email, 
-            password: formData.password 
-        })
-        if (res.success) {
-          toast.success("Access granted")
-        } else {
-          toast.error(res.message || "Invalid credentials")
-        }
+        const res = await openSignIn({ email: formData.email, password: formData.password })
+        if (res.success) toast.success("Welcome back!")
+        else toast.error(res.message || "Invalid credentials")
       }
     } catch (error) {
-      console.error("Auth error:", error)
-      toast.error("An authentication error occurred")
+      toast.error("An error occurred")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="bg-[#F2F2F2] font-sans text-black min-h-screen selection:bg-black selection:text-white p-4 md:p-8 flex items-center justify-center">
-      
-      {/* 🏁 MAIN BOX */}
-      <main className="w-full max-w-6xl neo-border bg-white neo-shadow-lg flex flex-col md:flex-row overflow-hidden min-h-[600px]">
-            
-            {/* Left Section: Loud Branding & Visuals */}
-            <div className="md:w-[50%] bg-tertiary p-8 md:p-12 flex flex-col justify-between border-b-[4px] md:border-b-0 md:border-r-[4px] border-black">
-                <div>
-                   <div className="inline-block bg-black text-white px-4 py-2 neo-border mb-8 -rotate-2">
-                        <Camera className="w-8 h-8" />
-                   </div>
-                   <h1 className="text-7xl md:text-9xl font-black font-headline leading-[0.8] mb-6 tracking-tighter italic">
-                     AURA<br/><span className="text-secondary outline-text-black">SOCIAL</span>
-                   </h1>
-                   <p className="text-xl font-bold uppercase tracking-tight bg-white neo-border px-4 py-2 inline-block -rotate-1">
-                     Raw. Bold. Expressive.
-                   </p>
-                </div>
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+      {/* Decorative Background Elements */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px]" />
+      </div>
 
-                <div className="mt-12">
-                    <div className="neo-card bg-lime-400 rotate-1 max-w-sm">
-                        <p className="font-black text-lg">"The world is too soft. Let's make it brutal."</p>
-                        <div className="flex items-center gap-2 mt-4">
-                            <div className="w-6 h-1 bg-black" />
-                            <span className="text-xs font-black uppercase">The Aura Team</span>
-                        </div>
-                    </div>
+      <div className="w-full max-w-5xl flex flex-col md:flex-row bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+        
+        {/* Left: Branding & Inspiration */}
+        <div className="hidden md:flex md:w-[45%] bg-gradient-to-br from-primary to-primary-dark p-12 flex-col justify-between relative overflow-hidden">
+          {/* Abstract pattern */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent scale-150" />
+          </div>
+
+          <div className="relative z-10">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-8">
+              <Sparkles className="text-white w-6 h-6" />
+            </div>
+            <h1 className="text-5xl font-black text-white leading-tight mb-6">
+              Connect with<br />the next vibe.
+            </h1>
+            <p className="text-primary-foreground/80 text-lg font-medium leading-relaxed max-w-xs">
+              Aura is where modern creators share, connect, and inspire. Join the movement.
+            </p>
+          </div>
+
+          <div className="relative z-10">
+            <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20">
+              <p className="text-white/90 italic font-medium">"Finally, a social space that feels as good as it looks."</p>
+              <div className="flex items-center gap-3 mt-4">
+                <div className="w-8 h-8 rounded-full bg-secondary" />
+                <span className="text-white text-sm font-bold">@alex_studio</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Form Area */}
+        <div className="flex-1 p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white">
+          <div className="mb-10 text-center md:text-left">
+            <h2 className="text-3xl font-black text-gray-900 mb-2">
+              {isSignup ? 'Create Account' : 'Welcome Back'}
+            </h2>
+            <p className="text-gray-500 font-medium">
+              {isSignup ? 'Start your journey with Aura today.' : 'Please enter your details to continue.'}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {isSignup && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input 
+                      name="fullName" placeholder="John Doe" 
+                      className="input-field pl-12" required value={formData.fullName} onChange={handleChange} 
+                    />
+                  </div>
                 </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Username</label>
+                  <div className="relative">
+                    <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input 
+                      name="username" placeholder="johndoe" 
+                      className="input-field pl-12" required value={formData.username} onChange={handleChange} 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input 
+                  type="email" name="email" placeholder="you@example.com" 
+                  className="input-field pl-12" required value={formData.email} onChange={handleChange} 
+                />
+              </div>
             </div>
 
-            {/* Right Section: Form Container */}
-            <div className="flex-1 bg-white p-8 md:p-12 lg:p-16 flex flex-col">
-                <div className="mb-10 flex justify-between items-start">
-                    <h2 className="text-5xl font-black tracking-tighter">
-                        {isSignup ? 'NEW ENTRY' : 'RETURN'}
-                    </h2>
-                    <div className="w-12 h-12 bg-accent neo-border shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
-                        <AtSign className="w-6 h-6" />
-                    </div>
-                </div>
-
-                {/* Registration/Login Form */}
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    {isSignup && (
-                        <div className='grid grid-cols-1 gap-5'>
-                            <div className="space-y-1">
-                                <label className="text-xs font-black uppercase tracking-widest" htmlFor="fullName">Full Name</label>
-                                <input 
-                                    className="w-full bg-white neo-border px-4 py-4 text-lg font-bold outline-none focus:bg-lime-50 transition-colors" 
-                                    id="fullName" name="fullName" placeholder="SHIVAM ART" type="text" required value={formData.fullName} onChange={handleChange} 
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-xs font-black uppercase tracking-widest" htmlFor="username">Username</label>
-                                <input 
-                                    className="w-full bg-white neo-border px-4 py-4 text-lg font-bold outline-none focus:bg-lime-50 transition-colors" 
-                                    id="username" name="username" placeholder="shivam_345" type="text" required value={formData.username} onChange={handleChange} 
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="space-y-1">
-                        <label className="text-xs font-black uppercase tracking-widest" htmlFor="email">Email</label>
-                        <input 
-                            className="w-full bg-white neo-border px-4 py-4 text-lg font-bold outline-none focus:bg-pink-50 transition-colors" 
-                            id="email" name="email" placeholder="shivam@aura.xyz" type="email" required value={formData.email} onChange={handleChange} 
-                        />
-                    </div>
-
-                    <div className="space-y-1">
-                        <div className="flex justify-between items-center">
-                            <label className="text-xs font-black uppercase tracking-widest" htmlFor="password">Secret Key</label>
-                        </div>
-                        <div className="relative">
-                            <input 
-                                className="w-full bg-white neo-border px-4 py-4 text-lg font-bold outline-none focus:bg-pink-50 transition-colors" 
-                                id="password" name="password" placeholder="••••••••" type={showPassword ? "text" : "password"} required value={formData.password} onChange={handleChange} 
-                            />
-                            <button onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 hover:text-primary transition-colors" type="button">
-                               {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div className="pt-4">
-                        <button 
-                            disabled={loading}
-                            className={`w-full py-5 text-xl font-black uppercase tracking-widest transition-all
-                                ${loading ? 'bg-stone-200 cursor-not-allowed' : 'bg-primary neo-border shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 active:translate-x-1 active:translate-y-1 active:shadow-none'}`} 
-                            type="submit"
-                        >
-                            {loading ? 'WAITING...' : isSignup ? 'JOIN CLUB' : 'ENTER AURA'}
-                        </button>
-                    </div>
-                </form>
-
-                <p className="mt-8 text-center text-sm font-bold">
-                    {isSignup ? 'OLD MEMBER?' : "NOT A MEMBER?"}
-                    <button onClick={() => setIsSignup(!isSignup)} className="ml-2 text-primary hover:bg-black hover:text-white px-2 py-0.5 border-2 border-transparent hover:border-black transition-all uppercase underline">
-                        {isSignup ? 'LOGIN' : 'SIGN UP'}
-                    </button>
-                </p>
-
-                <div className="mt-auto pt-10 flex flex-wrap justify-center gap-6">
-                    <button className="flex items-center gap-2 font-black uppercase text-[10px] tracking-widest hover:translate-y-[-2px] transition-transform">
-                        <div className="w-2 h-2 bg-pink-500 rounded-full" /> Google
-                    </button>
-                    <button className="flex items-center gap-2 font-black uppercase text-[10px] tracking-widest hover:translate-y-[-2px] transition-transform">
-                        <div className="w-2 h-2 bg-black rounded-full" /> Github
-                    </button>
-                </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input 
+                  type={showPassword ? "text" : "password"} name="password" placeholder="••••••••" 
+                  className="input-field pl-12" required value={formData.password} onChange={handleChange} 
+                />
+                <button 
+                  type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
-      </main>
+
+            {isSignup && (
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Location (Optional)</label>
+                <div className="relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input 
+                    name="location" placeholder="New York, NY" 
+                    className="input-field pl-12" value={formData.location} onChange={handleChange} 
+                  />
+                </div>
+              </div>
+            )}
+
+            <button 
+              type="submit" disabled={loading}
+              className="w-full button-primary py-4 mt-4"
+            >
+              {loading ? 'Processing...' : isSignup ? 'Sign Up' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-gray-500 font-medium">
+              {isSignup ? 'Already have an account?' : "Don't have an account?"}
+              <button 
+                onClick={() => setIsSignup(!isSignup)}
+                className="ml-2 text-primary font-bold hover:underline"
+              >
+                {isSignup ? 'Sign In' : 'Create Account'}
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-
   )
 }
 

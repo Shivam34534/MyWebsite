@@ -1,157 +1,119 @@
 import React, { useState, useEffect } from 'react'
-import UserCard from '../components/modals/UserCard.jsx'
-import PostCard from '../components/modals/PostCard.jsx'
-import Loading from '../components/modals/Loading'
 import api from '../api/axios'
-import { useAuth } from '../mockClerk'
-import toast from 'react-hot-toast'
-import { assets } from '../assets/assets'
+import { Search, Sparkles, TrendingUp, Filter, ArrowRight } from 'lucide-react'
 
 const Discover = () => {
-  const [input, setInput] = useState('')
   const [users, setUsers] = useState([])
-  const [posts, setPosts] = useState([])
-  const [suggestedUsers, setSuggestedUsers] = useState([])
-  const [loading, setLoading] = useState(false)
-  const { getToken } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
-    const fetchInitialDiscover = async () => {
-      if (!input.trim()) {
-        try {
-          const token = await getToken();
-          const { data } = await api.post('/api/user/discover', { input: '' }, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (data.success) {
-            setSuggestedUsers(data.users.slice(0, 8));
-          }
-        } catch (error) {
-          console.error('Initial discover error', error);
-        }
-      } else {
-        setSuggestedUsers([]);
-      }
-    };
-    fetchInitialDiscover();
-  }, [input, getToken]);
-
-  useEffect(() => {
-    if (!input.trim()) {
-      setUsers([]);
-      setPosts([]);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setLoading(true);
+    const fetchUsers = async () => {
       try {
-        const token = await getToken();
-        const { data } = await api.get(`/api/search?query=${input}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const { data } = await api.post('/api/user/discover', { input: search })
         if (data.success) {
-          setUsers(data.users);
-          setPosts(data.posts);
-        } else {
-          toast.error(data.message || 'Failed to search');
+          setUsers(data.users)
         }
       } catch (error) {
-        console.error('Error during search:', error);
+        console.error("Discovery failed", error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [input, getToken]);
+    }
+    const timer = setTimeout(fetchUsers, 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
   return (
-    <div className='w-full min-h-screen bg-[#F2F2F2] px-4 sm:px-8 py-10 flex flex-col gap-12 overflow-y-auto no-scrollbar'>
-      {/* Title Section */}
-      <div className='flex flex-col gap-2 -rotate-1'>
-          <h1 className='text-6xl font-black italic tracking-tighter text-black uppercase leading-none'>DISCOVER.NET</h1>
-          <div className='bg-primary text-black px-3 py-1 neo-border text-[10px] font-black uppercase tracking-widest w-fit shadow-[4px_4px_0px_0px_#000]'>GLOBAL_ACCESS_ENABLED</div>
+    <div className="animate-fade-in">
+      <div className="mb-12">
+        <h1 className="text-4xl font-black text-gray-900 mb-2">Explore</h1>
+        <p className="text-gray-500 font-medium text-lg">Discover the next wave of creative minds.</p>
       </div>
 
-      {/* Global Search Canvas */}
-      <div className='relative w-full max-w-2xl group transition-all translate-y-2'>
-          <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-black text-[28px] font-black">search</span>
+      {/* Search Header */}
+      <div className="flex flex-col md:flex-row gap-4 mb-12">
+        <div className="flex-1 relative">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input 
-              type="text" 
-              placeholder='SEARCH_THE_VOID...'
-              className='w-full pl-16 pr-6 py-6 bg-white neo-border text-lg font-black placeholder:text-black/20 focus:bg-stone-50 outline-none transition-all uppercase tracking-widest shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]' 
-              onChange={(e) => setInput(e.target.value)} 
-              value={input} 
+            type="text" 
+            placeholder="Search by name, username, or location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-14 pr-6 py-5 rounded-[2rem] bg-white border border-gray-100 shadow-xl shadow-gray-200/30 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all text-lg font-medium"
           />
+        </div>
+        <button className="px-8 py-5 rounded-[2rem] bg-white border border-gray-100 shadow-xl shadow-gray-200/30 flex items-center gap-2 font-bold text-gray-600 hover:text-primary transition-all">
+          <Filter size={20} /> <span>Filters</span>
+        </button>
       </div>
+
+      {/* Content Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         
-      {loading ? (
-        <div className="py-20 flex justify-center items-center">
-            <Loading />
-        </div>
-      ) : (
-        <div className='flex flex-col gap-16 pb-24'>
-            {/* Suggested Creators Stage */}
-            {suggestedUsers.length > 0 && !input.trim() && (
-                <div className='flex flex-col gap-8'>
-                    <div className="flex items-center justify-between border-b-[4px] border-black pb-4">
-                        <h2 className='text-2xl font-black uppercase tracking-tighter italic'>HOT_CREATORS</h2>
-                        <span className="bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest neo-border">VERIFIED</span>
-                    </div>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
-                        {suggestedUsers.map((user) => (
-                            <UserCard user={user} key={user._id} />
-                        ))}
-                    </div>
+        {/* Main Discovery Grid */}
+        <div className="lg:col-span-2 space-y-10">
+          <section>
+             <div className="flex items-center justify-between mb-6 px-2">
+                <div className="flex items-center gap-2">
+                   <Sparkles className="text-primary w-5 h-5" />
+                   <h2 className="text-xl font-bold text-gray-900 uppercase tracking-wider text-xs">Suggested for you</h2>
                 </div>
-            )}
+                <button className="text-xs font-black text-primary hover:underline uppercase tracking-widest flex items-center gap-1">
+                   See All <ArrowRight size={12} />
+                </button>
+             </div>
 
-            {/* Search Result Creators */}
-            {users.length > 0 && (
-                <div className='flex flex-col gap-8 animate-in slide-in-from-bottom-4 duration-500'>
-                    <div className="flex items-center gap-4 border-b-[4px] border-black pb-4">
-                        <h2 className='text-2xl font-black uppercase tracking-tighter italic'>IDENTITIES_FOUND</h2>
-                        <span className="text-[10px] font-black text-black px-3 py-1 bg-accent neo-border shadow-[3px_3px_0px_0px_#000] uppercase">{users.length} HITS</span>
-                    </div>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
-                        {users.map((user) => (
-                            <UserCard user={user} key={user._id} />
-                        ))}
-                    </div>
-                </div>
-            )}
-            
-            {/* Search Result Gallery Items */}
-            {posts.length > 0 && (
-                <div className='flex flex-col gap-8 animate-in slide-in-from-bottom-4 duration-500'>
-                    <div className="flex items-center gap-4 border-b-[4px] border-black pb-4">
-                        <h2 className='text-2xl font-black uppercase tracking-tighter italic'>STORY_FRAGMENTS</h2>
-                    </div>
-                    <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8'>
-                        {posts.map((post) => (
-                            <PostCard post={post} key={post._id} />
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Empty Context */}
-            {input.trim() && users.length === 0 && posts.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-24 text-center gap-6 bg-white neo-border neo-shadow-lg max-w-xl mx-auto italic">
-                    <div className="w-20 h-20 neo-border bg-stone-100 flex items-center justify-center -rotate-6">
-                        <span className="material-symbols-outlined text-6xl font-black">error</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <h3 className="text-4xl font-black uppercase tracking-tight">NULL_RESULTS</h3>
-                        <p className="text-[10px] font-black uppercase tracking-widest opacity-40">The void returned nothing for your request.</p>
-                    </div>
-                </div>
-            )}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {loading ? (
+                   [1,2,3,4].map(i => <div key={i} className="h-48 bg-gray-100 rounded-[2rem] animate-pulse" />)
+                ) : users.map(user => (
+                   <div key={user._id} className="glass-card bg-white hover:border-primary/20 group">
+                      <div className="flex items-start justify-between mb-4">
+                         <img 
+                            src={user.profile_picture || '/default-avatar.png'} 
+                            className="w-16 h-16 rounded-[1.4rem] object-cover border-2 border-white shadow-sm"
+                            alt="" 
+                         />
+                         <button className="button-primary px-4 py-1.5 text-xs">Follow</button>
+                      </div>
+                      <h3 className="font-bold text-gray-900 mb-1 group-hover:text-primary transition-colors">{user.full_name}</h3>
+                      <p className="text-xs text-gray-400 font-medium mb-4">@{user.username}</p>
+                      <p className="text-[11px] text-gray-500 font-medium line-clamp-2">
+                         {user.bio || "No bio yet. This user is keeping it mysterious."}
+                      </p>
+                   </div>
+                ))}
+             </div>
+          </section>
         </div>
-      )}
+
+        {/* Sidebar Trends */}
+        <aside className="space-y-10">
+           <section>
+              <div className="flex items-center gap-2 mb-6">
+                <TrendingUp className="text-secondary w-5 h-5" />
+                <h2 className="text-xl font-bold text-gray-900 uppercase tracking-wider text-xs">Trending Curations</h2>
+              </div>
+              <div className="space-y-4">
+                 {[
+                   { title: 'Digital Art', posts: '12k+' },
+                   { title: 'Minimalism', posts: '8.4k' },
+                   { title: 'UI Design', posts: '5.2k' },
+                   { title: 'Web3', posts: '3.1k' }
+                 ].map((trend, i) => (
+                   <div key={i} className="p-4 rounded-2xl bg-white border border-gray-100 hover:shadow-lg transition-all cursor-pointer group">
+                      <div className="flex items-center justify-between">
+                         <span className="font-bold text-gray-900 group-hover:text-primary transition-colors">{trend.title}</span>
+                         <span className="text-[10px] font-black text-gray-400">{trend.posts} posts</span>
+                      </div>
+                   </div>
+                 ))}
+              </div>
+           </section>
+        </aside>
+      </div>
     </div>
-
   )
 }
 
